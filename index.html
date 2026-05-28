@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soyuco — Journal & AI Organizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Caveat:wght@400;600&family=Space+Grotesk:wght@300;400;600&family=Syne:wght@400;700;800&family=EB+Garamond:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@300;400&family=Bangers&family=Pacifico&family=Press+Start+2P&family=Satisfy&family=Fredoka+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="themes.css">
+</head>
+<body data-theme="default">
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-row">
+        <!-- Soyuco brand logo — auto-recolors with theme -->
+        <div class="logo-img-slot" id="logoSlot">
+          <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" style="width:36px;height:36px;display:block;transition:fill 0.2s;">
+            <g transform="translate(0,600) scale(0.1,-0.1)" fill="var(--accent2)" stroke="none">
+              <path d="M2771 4870 c-4 -289 -39 -718 -72 -885 -30 -148 -96 -330 -127 -349 -12 -7 -162 83 -254 152 -40 30 -140 111 -222 180 l-148 124 129 -153 c70 -85 152 -187 182 -227 74 -100 152 -233 144 -245 -13 -21 -161 -80 -267 -107 -184 -47 -446 -73 -849 -86 -114 -4 -206 -8 -205 -10 2 -1 118 -7 258 -13 549 -24 802 -64 998 -156 l74 -35 -39 -71 c-46 -85 -184 -272 -317 -426 -53 -62 -94 -113 -92 -113 2 0 56 44 120 98 63 55 157 131 208 170 98 74 253 172 273 172 15 0 66 -103 94 -189 53 -164 85 -426 105 -856 l12 -280 7 165 c25 558 51 774 114 975 27 85 66 169 83 180 14 9 126 -54 225 -125 67 -49 291 -230 374 -304 13 -11 -36 52 -110 140 -155 187 -232 291 -285 388 l-37 69 22 18 c65 53 304 117 530 143 123 14 226 21 636 43 l140 7 -185 7 c-582 23 -881 66 -1067 155 -40 19 -73 41 -73 48 0 42 164 273 342 482 54 64 98 118 98 120 0 3 -46 -35 -103 -83 -210 -180 -354 -286 -465 -342 l-43 -22 -39 83 c-77 160 -119 402 -140 798 -7 118 -15 269 -19 335 l-8 120 -2 -95z"/>
+              <path d="M4031 2749 c-2 -123 -20 -327 -37 -419 -17 -91 -59 -200 -79 -200 -18 0 -149 93 -245 173 l-84 72 79 -95 c80 -97 165 -220 165 -240 0 -17 -87 -50 -185 -71 -87 -17 -296 -37 -440 -41 -47 -1 -55 -3 -25 -5 25 -1 116 -7 203 -13 182 -12 290 -29 367 -59 88 -34 88 -34 65 -78 -21 -40 -147 -205 -199 -262 -17 -19 17 5 76 53 96 78 210 156 229 156 14 0 59 -120 73 -200 16 -87 35 -297 38 -430 1 -53 2 -61 5 -25 16 275 27 385 42 461 19 92 57 194 72 194 18 0 119 -68 217 -148 l103 -83 -88 109 c-106 131 -152 210 -132 223 74 47 223 76 488 93 108 8 165 14 126 15 -123 2 -337 21 -425 37 -73 13 -200 58 -200 71 0 24 62 111 210 296 14 18 -11 1 -60 -39 -92 -77 -217 -164 -235 -164 -15 0 -51 79 -69 150 -17 67 -34 225 -45 410 -6 104 -8 117 -10 59z"/>
+            </g>
+          </svg>
+        </div>
+        <div class="logo"><span id="appName">Soyuco</span><div class="logo-dot"></div></div>
+      </div>
+      <div class="date-display" id="sidebarDate"></div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Pages</div>
+      <button class="nav-item active" data-view="journal" onclick="switchView(this)">
+        <span class="icon">✦</span> Journal
+        <span class="count" id="entryCount">0</span>
+      </button>
+      <button class="nav-item" data-view="planner" onclick="switchView(this)">
+        <span class="icon">◈</span> Day Planner
+      </button>
+      <button class="nav-item ai-nav" data-view="ai" onclick="switchView(this)">
+        <span class="icon">⬡</span> AI Planner
+      </button>
+      <button class="nav-item" data-view="budget" onclick="switchView(this)">
+        <span class="icon">◎</span> Budget
+      </button>
+
+      <div class="nav-label" style="margin-top:12px">Collections</div>
+      <div id="collectionsNav"></div>
+      <button class="nav-item" onclick="newCollection()"><span class="icon">+</span> New Collection</button>
+    </div>
+
+    <div class="mood-bar">
+      <div class="mood-label">Today's mood</div>
+      <div class="mood-emojis">
+        <span class="mood-emoji" onclick="selectMood(this)" title="Awful">😔</span>
+        <span class="mood-emoji" onclick="selectMood(this)" title="Meh">😐</span>
+        <span class="mood-emoji" onclick="selectMood(this)" title="Okay">🙂</span>
+        <span class="mood-emoji" onclick="selectMood(this)" title="Good">😊</span>
+        <span class="mood-emoji" onclick="selectMood(this)" title="Great">🤩</span>
+      </div>
+    </div>
+
+    <div class="theme-section">
+      <!-- Standard themes -->
+      <div class="theme-label">Theme</div>
+      <div class="theme-swatches">
+        <div class="swatch active" data-t="default" onclick="setTheme(this)" title="Ember"></div>
+        <div class="swatch" data-t="parchment" onclick="setTheme(this)" title="Parchment"></div>
+        <div class="swatch" data-t="ocean" onclick="setTheme(this)" title="Ocean"></div>
+        <div class="swatch" data-t="forest" onclick="setTheme(this)" title="Forest"></div>
+        <div class="swatch" data-t="rose" onclick="setTheme(this)" title="Rose"></div>
+        <div class="swatch" data-t="terminal" onclick="setTheme(this)" title="Terminal"></div>
+        <div class="swatch" data-t="lavender" onclick="setTheme(this)" title="Lavender"></div>
+      </div>
+
+      <!-- PREMIUM THEMES -->
+      <div class="premium-label">
+        <span class="premium-crown">👑</span> Premium <span class="premium-badge">PRO</span>
+      </div>
+      <div class="theme-swatches">
+        <div class="swatch" data-t="spongebob" onclick="setTheme(this)" title="SpongeBob 🧽"></div>
+        <div class="swatch" data-t="meangirls" onclick="setTheme(this)" title="Mean Girls 💅"></div>
+        <div class="swatch" data-t="minecraft" onclick="setTheme(this)" title="Minecraft ⛏"></div>
+      </div>
+
+      <button class="custom-theme-btn" onclick="toggleCustomizer()">✦ Customize Theme</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main">
+    <div id="topbar">
+      <div class="topbar-title" id="topbarTitle">Journal</div>
+      <button class="btn btn-ghost" onclick="toggleCustomizer()">🎨 Theme</button>
+      <div style="position:relative;" id="accountArea">
+        <button class="btn btn-ghost" id="accountBtn" onclick="toggleAccountMenu()" style="display:flex;align-items:center;gap:6px;">◉ Sign In</button>
+        <div id="accountMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:220px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:200;overflow:hidden;">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+            <div style="font-family:var(--font-ui);font-size:0.82rem;font-weight:600;color:var(--text);">Guest</div>
+            <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);margin-top:2px;">Sign in to sync your data</div>
+          </div>
+          <button onclick="alert('Sign In — coming soon!')" style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text2);background:none;border:none;cursor:pointer;transition:background var(--transition);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">✦ Sign In</button>
+          <button onclick="alert('Create Account — coming soon!')" style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text2);background:none;border:none;cursor:pointer;transition:background var(--transition);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">◈ Create Account</button>
+          <div style="height:1px;background:var(--border);"></div>
+          <button style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text3);background:none;border:none;cursor:pointer;">⚙ Settings</button>
+          <button style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text3);background:none;cursor:pointer;">◇ Help</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="newBtn" onclick="newEntry()">✦ New Entry</button>
+    </div>
+
+    <div id="content">
+      <!-- Views are injected here via includes or kept inline -->
+
+      <!-- JOURNAL VIEW -->
+      <div class="view active" id="view-journal">
+        <div class="journal-layout">
+          <div class="entry-list">
+            <div class="entry-list-header">
+              <input class="entry-search" type="text" placeholder="Search entries..." oninput="filterEntries(this.value)">
+            </div>
+            <div id="entryListBody"></div>
+          </div>
+          <div class="editor-pane">
+            <div id="editorPlaceholder" class="empty-state fade-in">
+              <div class="empty-icon" id="emptyIcon">✦</div>
+              <div class="empty-title" id="emptyTitle">Begin your story</div>
+              <div class="empty-sub">Select an entry to read,<br>or create a new one to start writing.</div>
+            </div>
+            <div id="editorActive" style="display:none;flex-direction:column;height:100%;">
+              <div class="editor-toolbar">
+                <select class="font-family-picker" id="fontPicker" onchange="changeEditorFont(this.value)">
+                  <option value="'EB Garamond',serif">Garamond</option>
+                  <option value="'Playfair Display',serif">Playfair</option>
+                  <option value="'Caveat',cursive">Handwritten</option>
+                  <option value="'DM Mono',monospace">Mono</option>
+                  <option value="'Space Grotesk',sans-serif">Grotesk</option>
+                  <option value="'Syne',sans-serif">Syne</option>
+                  <option value="'Bangers',cursive">Bangers</option>
+                  <option value="'Press Start 2P',monospace">Pixel</option>
+                </select>
+                <input class="font-size-picker" type="number" value="17" min="10" max="36" id="fontSizePicker"
+                  onchange="document.getElementById('editorTextarea').style.fontSize=this.value+'px'">
+                <div class="editor-toolbar-sep"></div>
+                <button class="tool-btn" title="Bold"><b>B</b></button>
+                <button class="tool-btn" title="Italic"><i>I</i></button>
+                <button class="tool-btn" title="Underline"><u>U</u></button>
+                <div class="editor-toolbar-sep"></div>
+                <button class="tool-btn" onclick="aiAssistEntry()">⬡ AI Assist</button>
+                <div class="editor-toolbar-sep"></div>
+                <button class="tool-btn" onclick="saveEntry()">💾 Save</button>
+                <button class="tool-btn" onclick="deleteEntry()" style="color:var(--danger)">🗑 Delete</button>
+              </div>
+              <input class="entry-title-input" id="entryTitle" type="text" placeholder="Untitled entry…" oninput="onTitleChange()">
+              <div class="entry-meta">
+                <div class="meta-item">📅 <span id="metaDate">–</span></div>
+                <div class="meta-item editable" onclick="addTag()">🏷 <span id="metaTags">Add tag</span></div>
+                <div class="meta-item word-count">📝 <span id="wordCount">0</span> words</div>
+              </div>
+              <!-- Collection picker -->
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 32px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+                <span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text3);">◇ Collections:</span>
+                <div id="entryCollectionPicker" style="display:flex;gap:12px;flex-wrap:wrap;"></div>
+              </div>
+              <div class="editor-body">
+                <textarea class="editor-textarea" id="editorTextarea"
+                  placeholder="What's on your mind today? Let your thoughts flow freely…"
+                  oninput="onBodyChange()"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANNER VIEW -->
+      <div class="view" id="view-planner">
+        <div class="planner-layout">
+          <div class="planner-header">
+            <div class="planner-date-nav">
+              <button class="nav-btn" onclick="changeDay(-1)">◀</button>
+              <div class="planner-date-title" id="plannerDate"></div>
+              <button class="nav-btn" onclick="changeDay(1)">▶</button>
+              <button class="btn btn-ghost" style="font-size:.75rem;padding:5px 10px;" onclick="goToday()">Today</button>
+            </div>
+            <button class="btn btn-ai" onclick="switchView(document.querySelector('[data-view=ai]'))">⬡ Plan with AI</button>
+          </div>
+
+          <!-- Planner grid — calendar + schedule share the left column -->
+          <div class="planner-grid">
+            <div class="planner-col">
+
+              <!-- Calendar sits at the top of the left column -->
+              <div class="planner-card">
+                <div class="planner-card-header" style="padding:8px 12px;">
+                  <button class="nav-btn" style="padding:3px 7px;font-size:0.75rem;" onclick="calPrevMonth()">◀</button>
+                  <div class="planner-card-title" id="calendarMonthLabel" style="text-transform:none;font-size:0.78rem;letter-spacing:0;color:var(--text);"></div>
+                  <button class="nav-btn" style="padding:3px 7px;font-size:0.75rem;" onclick="calNextMonth()">▶</button>
+                </div>
+                <div class="planner-card-body" style="padding:6px 10px 10px;">
+                  <div id="calendarGrid" class="cal-grid"></div>
+                </div>
+              </div>
+
+              <!-- Schedule below the calendar -->
+              <div class="planner-card">
+                <div class="planner-card-header">
+                  <div class="planner-card-title" id="scheduleCardTitle">⏱ Schedule</div>
+                  <button class="btn btn-ghost" style="font-size:.68rem;padding:3px 8px;" onclick="openEventModal(9, plannerDay.toDateString(), false)">+ Event</button>
+                </div>
+                <div class="planner-card-body" id="scheduleBody"></div>
+              </div>
+            </div>
+
+            <div class="planner-col">
+              <div class="planner-card">
+                <div class="planner-card-header">
+                  <div class="planner-card-title" id="tasksCardTitle">☑ Tasks</div>
+                  <span id="todoProgress" style="font-family:var(--font-mono);font-size:.68rem;color:var(--text3)"></span>
+                </div>
+                <div class="planner-card-body">
+                  <div id="todoList"></div>
+                  <button class="add-todo" onclick="openTodoModal()">+ Add task</button>
+                </div>
+              </div>
+              <div class="planner-card">
+                <div class="planner-card-header">
+                  <div class="planner-card-title" id="habitsCardTitle">◈ Habits</div>
+                  <button class="btn btn-ghost" style="font-size:.68rem;padding:3px 8px;" onclick="openHabitModal()">+ Habit</button>
+                </div>
+                <div class="planner-card-body" id="habitBody"></div>
+              </div>
+              <div class="planner-card">
+                <div class="planner-card-header">
+                  <div class="planner-card-title">📈 Mood This Week</div>
+                </div>
+                <div class="planner-card-body">
+                  <div class="mood-chart" id="moodChart"></div>
+                  <div style="padding-top:20px;"></div>
+                </div>
+              </div>
+              <div class="planner-card">
+                <div class="planner-card-header">
+                  <div class="planner-card-title" id="quoteCardTitle">✦ Daily Spark</div>
+                  <button class="btn btn-ghost" style="font-size:.68rem;padding:3px 8px;" onclick="newQuote()">↻</button>
+                </div>
+                <div class="planner-card-body">
+                  <div class="daily-quote" id="dailyQuote"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI PLANNER VIEW -->
+      <div class="view" id="view-ai">
+        <div class="ai-layout">
+          <div class="ai-hero">
+            <div class="ai-hero-title" id="aiHeroTitle">⬡ AI Day Planner</div>
+            <div class="ai-hero-sub">Describe your day, goals, or constraints — I'll build your perfect schedule.</div>
+            <div class="ai-input-row">
+              <textarea class="ai-prompt-box" id="aiPrompt" rows="2"
+                placeholder="e.g. I have a team meeting at 2pm, need to finish a report, want to exercise, and have dinner with family at 7pm…"
+                onkeydown="if((e=event).key==='Enter'&&(e.ctrlKey||e.metaKey))sendAiPlan()"></textarea>
+              <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiPlan()">
+                <span id="aiSendLabel">⬡ Plan My Day</span>
+              </button>
+            </div>
+            <div class="ai-chips">
+              <div class="ai-chip" onclick="fillChip('Productive work day with deep focus blocks and regular breaks')">💼 Productive</div>
+              <div class="ai-chip" onclick="fillChip('Relaxed Sunday with self-care, light exercise, and reading')">🌿 Relaxed</div>
+              <div class="ai-chip" onclick="fillChip('Balanced day mixing work, exercise, creative time, and social activities')">⚖️ Balanced</div>
+              <div class="ai-chip" onclick="fillChip('High energy fitness day with morning workout, healthy meals, and recovery')">💪 Fitness</div>
+              <div class="ai-chip" onclick="fillChip('Creative day focused on art, writing, music and inspiration')">🎨 Creative</div>
+              <div class="ai-chip" onclick="fillChip('Minimal, meditative day with journaling, meditation, nature walks')">🧘 Mindful</div>
+            </div>
+          </div>
+          <div class="ai-body" id="aiBody">
+            <div id="aiInsights" style="margin-bottom:20px;"></div>
+            <div id="aiThread"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUDGET VIEW -->
+      <div class="view" id="view-budget">
+        <div class="ai-layout">
+          <div class="ai-hero">
+            <div class="ai-hero-title" id="budgetHeroTitle">◎ Budget Planner</div>
+            <div class="ai-hero-sub">Track your income, expenses, and savings goals — all in one place.</div>
+          </div>
+          <div class="ai-body">
+            <!-- Summary strip -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+              <div class="planner-card" style="border-left:3px solid var(--success);">
+                <div class="planner-card-body">
+                  <div class="planner-card-title">Income</div>
+                  <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--text);margin:6px 0 2px;" id="bIncome">$0.00</div>
+                  <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);">This month</div>
+                </div>
+              </div>
+              <div class="planner-card" style="border-left:3px solid var(--danger);">
+                <div class="planner-card-body">
+                  <div class="planner-card-title">Expenses</div>
+                  <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--text);margin:6px 0 2px;" id="bExpenses">$0.00</div>
+                  <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);">This month</div>
+                </div>
+              </div>
+              <div class="planner-card" style="border-left:3px solid var(--accent);">
+                <div class="planner-card-body">
+                  <div class="planner-card-title">Balance</div>
+                  <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;margin:6px 0 2px;" id="bBalance">$0.00</div>
+                  <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);">Remaining</div>
+                </div>
+              </div>
+              <div class="planner-card" style="border-left:3px solid var(--accent2);">
+                <div class="planner-card-body">
+                  <div class="planner-card-title">Savings</div>
+                  <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--text);margin:6px 0 2px;" id="bSavings">$0.00</div>
+                  <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);"><span id="bSavingsPct">0%</span> of goal</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spending Trend Chart -->
+            <div class="planner-card" style="margin-bottom:20px;">
+              <div class="planner-card-header">
+                <div class="planner-card-title">📈 Spending Trend</div>
+                <div style="display:flex;gap:4px;">
+                  <button id="trendBtn7"   class="btn btn-primary" style="font-size:0.65rem;padding:3px 10px;" onclick="setTrendRange(7)">7d</button>
+                  <button id="trendBtn30"  class="btn btn-ghost"   style="font-size:0.65rem;padding:3px 10px;" onclick="setTrendRange(30)">30d</button>
+                  <button id="trendBtn365" class="btn btn-ghost"   style="font-size:0.65rem;padding:3px 10px;" onclick="setTrendRange(365)">1y</button>
+                </div>
+              </div>
+              <div class="planner-card-body" style="padding:12px 16px 16px;">
+                <div id="trendChartWrap">
+                  <svg id="trendChart" width="100%" height="160" style="display:block;overflow:visible;"></svg>
+                  <div id="trendEmpty" style="display:none;font-family:var(--font-ui);font-size:0.78rem;color:var(--text3);text-align:center;padding:40px 0;">No expense data for this period.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Two column grid -->
+            <div class="planner-grid">
+              <!-- Left col: transactions -->
+              <div class="planner-col">
+                <div class="planner-card">
+                  <div class="planner-card-header">
+                    <div class="planner-card-title">◈ Transactions</div>
+                    <button class="btn btn-ghost" style="font-size:.68rem;padding:3px 8px;" onclick="openTxModal()">+ Add</button>
+                  </div>
+                  <div style="padding:0;max-height:420px;overflow-y:auto;" id="txListWrap">
+                    <div id="txList"></div>
+                    <div id="txEmpty" style="padding:20px;font-family:var(--font-ui);font-size:0.78rem;color:var(--text3);text-align:center;">No transactions yet. Add one above.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right col: categories, goals, limits -->
+              <div class="planner-col">
+                <div class="planner-card">
+                  <div class="planner-card-header">
+                    <div class="planner-card-title">◇ Spending by Category</div>
+                  </div>
+                  <div class="planner-card-body">
+                    <div id="byCat"></div>
+                    <div id="byCatEmpty" style="font-family:var(--font-ui);font-size:0.78rem;color:var(--text3);text-align:center;">Add transactions to see breakdown.</div>
+                  </div>
+                </div>
+
+                <div class="planner-card">
+                  <div class="planner-card-header">
+                    <div class="planner-card-title">⬡ Savings Goals</div>
+                    <button class="btn btn-ghost" style="font-size:.68rem;padding:3px 8px;" onclick="openGoalModal()">+ Goal</button>
+                  </div>
+                  <div class="planner-card-body">
+                    <div id="goalsList"></div>
+                    <div id="goalsEmpty" style="font-family:var(--font-ui);font-size:0.78rem;color:var(--text3);text-align:center;">No savings goals yet.</div>
+                  </div>
+                </div>
+
+                <div class="planner-card">
+                  <div class="planner-card-header">
+                    <div class="planner-card-title">✦ Budget Limits</div>
+                    <button class="btn btn-ghost" style="font-size:.68rem;padding:3px 8px;" onclick="openLimitModal()">+ Limit</button>
+                  </div>
+                  <div class="planner-card-body">
+                    <div id="limitsList"></div>
+                    <div id="limitsEmpty" style="font-family:var(--font-ui);font-size:0.78rem;color:var(--text3);text-align:center;">Set spending limits per category.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MODALS -->
+  <!-- Add/Edit Transaction Modal -->
+  <div id="txModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;" onclick="if(event.target===this)closeTxModal()">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:400px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;" id="txModalTitle">Add Transaction</div>
+        <button class="close-btn" onclick="closeTxModal()">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Description</label>
+          <input id="txDesc" type="text" placeholder="e.g. Grocery shopping" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Amount ($)</label>
+          <input id="txAmount" type="number" min="0" step="0.01" placeholder="0.00" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Type</label>
+          <div style="display:flex;gap:8px;">
+            <button id="btnExpense" class="btn btn-primary" onclick="setTxType('expense')">Expense</button>
+            <button id="btnIncome" class="btn btn-ghost" onclick="setTxType('income')">Income</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Category</label>
+          <select id="txCat" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+            <option value="food">🍔 Food & Dining</option>
+            <option value="transport">🚗 Transport</option>
+            <option value="housing">🏠 Housing</option>
+            <option value="health">💊 Health</option>
+            <option value="entertainment">🎬 Entertainment</option>
+            <option value="shopping">🛍 Shopping</option>
+            <option value="utilities">💡 Utilities</option>
+            <option value="salary">💼 Salary</option>
+            <option value="other">◇ Other</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Date</label>
+          <input id="txDate" type="date" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button id="txModalDeleteBtn" class="btn" style="color:var(--danger);border:1px solid var(--danger);display:none;" onclick="deleteTxModal()">🗑 Delete</button>
+        <div style="display:flex;gap:10px;margin-left:auto;">
+          <button class="btn btn-ghost" onclick="closeTxModal()">Cancel</button>
+          <button id="txModalSaveBtn" class="btn btn-primary" onclick="saveTx()">Add Transaction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Savings Adjustment Modal -->
+  <div id="savingsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:380px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;" id="savingsModalGoalName">Goal</div>
+        <button class="close-btn" onclick="closeModal('savingsModal')">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-family:var(--font-ui);font-size:0.78rem;color:var(--text2);">
+          Currently saved: <span style="font-family:var(--font-mono);color:var(--accent2);" id="savingsModalCurrent">$0.00</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Amount ($)</label>
+          <input id="savingsModalAmount" type="number" min="0" step="0.01" placeholder="0.00"
+            style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeModal('savingsModal')">Cancel</button>
+        <button class="btn" style="background:var(--danger);color:#fff;" onclick="applySavings(false)">− Remove</button>
+        <button class="btn btn-primary" onclick="applySavings(true)">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Goal Modal -->
+  <div id="goalModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;" onclick="if(event.target===this)closeGoalModal()">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:380px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;">Add Savings Goal</div>
+        <button class="close-btn" onclick="closeGoalModal()">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Goal Name</label>
+          <input id="goalName" type="text" placeholder="e.g. New Laptop, Holiday Fund" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Target Amount ($)</label>
+          <input id="goalTarget" type="number" min="0" step="1" placeholder="1000" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Saved So Far ($)</label>
+          <input id="goalSaved" type="number" min="0" step="1" placeholder="0" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeGoalModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveGoal()">Add Goal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Set Limit Modal -->
+  <div id="limitModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;" onclick="if(event.target===this)closeLimitModal()">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:360px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;">Set Budget Limit</div>
+        <button class="close-btn" onclick="closeLimitModal()">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Category</label>
+          <select id="limitCat" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+            <option value="food">🍔 Food & Dining</option>
+            <option value="transport">🚗 Transport</option>
+            <option value="housing">🏠 Housing</option>
+            <option value="health">💊 Health</option>
+            <option value="entertainment">🎬 Entertainment</option>
+            <option value="shopping">🛍 Shopping</option>
+            <option value="utilities">💡 Utilities</option>
+            <option value="other">◇ Other</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Monthly Limit ($)</label>
+          <input id="limitAmt" type="number" min="0" step="1" placeholder="500" style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeLimitModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveLimit()">Set Limit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME CUSTOMIZER PANEL -->
+  <div id="customizer">
+    <div class="customizer-header">
+      <div class="customizer-title">✦ Theme Customizer</div>
+      <button class="close-btn" onclick="toggleCustomizer()">✕</button>
+    </div>
+    <div class="customizer-body">
+      <div class="c-section">
+        <span class="c-label">Preset Base</span>
+        <div class="c-row">
+          <span class="c-row-label">Start from preset</span>
+          <select class="c-select" onchange="setThemeByName(this.value)">
+            <option value="default">Ember (Dark)</option>
+            <option value="parchment">Parchment (Light)</option>
+            <option value="ocean">Midnight Ocean</option>
+            <option value="forest">Forest</option>
+            <option value="rose">Rose</option>
+            <option value="terminal">Terminal</option>
+            <option value="lavender">Lavender (Light)</option>
+            <option disabled>── 👑 Premium ──</option>
+            <option value="spongebob">SpongeBob 🧽</option>
+            <option value="meangirls">Mean Girls 💅</option>
+            <option value="minecraft">Minecraft ⛏</option>
+          </select>
+        </div>
+      </div>
+      <div class="c-section">
+        <span class="c-label">Colors</span>
+        <div class="c-row"><span class="c-row-label">Background</span><input type="color" class="color-swatch-input" id="c-bg" onchange="applyCustomColor('--bg',this.value)"></div>
+        <div class="c-row"><span class="c-row-label">Surface</span><input type="color" class="color-swatch-input" id="c-surface" onchange="applyCustomColor('--surface',this.value)"></div>
+        <div class="c-row"><span class="c-row-label">Text</span><input type="color" class="color-swatch-input" id="c-text" onchange="applyCustomColor('--text',this.value)"></div>
+        <div class="c-row"><span class="c-row-label">Accent</span><input type="color" class="color-swatch-input" id="c-accent" onchange="applyCustomColor('--accent',this.value)"></div>
+        <div class="c-row"><span class="c-row-label">Border</span><input type="color" class="color-swatch-input" id="c-border" onchange="applyCustomColor('--border',this.value)"></div>
+      </div>
+      <div class="c-section">
+        <span class="c-label">Typography</span>
+        <div class="c-row">
+          <span class="c-row-label">Display font</span>
+          <select class="c-select" onchange="applyCustomVar('--font-display',this.value)">
+            <option value="'Playfair Display',serif">Playfair Display</option>
+            <option value="'EB Garamond',serif">EB Garamond</option>
+            <option value="'Syne',sans-serif">Syne</option>
+            <option value="'Space Grotesk',sans-serif">Space Grotesk</option>
+            <option value="'Caveat',cursive">Caveat</option>
+            <option value="'DM Mono',monospace">DM Mono</option>
+            <option value="'Bangers',cursive">Bangers</option>
+            <option value="'Satisfy',cursive">Satisfy</option>
+            <option value="'Press Start 2P',monospace">Pixel</option>
+          </select>
+        </div>
+        <div class="c-row">
+          <span class="c-row-label">Body font</span>
+          <select class="c-select" onchange="applyCustomVar('--font-body',this.value)">
+            <option value="'EB Garamond',serif">EB Garamond</option>
+            <option value="'Playfair Display',serif">Playfair Display</option>
+            <option value="'Space Grotesk',sans-serif">Space Grotesk</option>
+            <option value="'DM Mono',monospace">DM Mono</option>
+            <option value="'Caveat',cursive">Caveat</option>
+            <option value="'Fredoka One',cursive">Fredoka One</option>
+          </select>
+        </div>
+      </div>
+      <div class="c-section">
+        <span class="c-label">Layout & Feel</span>
+        <div class="c-row">
+          <span class="c-row-label">Border radius</span>
+          <input type="range" class="c-slider" min="0" max="24" value="2" id="radiusSlider"
+            oninput="applyCustomVar('--radius',this.value+'px');applyCustomVar('--radius-lg',(+this.value*2)+'px');document.getElementById('radiusVal').textContent=this.value">
+          <span class="c-value" id="radiusVal">2</span>
+        </div>
+        <div class="c-row">
+          <span class="c-row-label">Sidebar width</span>
+          <input type="range" class="c-slider" min="180" max="340" value="265" id="sidebarSlider"
+            oninput="applyCustomVar('--sidebar-w',this.value+'px');document.getElementById('sidebarVal').textContent=this.value">
+          <span class="c-value" id="sidebarVal">265</span>
+        </div>
+      </div>
+      <div class="c-section">
+        <span class="c-label">Export / Import</span>
+        <button class="c-apply-btn" onclick="exportTheme()">Export Theme as CSS</button>
+        <button class="c-export-btn" onclick="importTheme()">Import Theme CSS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENT MODAL -->
+  <div id="eventModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:400px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;" id="eventModalTitle">Add Event</div>
+        <button class="close-btn" onclick="closeModal('eventModal')">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Event Title</label>
+          <input id="eventModalInput" type="text" placeholder="e.g. Team meeting, Lunch, Gym…"
+            style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);"
+            onkeydown="if(event.key==='Enter')saveEventModal()">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button id="eventModalDeleteBtn" class="btn" style="color:var(--danger);border:1px solid var(--danger);display:none;" onclick="deleteEventModal()">🗑 Delete</button>
+        <div style="display:flex;gap:10px;margin-left:auto;">
+          <button class="btn btn-ghost" onclick="closeModal('eventModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEventModal()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK MODAL -->
+  <div id="todoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:400px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;" id="todoModalTitle">Add Task</div>
+        <button class="close-btn" onclick="closeModal('todoModal')">✕</button>
+      </div>
+      <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Task</label>
+          <input id="todoModalInput" type="text" placeholder="What needs to be done?"
+            style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);"
+            onkeydown="if(event.key==='Enter')saveTodoModal()">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Priority</label>
+          <select id="todoModalPriority"
+            style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);cursor:pointer;">
+            <option value="high">🔴 High</option>
+            <option value="med" selected>🟡 Medium</option>
+            <option value="low">🟢 Low</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button id="todoModalDeleteBtn" class="btn" style="color:var(--danger);border:1px solid var(--danger);display:none;" onclick="deleteTodoModal()">🗑 Delete</button>
+        <div style="display:flex;gap:10px;margin-left:auto;">
+          <button class="btn btn-ghost" onclick="closeModal('todoModal')">Cancel</button>
+          <button id="todoModalSaveBtn" class="btn btn-primary" onclick="saveTodoModal()">Add Task</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HABIT MODAL -->
+  <div id="habitModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:380px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;">Add Habit</div>
+        <button class="close-btn" onclick="closeModal('habitModal')">✕</button>
+      </div>
+      <div style="padding:18px 20px;">
+        <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Habit Name</label>
+        <input id="habitModalInput" type="text" placeholder="e.g. Morning pages, Exercise, Meditate…"
+          style="margin-top:8px;width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);"
+          onkeydown="if(event.key==='Enter')saveHabitModal()">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeModal('habitModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveHabitModal()">Add Habit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAG MODAL -->
+  <div id="tagModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:380px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;">Add Tag</div>
+        <button class="close-btn" onclick="closeModal('tagModal')">✕</button>
+      </div>
+      <div style="padding:18px 20px;">
+        <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Tag</label>
+        <input id="tagModalInput" type="text" placeholder="e.g. gratitude, ideas, work…"
+          style="margin-top:8px;width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);"
+          onkeydown="if(event.key==='Enter')saveTagModal()">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeModal('tagModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTagModal()">Add Tag</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE COLLECTION CONFIRMATION MODAL -->
+  <div id="deleteCollectionModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:360px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="padding:24px 24px 16px;">
+        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--text);font-style:italic;margin-bottom:8px;">Delete Collection?</div>
+        <div style="font-family:var(--font-ui);font-size:0.82rem;color:var(--text2);line-height:1.6;">The collection will be removed. Your journal entries will not be deleted.</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeModal('deleteCollectionModal')">Cancel</button>
+        <button class="btn" style="background:var(--danger);color:#fff;" onclick="confirmDeleteCollection()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE ENTRY CONFIRMATION MODAL -->
+  <div id="deleteEntryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:360px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="padding:24px 24px 16px;">
+        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--text);font-style:italic;margin-bottom:8px;">Delete Entry?</div>
+        <div style="font-family:var(--font-ui);font-size:0.82rem;color:var(--text2);line-height:1.6;">This entry will be permanently deleted and cannot be recovered.</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeModal('deleteEntryModal')">Cancel</button>
+        <button class="btn" style="background:var(--danger);color:#fff;" onclick="confirmDeleteEntry()">Delete</button>
+      </div>
+    </div>
+  </div>
+  <div id="collectionModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);width:380px;max-width:94vw;box-shadow:var(--shadow-lg);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text);font-style:italic;">New Collection</div>
+        <button class="close-btn" onclick="closeModal('collectionModal')">✕</button>
+      </div>
+      <div style="padding:18px 20px;">
+        <label style="font-family:var(--font-ui);font-size:0.7rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Collection Name</label>
+        <input id="collectionModalInput" type="text" placeholder="e.g. Gratitude, Dreams, Work…"
+          style="margin-top:8px;width:100%;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-family:var(--font-ui);font-size:0.85rem;color:var(--text);"
+          onkeydown="if(event.key==='Enter')saveCollectionModal()">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border);">
+        <button class="btn btn-ghost" onclick="closeModal('collectionModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCollectionModal()">Create</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- JavaScript modules -->
+<script src="js/state.js"></script>
+<script src="js/journal.js"></script>
+<script src="js/planner.js"></script>
+<script src="js/ai-planner.js"></script>
+<script src="js/budget.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
