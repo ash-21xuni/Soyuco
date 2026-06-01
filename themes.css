@@ -246,7 +246,7 @@ a{color:var(--accent);text-decoration:none;}
 
 /* Logo image slot */
 .logo-img-slot{
-  width:36px;height:36px;flex-shrink:0;
+  width:45px;height:45px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;position:relative;
 }
