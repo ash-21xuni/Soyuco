@@ -12,6 +12,69 @@
     <link rel="stylesheet" href="themes.css" />
   </head>
   <body data-theme="default">
+    <!-- #region Auth Check -->
+    <script type="module">
+        import { supabase, getCurrentUser } from './supabase-client.js'
+        
+        async function checkAuth() {
+            // Check localStorage for session
+            const savedSession = localStorage.getItem('soyuco_session')
+            let session = null
+            
+            if (savedSession) {
+                session = JSON.parse(savedSession)
+                // Check if session is expired
+                if (session.expires_at < Date.now() / 1000) {
+                    localStorage.removeItem('soyuco_session')
+                    session = null
+                }
+            }
+            
+            // If no valid session, redirect to login
+            if (!session) {
+                window.location.href = 'login.html'
+                return
+            }
+            
+            // Set the session in Supabase
+            await supabase.auth.setSession(session)
+            
+            // Get current user
+            const user = await getCurrentUser()
+            if (!user) {
+                localStorage.removeItem('soyuco_session')
+                window.location.href = 'login.html'
+                return
+            }
+            
+            // Store user globally
+            window.currentUser = user
+            
+            // Update UI with user name
+            const userNameSpan = document.getElementById('userName')
+            const userAvatar = document.getElementById('userAvatar')
+            const userEmailDisplay = document.getElementById('userEmailDisplay')
+            
+            if (userNameSpan) {
+                const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'
+                userNameSpan.textContent = displayName
+                if (userAvatar) {
+                    userAvatar.textContent = displayName.charAt(0).toUpperCase()
+                    userAvatar.style.fontWeight = 'bold'
+                }
+                if (userEmailDisplay) {
+                    userEmailDisplay.textContent = user.email
+                }
+            }
+            
+            console.log('✅ Authenticated as:', user.email)
+        }
+        
+        // Run auth check
+        await checkAuth()
+    </script>
+<!-- #endregion-->
+
     <!-- #region App -->
     <div id="app">
       <!-- SIDEBAR -->
@@ -278,116 +341,20 @@
             🎨 Theme
           </button>
           <div style="position: relative" id="accountArea">
-            <button
-              class="btn btn-ghost"
-              id="accountBtn"
-              onclick="toggleAccountMenu()"
-              style="display: flex; align-items: center; gap: 6px"
-            >
-              ◉ Sign In
-            </button>
-            <div
-              id="accountMenu"
-              style="
-                display: none;
-                position: absolute;
-                top: calc(100% + 8px);
-                right: 0;
-                width: 220px;
-                background: var(--bg2);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-lg);
-                box-shadow: var(--shadow-lg);
-                z-index: 200;
-                overflow: hidden;
-              "
-            >
-              <div
-                style="
-                  padding: 14px 16px;
-                  border-bottom: 1px solid var(--border);
-                "
-                id="accountMenuHeader"
-              >
-                <div
-                  style="
-                    font-family: var(--font-ui);
-                    font-size: 0.82rem;
-                    font-weight: 600;
-                    color: var(--text);
-                  "
-                  id="accountUserName"
-                >
-                  Guest
-                </div>
-                <div
-                  style="
-                    font-family: var(--font-mono);
-                    font-size: 0.62rem;
-                    color: var(--text3);
-                    margin-top: 2px;
-                  "
-                  id="accountUserStatus"
-                >
-                  Sign in to sync your data
-                </div>
+              <button class="btn btn-ghost" id="accountBtn" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 8px;">
+                  <span id="userAvatar" style="font-weight: bold; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--accent); color: var(--bg); border-radius: 50%;">◉</span>
+                  <span id="userName">Loading...</span>
+                  <span>▼</span>
+              </button>
+              <div id="userMenu" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 220px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 200; overflow: hidden;">
+                  <div style="padding: 12px 16px; border-bottom: 1px solid var(--border);">
+                      <div style="font-family: var(--font-ui); font-size: 0.7rem; color: var(--text3);">Signed in as</div>
+                      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); margin-top: 4px; word-break: break-all;" id="userEmailDisplay"></div>
+                  </div>
+                  <button onclick="handleSignOut()" style="display: block; width: 100%; text-align: left; padding: 12px 16px; font-family: var(--font-ui); font-size: 0.85rem; color: var(--danger); background: none; border: none; cursor: pointer; transition: background var(--transition);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
+                      🚪 Sign Out
+                  </button>
               </div>
-              <button
-                id="accountMenuItemSign"
-                onclick="handleAccountAction()"
-                style="
-                  display: block;
-                  width: 100%;
-                  text-align: left;
-                  padding: 10px 16px;
-                  font-family: var(--font-ui);
-                  font-size: 0.8rem;
-                  color: var(--text2);
-                  background: none;
-                  border: none;
-                  cursor: pointer;
-                  transition: background var(--transition);
-                "
-                onmouseover="this.style.background = 'var(--surface)'"
-                onmouseout="this.style.background = 'none'"
-              >
-                ✦ Sign In
-              </button>
-              <div style="height: 1px; background: var(--border)"></div>
-              <button
-                onclick="alert('Settings coming soon!')"
-                style="
-                  display: block;
-                  width: 100%;
-                  text-align: left;
-                  padding: 10px 16px;
-                  font-family: var(--font-ui);
-                  font-size: 0.8rem;
-                  color: var(--text3);
-                  background: none;
-                  border: none;
-                  cursor: pointer;
-                "
-              >
-                ⚙ Settings
-              </button>
-              <button
-                onclick="alert('Help coming soon!')"
-                style="
-                  display: block;
-                  width: 100%;
-                  text-align: left;
-                  padding: 10px 16px;
-                  font-family: var(--font-ui);
-                  font-size: 0.8rem;
-                  color: var(--text3);
-                  background: none;
-                  cursor: pointer;
-                "
-              >
-                ◇ Help
-              </button>
-            </div>
           </div>
           <button class="btn btn-primary" id="newBtn" onclick="newEntry()">
             ✦ New Entry
@@ -3492,6 +3459,37 @@
         window.closeLimitModal();
         if (window.renderBudget) window.renderBudget();
       };
+      // User menu functions
+      window.toggleUserMenu = function() {
+          const menu = document.getElementById('userMenu');
+          if (menu) {
+              menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+          }
+      };
+
+      window.handleSignOut = async function() {
+          try {
+              const { supabase } = await import('./supabase-client.js');
+              await supabase.auth.signOut();
+              localStorage.removeItem('soyuco_session');
+              window.showToast('Signed out successfully!', 'success');
+              setTimeout(() => {
+                  window.location.href = 'login.html';
+              }, 500);
+          } catch (error) {
+              console.error('Sign out error:', error);
+              window.showToast('Failed to sign out', 'error');
+          }
+      };
+
+      // Close menu when clicking outside
+      document.addEventListener('click', function(e) {
+          const menu = document.getElementById('userMenu');
+          const btn = document.getElementById('accountBtn');
+          if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+              menu.style.display = 'none';
+          }
+      });      
     </script>
     <!-- #endregion -->
   </body>
