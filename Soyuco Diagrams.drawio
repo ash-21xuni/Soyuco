@@ -1,0 +1,46 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17">
+  <diagram name="Page-1" id="Z_RnJYw8HpLAuOBS58o4">
+    <mxGraphModel dx="1120" dy="524" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-2" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="150" y="50" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-3" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="230" y="50" width="380" height="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-4" value="Database" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="660" y="440" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-5" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Use Cases of Soyuco&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="317.5" y="10" width="205" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-6" value="Key Considerations:&lt;div&gt;&lt;ul&gt;&lt;li&gt;Mood Buttons don&#39;t actually work&lt;/li&gt;&lt;li&gt;Theme needs to be saved&lt;/li&gt;&lt;li&gt;There is a database --&amp;gt; need to configure how it works upon loading cloud data&lt;/li&gt;&lt;li&gt;Need to have two HTML pages - Login, Index&lt;/li&gt;&lt;ul&gt;&lt;li&gt;Can only access index after logging in&lt;/li&gt;&lt;li&gt;Login page needs to have all product information&lt;/li&gt;&lt;li&gt;No local storage note saving, cloud only&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;Need to consider using React framework&lt;/li&gt;&lt;li&gt;Settings and help need to be configured --&amp;gt; separate pages&lt;/li&gt;&lt;li&gt;Repeating tasks need to be configured&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#9933FF;" parent="1" vertex="1">
+          <mxGeometry x="860" y="170" width="830" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-8" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Additional Notes&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#9933FF;" parent="1" vertex="1">
+          <mxGeometry x="860" y="10" width="205" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-9" value="Learning Outcomes:&lt;div&gt;&lt;ul&gt;&lt;li&gt;HTML&lt;/li&gt;&lt;li&gt;CSS&lt;/li&gt;&lt;li&gt;Javascript&lt;/li&gt;&lt;li&gt;Databases&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#9933FF;" parent="1" vertex="1">
+          <mxGeometry x="860" y="50" width="830" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-10" value="User" style="swimlane;whiteSpace=wrap;html=1;strokeColor=#0066CC;" parent="1" vertex="1">
+          <mxGeometry x="25" y="1190" width="200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-11" value="User Interface" style="swimlane;whiteSpace=wrap;html=1;strokeColor=#0066CC;" parent="1" vertex="1">
+          <mxGeometry x="225" y="1190" width="200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-13" value="Database" style="swimlane;whiteSpace=wrap;html=1;strokeColor=#0066CC;" parent="1" vertex="1">
+          <mxGeometry x="625" y="1190" width="200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-12" value="Journal" style="swimlane;whiteSpace=wrap;html=1;strokeColor=#0066CC;" parent="1" vertex="1">
+          <mxGeometry x="425" y="1190" width="200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-14" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Activity Diagram of Soyuco&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#0066CC;" parent="1" vertex="1">
+          <mxGeometry x="296" y="1140" width="257" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
