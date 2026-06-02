@@ -351,7 +351,7 @@ function renderMoodChart() {
 
   chart.innerHTML = days.map(d => {
     const key      = d.toDateString();
-    const val      = moodHistory[key] || 0;
+    const val      = window.moodHistory?.[key] || 0;
     const isToday  = key === today;
     const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
     const height   = val ? val * 12 : 4;
@@ -360,39 +360,87 @@ function renderMoodChart() {
     const title    = `${dayLabel}: ${val ? moodLabels[val] : '–'}`;
 
     return `<div class="mood-bar-item ${isToday ? 'mood-today' : ''}"
-      style="height:${height}px;opacity:${opacity};background:${color};"
+      style="height:${height}px;opacity:${opacity};background:${color};flex:1;margin:0 2px;border-radius:2px 2px 0 0;"
       data-label="${dayLabel}"
       title="${title}"></div>`;
   }).join('');
 
   // Restore selected emoji if today has a mood set
-  const todayMood = moodHistory[today];
-  if (todayMood) {
-    document.querySelectorAll('.mood-emoji').forEach((el, i) => {
-      el.classList.toggle('selected', i + 1 === todayMood);
+  const todayMood = window.moodHistory?.[today];
+  const moodEmojis = document.querySelectorAll('.mood-emoji');
+  if (todayMood && moodEmojis.length) {
+    moodEmojis.forEach((el, i) => {
+      if (i + 1 === todayMood) {
+        el.classList.add('selected');
+      } else {
+        el.classList.remove('selected');
+      }
     });
-  } else {
-    document.querySelectorAll('.mood-emoji').forEach(el => el.classList.remove('selected'));
+  } else if (moodEmojis.length) {
+    moodEmojis.forEach(el => el.classList.remove('selected'));
   }
 }
 
-function selectMood(el) {
+async function selectMood(el) {
+  // Update UI
   document.querySelectorAll('.mood-emoji').forEach(e => e.classList.remove('selected'));
   el.classList.add('selected');
-  const val   = [...el.parentNode.children].indexOf(el) + 1;
-  const today = new Date().toDateString();
-  moodHistory[today] = val;
-
-  // Prune anything older than 7 days to keep storage clean
+  const val = [...el.parentNode.children].indexOf(el) + 1;
+  
+  // Use consistent date format
+  const todayDate = new Date();
+  const todayKey = todayDate.toDateString();
+  const todayISO = todayDate.toISOString().split('T')[0];
+  
+  // Save to window.moodHistory
+  if (!window.moodHistory) window.moodHistory = {};
+  window.moodHistory[todayKey] = val;
+  
+  // Prune older than 7 days
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 7);
-  Object.keys(moodHistory).forEach(key => {
-    if (new Date(key) < cutoff) delete moodHistory[key];
+  Object.keys(window.moodHistory).forEach(key => {
+    if (new Date(key) < cutoff) delete window.moodHistory[key];
   });
-
-  localStorage.setItem('soyuco_mood', JSON.stringify(moodHistory));
+  
+  // Save to localStorage
+  localStorage.setItem('soyuco_mood', JSON.stringify(window.moodHistory));
+  
+  // Save to cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('mood_history')
+        .upsert({ 
+          user_id: window.currentUser.id, 
+          date: todayISO, 
+          mood_value: val 
+        }, { onConflict: 'user_id, date' });
+      
+      if (error) {
+        console.error('Error saving mood to cloud:', error);
+      } else {
+        console.log('Mood saved to cloud:', val);
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
+  // Refresh the chart
   renderMoodChart();
+  
+  // Show confirmation
+  const moodNames = ['', 'Awful', 'Meh', 'Okay', 'Good', 'Great'];
+  if (window.showToast) {
+    window.showToast(`Mood saved: ${moodNames[val]}`, 'success');
+  }
 }
+
+// Make sure selectMood is available globally
+window.selectMood = selectMood;
+window.renderMoodChart = renderMoodChart;
 
 // ===========================
 // DAILY QUOTE

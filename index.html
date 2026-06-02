@@ -17,29 +17,24 @@
         import { supabase, getCurrentUser } from './supabase-client.js'
         
         async function checkAuth() {
-            // Check localStorage for session
             const savedSession = localStorage.getItem('soyuco_session')
             let session = null
             
             if (savedSession) {
                 session = JSON.parse(savedSession)
-                // Check if session is expired
                 if (session.expires_at < Date.now() / 1000) {
                     localStorage.removeItem('soyuco_session')
                     session = null
                 }
             }
             
-            // If no valid session, redirect to login
             if (!session) {
                 window.location.href = 'login.html'
                 return
             }
             
-            // Set the session in Supabase
             await supabase.auth.setSession(session)
             
-            // Get current user
             const user = await getCurrentUser()
             if (!user) {
                 localStorage.removeItem('soyuco_session')
@@ -47,7 +42,6 @@
                 return
             }
             
-            // Store user globally
             window.currentUser = user
             
             // Update UI with user name
@@ -60,17 +54,133 @@
                 userNameSpan.textContent = displayName
                 if (userAvatar) {
                     userAvatar.textContent = displayName.charAt(0).toUpperCase()
-                    userAvatar.style.fontWeight = 'bold'
                 }
                 if (userEmailDisplay) {
                     userEmailDisplay.textContent = user.email
                 }
             }
             
-            console.log('✅ Authenticated as:', user.email)
+            // ✅ LOAD ALL CLOUD DATA
+            await loadCloudData()
+            
+            console.log('✅ Authenticated and data loaded for:', user.email)
         }
         
-        // Run auth check
+        async function loadCloudData() {
+            try {
+                // Show loading indicator
+                const topbarTitle = document.getElementById('topbarTitle')
+                if (topbarTitle) topbarTitle.innerHTML = '📡 Loading your data...'
+                
+                // Load entries
+                const { data: entries } = await supabase
+                    .from('entries')
+                    .select('*')
+                    .order('date', { ascending: false })
+                
+                if (entries && entries.length) {
+                    window.entries = entries
+                    localStorage.setItem('soyuco_entries', JSON.stringify(entries))
+                    // Update entry count in sidebar
+                    const entryCount = document.getElementById('entryCount')
+                    if (entryCount) entryCount.textContent = entries.length
+                } else if (!window.entries) {
+                    window.entries = []
+                }
+                
+                // Load todos
+                const { data: todos } = await supabase.from('todos').select('*')
+                if (todos && todos.length) {
+                    window.todos = todos
+                    localStorage.setItem('soyuco_todos', JSON.stringify(todos))
+                } else if (!window.todos) {
+                    window.todos = []
+                }
+                
+                // Load habits
+                const { data: habits } = await supabase.from('habits').select('*')
+                if (habits && habits.length) {
+                    window.habits = habits
+                    localStorage.setItem('soyuco_habits', JSON.stringify(habits))
+                } else if (!window.habits) {
+                    window.habits = []
+                }
+                
+                // Load mood history
+                const { data: moods } = await supabase.from('mood_history').select('*');
+                if (moods && moods.length) {
+                    const moodMap = {};
+                    moods.forEach(m => { 
+                        // Convert ISO date to DateString format for consistency
+                        const dateKey = new Date(m.date).toDateString();
+                        moodMap[dateKey] = m.mood_value;
+                    });
+                    window.moodHistory = moodMap;
+                    localStorage.setItem('soyuco_mood', JSON.stringify(moodMap));
+                } else if (!window.moodHistory) {
+                    window.moodHistory = {};
+                }
+                
+                // Load events
+                const { data: events } = await supabase.from('events').select('*')
+                if (events && events.length) {
+                    const eventsMap = {}
+                    events.forEach(e => {
+                        if (!eventsMap[e.day]) eventsMap[e.day] = {}
+                        eventsMap[e.day][e.hour] = { text: e.text, ai: e.ai_generated }
+                    })
+                    localStorage.setItem('soyuco_events', JSON.stringify(eventsMap))
+                }
+                
+                // Load transactions
+                const { data: transactions } = await supabase.from('transactions').select('*')
+                if (transactions && transactions.length) {
+                    window.bTransactions = transactions
+                    localStorage.setItem('soyuco_tx', JSON.stringify(transactions))
+                } else if (!window.bTransactions) {
+                    window.bTransactions = []
+                }
+                
+                // Load goals
+                const { data: goals } = await supabase.from('goals').select('*')
+                if (goals && goals.length) {
+                    window.bGoals = goals
+                    localStorage.setItem('soyuco_goals', JSON.stringify(goals))
+                } else if (!window.bGoals) {
+                    window.bGoals = []
+                }
+                
+                // Load budget limits
+                const { data: limits } = await supabase.from('budget_limits').select('*')
+                if (limits && limits.length) {
+                    window.bLimits = limits
+                    localStorage.setItem('soyuco_limits', JSON.stringify(limits))
+                } else if (!window.bLimits) {
+                    window.bLimits = []
+                }
+                
+                // Refresh all views
+                if (window.renderEntryList) window.renderEntryList()
+                if (window.renderPlanner) window.renderPlanner()
+                if (window.renderBudget) window.renderBudget()
+                if (window.renderAiInsights) window.renderAiInsights()
+                if (window.renderMoodChart) window.renderMoodChart()
+                
+                // Reset topbar title
+                if (topbarTitle) {
+                    const titles = { journal: 'Journal', planner: 'Day Planner', ai: 'AI Day Planner', budget: 'Budget Planner' }
+                    const currentView = window.currentView || 'journal'
+                    topbarTitle.textContent = titles[currentView] || 'Journal'
+                }
+                
+                window.showToast(`Welcome back! ${window.entries.length} entries loaded.`, 'success')
+                
+            } catch (error) {
+                console.error('Error loading cloud data:', error)
+                window.showToast('Error loading your data', 'error')
+            }
+        }
+        
         await checkAuth()
     </script>
 <!-- #endregion-->
@@ -2990,15 +3100,36 @@
         else document.getElementById("editorTextarea").focus();
       };
 
-      window.saveEntry = function () {
-        const entry = window.entries.find(
-          (e) => e.id === window.currentEntryId,
-        );
-        if (!entry) return;
-        entry.title = document.getElementById("entryTitle").value;
-        entry.body = document.getElementById("editorTextarea").value;
-        localStorage.setItem("soyuco_entries", JSON.stringify(window.entries));
-        if (window.renderEntryList) window.renderEntryList();
+      window.saveEntry = async function() {
+          const entry = window.entries.find(e => e.id === window.currentEntryId);
+          if (!entry) return;
+          entry.title = document.getElementById('entryTitle').value;
+          entry.body = document.getElementById('editorTextarea').value;
+          localStorage.setItem('soyuco_entries', JSON.stringify(window.entries));
+          
+          // Sync to cloud if logged in
+          if (window.currentUser) {
+              try {
+                  const { supabase } = await import('./supabase-client.js');
+                  const { error } = await supabase
+                      .from('entries')
+                      .upsert({ 
+                          id: entry.id,
+                          user_id: window.currentUser.id,
+                          title: entry.title,
+                          body: entry.body,
+                          date: new Date(entry.date).toISOString(),
+                          tags: entry.tags || [],
+                          collections: entry.collections || []
+                      });
+                  if (error) console.error('Error saving to cloud:', error);
+              } catch (err) {
+                  console.error('Cloud sync error:', err);
+              }
+          }
+          
+          if (window.renderEntryList) window.renderEntryList();
+          window.showToast('Entry saved!', 'success');
       };
 
       window.deleteEntry = function () {
@@ -3131,16 +3262,65 @@
         document.getElementById("customizer").classList.toggle("open");
       };
 
-      window.selectMood = function (el) {
-        document
-          .querySelectorAll(".mood-emoji")
-          .forEach((e) => e.classList.remove("selected"));
-        el.classList.add("selected");
-        const val = [...el.parentNode.children].indexOf(el) + 1;
-        const today = new Date().toDateString();
-        window.moodHistory[today] = val;
-        localStorage.setItem("soyuco_mood", JSON.stringify(window.moodHistory));
-        if (window.renderMoodChart) window.renderMoodChart();
+      window.selectMood = async function(el) {
+          try {
+              // Update UI
+              document.querySelectorAll('.mood-emoji').forEach(e => e.classList.remove('selected'));
+              el.classList.add('selected');
+              
+              // Get mood value (1-5 based on position)
+              const moodEmojis = document.querySelectorAll('.mood-emoji');
+              let val = 1;
+              for (let i = 0; i < moodEmojis.length; i++) {
+                  if (moodEmojis[i] === el) {
+                      val = i + 1;
+                      break;
+                  }
+              }
+              
+              // Date handling
+              const todayDate = new Date();
+              const todayKey = todayDate.toDateString();
+              const todayISO = todayDate.toISOString().split('T')[0];
+              
+              // Save to window.moodHistory
+              if (!window.moodHistory) window.moodHistory = {};
+              window.moodHistory[todayKey] = val;
+              
+              // Save to localStorage
+              localStorage.setItem('soyuco_mood', JSON.stringify(window.moodHistory));
+              
+              // Save to cloud if logged in
+              if (window.currentUser) {
+                  try {
+                      const { supabase } = await import('./supabase-client.js');
+                      const { error } = await supabase
+                          .from('mood_history')
+                          .upsert({ 
+                              user_id: window.currentUser.id, 
+                              date: todayISO, 
+                              mood_value: val 
+                          });
+                      if (error) console.error('Error saving mood to cloud:', error);
+                  } catch (err) {
+                      console.error('Cloud sync error:', err);
+                  }
+              }
+              
+              // Refresh the chart
+              if (window.renderMoodChart) window.renderMoodChart();
+              
+              // Show confirmation
+              const moodNames = ['', 'Awful', 'Meh', 'Okay', 'Good', 'Great'];
+              if (window.showToast) {
+                  window.showToast(`Mood: ${moodNames[val]}`, 'success');
+              }
+              
+              console.log('Mood saved:', val);
+              
+          } catch (error) {
+              console.error('Error saving mood:', error);
+          }
       };
 
       window.newCollection = function () {
