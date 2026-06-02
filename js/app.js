@@ -4,6 +4,26 @@
 
 import { initAuth, getCurrentUser, onAuthChange, signOut } from '../auth.js';
 
+// Make sure toast is available
+if (typeof window !== 'undefined' && !window.showToast) {
+  window.showToast = function(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    const icon = document.getElementById('toastIcon');
+    const msgEl = document.getElementById('toastMessage');
+    
+    if (type === 'success') icon.textContent = '✅';
+    else if (type === 'error') icon.textContent = '❌';
+    else icon.textContent = '✨';
+    
+    msgEl.textContent = message;
+    toast.style.transform = 'translateX(0)';
+    
+    setTimeout(() => {
+      toast.style.transform = 'translateX(400px)';
+    }, 5000);
+  };
+}
 // Global auth state
 let currentUser = null;
 
@@ -67,7 +87,7 @@ function updateAuthUI(user) {
       buttons[0].textContent = '✦ Sign Out';
       buttons[0].onclick = async () => {
         await signOut();
-        alert('Signed out. Your data remains in the cloud.');
+        window.showToast('Signed out. Your data remains in the cloud.');
         location.reload();
       };
     }
@@ -184,7 +204,7 @@ async function loadUserDataFromCloud() {
       if (currentView === 'budget') renderBudget();
     }
     
-    alert('✅ Your cloud data has been loaded!');
+    window.showToast('Your cloud data has been loaded!', 'success');
   } catch (error) {
     console.error('Error loading cloud data:', error);
   }

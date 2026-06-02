@@ -168,17 +168,16 @@
       <div class="topbar-title" id="topbarTitle">Journal</div>
       <button class="btn btn-ghost" onclick="toggleCustomizer()">🎨 Theme</button>
       <div style="position:relative;" id="accountArea">
-        <button class="btn btn-ghost" id="accountBtn" onclick="window.showAuthModal()" style="display:flex;align-items:center;gap:6px;">◉ Sign In</button>
+        <button class="btn btn-ghost" id="accountBtn" onclick="toggleAccountMenu()" style="display:flex;align-items:center;gap:6px;">◉ Sign In</button>
         <div id="accountMenu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:220px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:200;overflow:hidden;">
-          <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
-            <div style="font-family:var(--font-ui);font-size:0.82rem;font-weight:600;color:var(--text);">Guest</div>
-            <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);margin-top:2px;">Sign in to sync your data</div>
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);" id="accountMenuHeader">
+            <div style="font-family:var(--font-ui);font-size:0.82rem;font-weight:600;color:var(--text);" id="accountUserName">Guest</div>
+            <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);margin-top:2px;" id="accountUserStatus">Sign in to sync your data</div>
           </div>
-          <button onclick="alert('Sign In — coming soon!')" style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text2);background:none;border:none;cursor:pointer;transition:background var(--transition);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">✦ Sign In</button>
-          <button onclick="alert('Create Account — coming soon!')" style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text2);background:none;border:none;cursor:pointer;transition:background var(--transition);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">◈ Create Account</button>
+          <button id="accountMenuItemSign" onclick="handleAccountAction()" style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text2);background:none;border:none;cursor:pointer;transition:background var(--transition);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">✦ Sign In</button>
           <div style="height:1px;background:var(--border);"></div>
-          <button style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text3);background:none;border:none;cursor:pointer;">⚙ Settings</button>
-          <button style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text3);background:none;cursor:pointer;">◇ Help</button>
+          <button onclick="alert('Settings coming soon!')" style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text3);background:none;border:none;cursor:pointer;">⚙ Settings</button>
+          <button onclick="alert('Help coming soon!')" style="display:block;width:100%;text-align:left;padding:10px 16px;font-family:var(--font-ui);font-size:0.8rem;color:var(--text3);background:none;cursor:pointer;">◇ Help</button>
         </div>
       </div>
       <button class="btn btn-primary" id="newBtn" onclick="newEntry()">✦ New Entry</button>
@@ -878,6 +877,11 @@
       </div>
     </div>
   </div>
+  <!-- Toast Notification -->
+  <div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius-lg);padding:12px 20px;box-shadow:var(--shadow-lg);z-index:1000;transform:translateX(400px);transition:transform 0.3s ease;display:flex;align-items:center;gap:12px;font-family:var(--font-ui);font-size:0.85rem;color:var(--text);">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Message</span>
+  </div>  
 </div><!-- /#app -->
 
 <script type="module" src="supabase-client.js"></script>
@@ -892,6 +896,31 @@
 <script src="js/budget.js"></script>
 <script src="js/theme.js"></script>
 <script type="module">
+  // Initialize global state if not already set
+  if (!window.entries) {
+    window.entries = JSON.parse(localStorage.getItem('soyuco_entries') || '[]');
+  }
+  if (!window.todos) {
+    window.todos = JSON.parse(localStorage.getItem('soyuco_todos') || '[]');
+  }
+  if (!window.habits) {
+    window.habits = JSON.parse(localStorage.getItem('soyuco_habits') || '[]');
+  }
+  if (!window.moodHistory) {
+    window.moodHistory = JSON.parse(localStorage.getItem('soyuco_mood') || '{}');
+  }
+  if (!window.collections) {
+    window.collections = JSON.parse(localStorage.getItem('soyuco_collections') || '[]');
+  }
+  if (!window.bTransactions) {
+    window.bTransactions = JSON.parse(localStorage.getItem('soyuco_tx') || '[]');
+  }
+  if (!window.bGoals) {
+    window.bGoals = JSON.parse(localStorage.getItem('soyuco_goals') || '[]');
+  }
+  if (!window.bLimits) {
+    window.bLimits = JSON.parse(localStorage.getItem('soyuco_limits') || '[]');
+  }
   // Expose auth functions globally for inline onclick handlers
   import { signIn, signUp } from './auth.js';
   
@@ -929,7 +958,7 @@
     try {
       await signUp(email, password, name);
       document.getElementById('authModal').style.display = 'none';
-      alert('Account created! Your data will sync to the cloud.');
+      window.showToast('Account created! Syncing your data...', 'success');
       location.reload();
     } catch (error) {
       errorDiv.textContent = error.message;
@@ -974,6 +1003,131 @@
     window.entries.unshift({ id, title: '', body: '', date: Date.now(), tags: [] });
     localStorage.setItem('soyuco_entries', JSON.stringify(window.entries));
     window.openEntry(id, true);
+  };
+window.formatDate = function(ts) {
+  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
+
+window.openEntry = function(id, isNew = false) {
+  window.currentEntryId = id;
+  const entry = window.entries.find(e => e.id === id);
+  if (!entry) return;
+
+  document.getElementById('editorPlaceholder').style.display = 'none';
+  document.getElementById('editorActive').style.display = 'flex';
+  document.getElementById('entryTitle').value = entry.title;
+  document.getElementById('editorTextarea').value = entry.body;
+  document.getElementById('metaDate').textContent = window.formatDate(entry.date);
+  document.getElementById('metaTags').textContent = entry.tags?.length ? entry.tags.join(', ') : 'Add tag';
+
+  if (window.updateWordCount) window.updateWordCount();
+  if (window.renderEntryList) window.renderEntryList(document.querySelector('.entry-search')?.value || '');
+  if (window.renderEntryCollectionPicker) window.renderEntryCollectionPicker();
+
+  if (isNew) document.getElementById('entryTitle').focus();
+  else document.getElementById('editorTextarea').focus();
+};
+
+window.saveEntry = function() {
+  const entry = window.entries.find(e => e.id === window.currentEntryId);
+  if (!entry) return;
+  entry.title = document.getElementById('entryTitle').value;
+  entry.body = document.getElementById('editorTextarea').value;
+  localStorage.setItem('soyuco_entries', JSON.stringify(window.entries));
+  if (window.renderEntryList) window.renderEntryList();
+};
+
+window.deleteEntry = function() {
+  if (!window.currentEntryId) return;
+  const modal = document.getElementById('deleteEntryModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.confirmDeleteEntry = function() {
+  window.entries = window.entries.filter(e => e.id !== window.currentEntryId);
+  window.currentEntryId = null;
+  localStorage.setItem('soyuco_entries', JSON.stringify(window.entries));
+  document.getElementById('deleteEntryModal').style.display = 'none';
+  document.getElementById('editorActive').style.display = 'none';
+  document.getElementById('editorPlaceholder').style.display = 'flex';
+  if (window.renderEntryList) window.renderEntryList();
+};
+
+window.onTitleChange = function() {
+  const entry = window.entries.find(e => e.id === window.currentEntryId);
+  if (entry) {
+    entry.title = document.getElementById('entryTitle').value;
+    localStorage.setItem('soyuco_entries', JSON.stringify(window.entries));
+    if (window.renderEntryList) window.renderEntryList();
+  }
+};
+
+window.onBodyChange = function() {
+  const entry = window.entries.find(e => e.id === window.currentEntryId);
+  if (entry) entry.body = document.getElementById('editorTextarea').value;
+  if (window.updateWordCount) window.updateWordCount();
+};
+
+window.updateWordCount = function() {
+  const textarea = document.getElementById('editorTextarea');
+  if (!textarea) return;
+  const words = textarea.value.trim().split(/\s+/).filter(Boolean).length;
+  const wordCountSpan = document.getElementById('wordCount');
+  if (wordCountSpan) wordCountSpan.textContent = words;
+};
+
+window.addTag = function() {
+  document.getElementById('tagModalInput').value = '';
+  const modal = document.getElementById('tagModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+  window.saveTagModal = function() {
+    const tag = document.getElementById('tagModalInput').value.trim().toLowerCase();
+    if (!tag) return;
+    const entry = window.entries.find(e => e.id === window.currentEntryId);
+    if (!entry) return;
+    if (!entry.tags) entry.tags = [];
+    if (!entry.tags.includes(tag)) entry.tags.push(tag);
+    localStorage.setItem('soyuco_entries', JSON.stringify(window.entries));
+    document.getElementById('metaTags').textContent = entry.tags.join(', ');
+    document.getElementById('tagModal').style.display = 'none';
+    if (window.renderEntryList) window.renderEntryList();
+  };
+
+  window.renderEntryList = function(filter = '') {
+    const body = document.getElementById('entryListBody');
+    if (!body) return;
+
+    let filtered = window.entries.filter(e =>
+      e.title.toLowerCase().includes(filter.toLowerCase()) ||
+      e.body.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    if (!filtered.length) {
+      body.innerHTML = '<div class="empty-state" style="padding:32px 16px;"><div class="empty-sub">No entries yet.<br>Create your first one!</div></div>';
+      return;
+    }
+
+    body.innerHTML = filtered
+      .sort((a, b) => b.date - a.date)
+      .map(e => `
+        <div class="entry-card ${e.id === window.currentEntryId ? 'active' : ''}" onclick="window.openEntry(${e.id})">
+          <div class="entry-card-date">${window.formatDate(e.date)}</div>
+          <div class="entry-card-title">${e.title || 'Untitled'}</div>
+          <div class="entry-card-preview">${(e.body || '').substring(0, 120) || '<em>No content</em>'}</div>
+          <div class="entry-card-tags">${(e.tags || []).map(t => `<span class="tag accent">${t}</span>`).join('')}</div>
+        </div>
+      `)
+      .join('');
+  };
+
+  window.renderEntryCollectionPicker = function() {
+    const container = document.getElementById('entryCollectionPicker');
+    if (!container) return;
+    const entry = window.entries.find(e => e.id === window.currentEntryId);
+    if (!entry) return;
+    container.innerHTML = '<span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text3);">No collections yet</span>';
   };
 
   window.setTheme = function(el) {
@@ -1156,7 +1310,136 @@
   document.getElementById('authError').style.display = 'none';
   document.getElementById('authModal').style.display = 'flex';
   };
+  window.handleAccountAction = function() {
+    // Check if user is logged in
+    import('./auth.js').then(async (auth) => {
+      const user = await auth.getCurrentUser();
+      if (user) {
+        // User is logged in - sign out
+        await auth.signOut();
+        // Update UI to show logged out state
+        document.getElementById('accountUserName').textContent = 'Guest';
+        document.getElementById('accountUserStatus').textContent = 'Sign in to sync your data';
+        const signBtn = document.getElementById('accountMenuItemSign');
+        signBtn.innerHTML = '✦ Sign In';
+        signBtn.onclick = () => window.showAuthModal();
+        // Update the main account button
+        document.getElementById('accountBtn').innerHTML = '◉ Sign In';
+        // Close the menu
+        document.getElementById('accountMenu').style.display = 'none';
+        // Reload to reset state
+        location.reload();
+      } else {
+        // User is logged out - show sign in modal
+        window.showAuthModal();
+        document.getElementById('accountMenu').style.display = 'none';
+      }
+    });
+  };  
+  window.toggleAccountMenu = async function() {
+    const menu = document.getElementById('accountMenu');
+    if (!menu) return;
+    
+    const isVisible = menu.style.display === 'block';
+    
+    if (!isVisible) {
+      // Update menu content based on login status
+      try {
+        const { getCurrentUser } = await import('./auth.js');
+        const user = await getCurrentUser();
+        
+        if (user) {
+          document.getElementById('accountUserName').textContent = user.email?.split('@')[0] || 'User';
+          document.getElementById('accountUserStatus').textContent = '✓ Cloud Synced';
+          const signBtn = document.getElementById('accountMenuItemSign');
+          if (signBtn) signBtn.innerHTML = '🚪 Sign Out';
+        } else {
+          document.getElementById('accountUserName').textContent = 'Guest';
+          document.getElementById('accountUserStatus').textContent = 'Sign in to sync your data';
+          const signBtn = document.getElementById('accountMenuItemSign');
+          if (signBtn) signBtn.innerHTML = '✦ Sign In';
+        }
+      } catch (err) {
+        console.error('Failed to get user:', err);
+      }
+      
+      menu.style.display = 'block';
+    } else {
+      menu.style.display = 'none';
+    }
+  };
+
+  // Also make sure clicking outside closes the menu
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('accountMenu');
+    const accountBtn = document.getElementById('accountBtn');
+    if (menu && accountBtn && !accountBtn.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+  // Toast notification
+  window.showToast = function(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    const msgEl = document.getElementById('toastMessage');
+    
+    // Set icon based on type
+    if (type === 'success') icon.textContent = '✅';
+    else if (type === 'error') icon.textContent = '❌';
+    else if (type === 'info') icon.textContent = 'ℹ️';
+    else icon.textContent = '✨';
+    
+    msgEl.textContent = message;
+    
+    // Show toast
+    toast.style.transform = 'translateX(0)';
+    
+    // Hide after 5 seconds
+    setTimeout(() => {
+      toast.style.transform = 'translateX(400px)';
+    }, 5000);
+  };
+  window.closeTxModal = function() {
+    document.getElementById('txModal').style.display = 'none';
+  };
+
+  window.closeGoalModal = function() {
+    document.getElementById('goalModal').style.display = 'none';
+  };
+
+  window.closeLimitModal = function() {
+    document.getElementById('limitModal').style.display = 'none';
+  };
+
+  window.saveGoal = function() {
+    const name = document.getElementById('goalName').value.trim();
+    const target = parseFloat(document.getElementById('goalTarget').value);
+    const saved = parseFloat(document.getElementById('goalSaved').value) || 0;
+    if (!name || isNaN(target) || target <= 0) {
+      alert('Please enter a goal name and target amount.');
+      return;
+    }
+    window.bGoals.push({ id: Date.now(), name, target, saved });
+    localStorage.setItem('soyuco_goals', JSON.stringify(window.bGoals));
+    window.closeGoalModal();
+    if (window.renderBudget) window.renderBudget();
+  };
+
+  window.saveLimit = function() {
+    const cat = document.getElementById('limitCat').value;
+    const amount = parseFloat(document.getElementById('limitAmt').value);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid limit.');
+      return;
+    }
+    window.bLimits = window.bLimits.filter(l => l.cat !== cat);
+    window.bLimits.push({ cat, amount });
+    localStorage.setItem('soyuco_limits', JSON.stringify(window.bLimits));
+    window.closeLimitModal();
+    if (window.renderBudget) window.renderBudget();
+  };
 </script>
+
 
 </body>
 </html>
