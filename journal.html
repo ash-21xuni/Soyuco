@@ -346,29 +346,25 @@
       <!-- MAIN -->
       <main id="main">
         <div id="topbar">
-          <div class="topbar-title" id="topbarTitle">Journal</div>
-          <button class="btn btn-ghost" onclick="toggleCustomizer()">
-            🎨 Theme
-          </button>
-          <div style="position: relative" id="accountArea">
-              <button class="btn btn-ghost" id="accountBtn" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 8px;">
-                  <span id="userAvatar" style="font-weight: bold; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--accent); color: var(--bg); border-radius: 50%;">◉</span>
-                  <span id="userName">Loading...</span>
-                  <span>▼</span>
-              </button>
-              <div id="userMenu" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 220px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 200; overflow: hidden;">
-                  <div style="padding: 12px 16px; border-bottom: 1px solid var(--border);">
-                      <div style="font-family: var(--font-ui); font-size: 0.7rem; color: var(--text3);">Signed in as</div>
-                      <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text); margin-top: 4px; word-break: break-all;" id="userEmailDisplay"></div>
-                  </div>
-                  <button onclick="handleSignOut()" style="display: block; width: 100%; text-align: left; padding: 12px 16px; font-family: var(--font-ui); font-size: 0.85rem; color: var(--danger); background: none; border: none; cursor: pointer; transition: background var(--transition);" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='none'">
-                      🚪 Sign Out
-                  </button>
-              </div>
-          </div>
-          <button class="btn btn-primary" id="newBtn" onclick="newEntry()">
-            ✦ New Entry
-          </button>
+            <div class="topbar-title" id="topbarTitle">Journal</div>
+            <button class="btn btn-ghost" onclick="toggleCustomizer()">🎨 Theme</button>
+            <div style="position: relative" id="accountArea">
+                <button class="btn btn-ghost" id="accountBtn" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 6px; padding: 5px 10px;">
+                    <span id="userAvatar" style="font-weight: bold; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: var(--accent); color: var(--bg); border-radius: 50%;">◉</span>
+                    <span id="userName" style="font-size: 0.8rem;">Loading...</span>
+                    <span style="font-size: 0.7rem;">▼</span>
+                </button>
+                <div id="userMenu" style="display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 200px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 200; overflow: hidden;">
+                    <div style="padding: 10px 12px; border-bottom: 1px solid var(--border);">
+                        <div style="font-family: var(--font-ui); font-size: 0.65rem; color: var(--text3);">Signed in as</div>
+                        <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text); margin-top: 4px;" id="userEmailDisplay"></div>
+                    </div>
+                    <button onclick="handleSignOut()" style="display: block; width: 100%; text-align: left; padding: 10px 12px; font-family: var(--font-ui); font-size: 0.75rem; color: var(--danger); background: none; border: none; cursor: pointer;">
+                        🚪 Sign Out
+                    </button>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="newBtn" onclick="newEntry()" style="padding: 5px 12px;">✦ New Entry</button>
         </div>
 
         <div id="content">
