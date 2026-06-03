@@ -166,8 +166,13 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <h1>✦ Soyuco</h1>
-            <p>Your journal, everywhere you go</p>
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                <img src="logo.svg" alt="Soyuco Logo" style="width: 48px; height: 48px;">
+                <div>
+                    <h1 style="margin: 0;">✦ Soyuco</h1>
+                    <p style="margin: 0;">Your journal, everywhere you go</p>
+                </div>
+            </a>
         </div>
 
         <div class="card">
@@ -270,7 +275,7 @@
                 
                 // Redirect to main app
                 setTimeout(() => {
-                    window.location.href = 'index.html'
+                    window.location.href = 'journal.html'
                 }, 1000)
                 
             } catch (error) {
@@ -333,7 +338,7 @@
         if (savedSession) {
             const session = JSON.parse(savedSession)
             if (session.expires_at > Date.now() / 1000) {
-                window.location.href = 'index.html'
+                window.location.href = 'journal.html'
             }
         }
     </script>
