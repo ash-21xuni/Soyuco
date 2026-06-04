@@ -28,6 +28,9 @@ function renderTrendChart() {
   let labels = [];
   let buckets = [];
 
+  // Use window.bTransactions (global)
+  const transactions = window.bTransactions || [];
+
   if (trendRange === 7) {
     // One bucket per day for last 7 days
     for (let i = 6; i >= 0; i--) {
@@ -35,7 +38,7 @@ function renderTrendChart() {
       labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
       buckets.push({ label: labels[labels.length - 1], total: 0, dateStr: d.toISOString().split('T')[0] });
     }
-    window.bTransactions.filter(t => t.type === 'expense').forEach(t => {
+    transactions.filter(t => t.type === 'expense').forEach(t => {
       const b = buckets.find(b => b.dateStr === t.date);
       if (b) b.total += t.amount;
     });
@@ -50,7 +53,7 @@ function renderTrendChart() {
         : '';
       buckets.push({ label: lbl, total: 0, dateStr });
     }
-    window.bTransactions.filter(t => t.type === 'expense').forEach(t => {
+    transactions.filter(t => t.type === 'expense').forEach(t => {
       const b = buckets.find(b => b.dateStr === t.date);
       if (b) b.total += t.amount;
     });
@@ -66,7 +69,7 @@ function renderTrendChart() {
         key,
       });
     }
-    window.bTransactions.filter(t => t.type === 'expense').forEach(t => {
+    transactions.filter(t => t.type === 'expense').forEach(t => {
       const key = t.date.substring(0, 7);
       const b = buckets.find(b => b.key === key);
       if (b) b.total += t.amount;
@@ -462,6 +465,15 @@ async function saveLimit() {
 // ===========================
 
 function renderBudget() {
+    if (typeof window.bTransactions === 'undefined') {
+      window.bTransactions = JSON.parse(localStorage.getItem('soyuco_tx') || '[]');
+    }
+    if (typeof window.bGoals === 'undefined') {
+      window.bGoals = JSON.parse(localStorage.getItem('soyuco_goals') || '[]');
+    }
+    if (typeof window.bLimits === 'undefined') {
+      window.bLimits = JSON.parse(localStorage.getItem('soyuco_limits') || '[]');
+    }
   renderTrendChart();
   
   const income = window.bTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
