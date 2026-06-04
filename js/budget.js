@@ -162,34 +162,36 @@ function renderTrendChart() {
 // TRANSACTION MODAL (add + edit)
 // ===========================
 let _txEditId = null;
-
 function openTxModal(editId = null) {
   _txEditId = editId;
 
   if (editId !== null) {
     const t = bTransactions.find(t => t.id === editId);
     if (!t) return;
-    document.getElementById('txModalTitle').textContent      = 'Edit Transaction';
-    document.getElementById('txModalSaveBtn').textContent    = 'Save Changes';
+    document.getElementById('txModalTitle').textContent = 'Edit Transaction';
+    document.getElementById('txModalSaveBtn').textContent = 'Save Changes';
     document.getElementById('txModalDeleteBtn').style.display = 'block';
-    document.getElementById('txDesc').value   = t.desc;
+    document.getElementById('txDesc').value = t.desc;
     document.getElementById('txAmount').value = t.amount;
-    document.getElementById('txDate').value   = t.date;
-    document.getElementById('txCat').value    = t.cat;
+    document.getElementById('txDate').value = t.date;
+    document.getElementById('txCat').value = t.cat;
     txTypeB = t.type;
   } else {
-    document.getElementById('txModalTitle').textContent      = 'Add Transaction';
-    document.getElementById('txModalSaveBtn').textContent    = 'Add Transaction';
+    document.getElementById('txModalTitle').textContent = 'Add Transaction';
+    document.getElementById('txModalSaveBtn').textContent = 'Add Transaction';
     document.getElementById('txModalDeleteBtn').style.display = 'none';
-    document.getElementById('txDesc').value   = '';
+    // CLEAR ALL FIELDS for new transaction
+    document.getElementById('txDesc').value = '';
     document.getElementById('txAmount').value = '';
-    document.getElementById('txDate').value   = new Date().toISOString().split('T')[0];
-    document.getElementById('txCat').value    = 'food';
+    document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('txCat').value = 'food';
     txTypeB = 'expense';
   }
 
+  // Update button styles
   document.getElementById('btnExpense').className = txTypeB === 'expense' ? 'btn btn-primary' : 'btn btn-ghost';
-  document.getElementById('btnIncome').className  = txTypeB === 'income'  ? 'btn btn-primary' : 'btn btn-ghost';
+  document.getElementById('btnIncome').className = txTypeB === 'income' ? 'btn btn-primary' : 'btn btn-ghost';
+  
   document.getElementById('txModal').style.display = 'flex';
 }
 
@@ -203,35 +205,104 @@ function setTxType(t) {
   document.getElementById('btnIncome').className  = t === 'income'  ? 'btn btn-primary' : 'btn btn-ghost';
 }
 
-function saveTx() {
-  const desc   = document.getElementById('txDesc').value.trim();
+async function saveTx() {
+  const desc = document.getElementById('txDesc').value.trim();
   const amount = parseFloat(document.getElementById('txAmount').value);
-  const cat    = document.getElementById('txCat').value;
-  const date   = document.getElementById('txDate').value;
+  const cat = document.getElementById('txCat').value;
+  const date = document.getElementById('txDate').value;
 
   if (!desc || isNaN(amount) || amount <= 0) {
     alert('Please enter a description and valid amount.');
     return;
   }
 
+  let transactionId;
+  
   if (_txEditId !== null) {
+    // Update existing transaction
     const t = bTransactions.find(t => t.id === _txEditId);
-    if (t) { t.desc = desc; t.amount = amount; t.type = txTypeB; t.cat = cat; t.date = date; }
+    if (t) { 
+      t.desc = desc; 
+      t.amount = amount; 
+      t.type = txTypeB; 
+      t.cat = cat; 
+      t.date = date;
+      transactionId = _txEditId;
+    }
   } else {
-    bTransactions.push({ id: Date.now(), desc, amount, type: txTypeB, cat, date });
+    // Create new transaction
+    transactionId = Date.now();
+    bTransactions.push({ 
+      id: transactionId, 
+      desc, 
+      amount, 
+      type: txTypeB, 
+      cat, 
+      date 
+    });
   }
 
+  // Save to localStorage
   localStorage.setItem('soyuco_tx', JSON.stringify(bTransactions));
+  
+  // Sync to cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('transactions')
+        .upsert({ 
+          id: transactionId,
+          user_id: window.currentUser.id,
+          description: desc,
+          amount: amount,
+          type: txTypeB,
+          category: cat,
+          date: date
+        });
+      if (error) {
+        console.error('Error saving transaction to cloud:', error);
+      } else {
+        console.log('Transaction saved to cloud');
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
   closeTxModal();
   renderBudget();
+  window.showToast('Transaction saved!', 'success');
 }
 
-function deleteTxModal() {
+async function deleteTxModal() {
   if (_txEditId === null) return;
-  bTransactions = bTransactions.filter(t => t.id !== _txEditId);
+  
+  const transactionId = _txEditId;
+  bTransactions = bTransactions.filter(t => t.id !== transactionId);
   localStorage.setItem('soyuco_tx', JSON.stringify(bTransactions));
+  
+  // Delete from cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('transactions')
+        .delete()
+        .eq('id', transactionId);
+      if (error) {
+        console.error('Error deleting transaction from cloud:', error);
+      } else {
+        console.log('Transaction deleted from cloud');
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
   closeTxModal();
   renderBudget();
+  window.showToast('Transaction deleted!', 'success');
 }
 
 function deleteTx(id) {
@@ -255,18 +326,45 @@ function openSavingsModal(goalId) {
   openModal('savingsModal');
 }
 
-function applySavings(isAdd) {
+async function applySavings(isAdd) {
   const amount = parseFloat(document.getElementById('savingsModalAmount').value);
   if (isNaN(amount) || amount <= 0) {
     alert('Please enter a valid amount.');
     return;
   }
+  
   const g = bGoals.find(g => g.id === _savingsGoalId);
   if (!g) return;
+  
   g.saved = Math.max(0, g.saved + (isAdd ? amount : -amount));
   localStorage.setItem('soyuco_goals', JSON.stringify(bGoals));
+  
+  // Sync to cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('goals')
+        .upsert({ 
+          id: g.id,
+          user_id: window.currentUser.id,
+          name: g.name,
+          target: g.target,
+          saved: g.saved
+        });
+      if (error) {
+        console.error('Error updating goal savings in cloud:', error);
+      } else {
+        console.log('Goal savings updated in cloud');
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
   closeModal('savingsModal');
   renderBudget();
+  window.showToast(`$${amount.toFixed(2)} ${isAdd ? 'added to' : 'removed from'} savings!`, 'success');
 }
 
 
@@ -282,32 +380,99 @@ function closeGoalModal() {
   document.getElementById('goalModal').style.display = 'none';
 }
 
-function saveGoal() {
-  const name   = document.getElementById('goalName').value.trim();
+async function saveGoal() {
+  const name = document.getElementById('goalName').value.trim();
   const target = parseFloat(document.getElementById('goalTarget').value);
-  const saved  = parseFloat(document.getElementById('goalSaved').value) || 0;
+  const saved = parseFloat(document.getElementById('goalSaved').value) || 0;
 
   if (!name || isNaN(target) || target <= 0) {
     alert('Please enter a goal name and target amount.');
     return;
   }
 
-  bGoals.push({ id: Date.now(), name, target, saved });
+  const goalId = Date.now();
+  const newGoal = { id: goalId, name, target, saved };
+  bGoals.push(newGoal);
   localStorage.setItem('soyuco_goals', JSON.stringify(bGoals));
+  
+  // Sync to cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('goals')
+        .upsert({ 
+          id: goalId,
+          user_id: window.currentUser.id,
+          name: name,
+          target: target,
+          saved: saved
+        });
+      if (error) {
+        console.error('Error saving goal to cloud:', error);
+      } else {
+        console.log('Goal saved to cloud');
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
   closeGoalModal();
   renderBudget();
+  window.showToast('Goal saved!', 'success');
 }
 
-function deleteGoal(id) {
+async function deleteGoal(id) {
   bGoals = bGoals.filter(g => g.id !== id);
   localStorage.setItem('soyuco_goals', JSON.stringify(bGoals));
+  
+  // Delete from cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('goals')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        console.error('Error deleting goal from cloud:', error);
+      } else {
+        console.log('Goal deleted from cloud');
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
   renderBudget();
+  window.showToast('Goal deleted!', 'success');
 }
 
-function deleteLimit(cat) {
+async function deleteLimit(cat) {
   bLimits = bLimits.filter(l => l.cat !== cat);
   localStorage.setItem('soyuco_limits', JSON.stringify(bLimits));
+  
+  // Delete from cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('budget_limits')
+        .delete()
+        .eq('category', cat);
+      if (error) {
+        console.error('Error deleting limit from cloud:', error);
+      } else {
+        console.log('Budget limit deleted from cloud');
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
   renderBudget();
+  window.showToast('Budget limit deleted!', 'success');
 }
 
 function openLimitModal() {
@@ -319,8 +484,8 @@ function closeLimitModal() {
   document.getElementById('limitModal').style.display = 'none';
 }
 
-function saveLimit() {
-  const cat    = document.getElementById('limitCat').value;
+async function saveLimit() {
+  const cat = document.getElementById('limitCat').value;
   const amount = parseFloat(document.getElementById('limitAmt').value);
 
   if (isNaN(amount) || amount <= 0) {
@@ -331,8 +496,31 @@ function saveLimit() {
   bLimits = bLimits.filter(l => l.cat !== cat);
   bLimits.push({ cat, amount });
   localStorage.setItem('soyuco_limits', JSON.stringify(bLimits));
+  
+  // Sync to cloud if logged in
+  if (window.currentUser) {
+    try {
+      const { supabase } = await import('./supabase-client.js');
+      const { error } = await supabase
+        .from('budget_limits')
+        .upsert({ 
+          user_id: window.currentUser.id,
+          category: cat,
+          amount: amount
+        });
+      if (error) {
+        console.error('Error saving limit to cloud:', error);
+      } else {
+        console.log('Budget limit saved to cloud');
+      }
+    } catch (err) {
+      console.error('Cloud sync error:', err);
+    }
+  }
+  
   closeLimitModal();
   renderBudget();
+  window.showToast('Budget limit saved!', 'success');
 }
 
 // ===========================
