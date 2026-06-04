@@ -35,7 +35,7 @@ function renderTrendChart() {
       labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
       buckets.push({ label: labels[labels.length - 1], total: 0, dateStr: d.toISOString().split('T')[0] });
     }
-    bTransactions.filter(t => t.type === 'expense').forEach(t => {
+    window.bTransactions.filter(t => t.type === 'expense').forEach(t => {
       const b = buckets.find(b => b.dateStr === t.date);
       if (b) b.total += t.amount;
     });
@@ -50,7 +50,7 @@ function renderTrendChart() {
         : '';
       buckets.push({ label: lbl, total: 0, dateStr });
     }
-    bTransactions.filter(t => t.type === 'expense').forEach(t => {
+    window.bTransactions.filter(t => t.type === 'expense').forEach(t => {
       const b = buckets.find(b => b.dateStr === t.date);
       if (b) b.total += t.amount;
     });
@@ -66,7 +66,7 @@ function renderTrendChart() {
         key,
       });
     }
-    bTransactions.filter(t => t.type === 'expense').forEach(t => {
+    window.bTransactions.filter(t => t.type === 'expense').forEach(t => {
       const key = t.date.substring(0, 7);
       const b = buckets.find(b => b.key === key);
       if (b) b.total += t.amount;
@@ -85,7 +85,7 @@ function renderTrendChart() {
   empty.style.display = 'none';
 
   // Chart dimensions
-  const W      = 800; // viewBox units
+  const W      = 800;
   const H      = 140;
   const padL   = 42;
   const padR   = 12;
@@ -95,18 +95,15 @@ function renderTrendChart() {
   const chartH = H - padT - padB;
   const n      = buckets.length;
 
-  // Compute points
   const pts = buckets.map((b, i) => {
     const x = padL + (i / (n - 1)) * chartW;
     const y = padT + chartH - (b.total / maxVal) * chartH;
     return { x, y, total: b.total, label: b.label };
   });
 
-  // Build SVG path
   const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
   const fillPath = `${linePath} L${pts[pts.length-1].x.toFixed(1)},${(padT+chartH).toFixed(1)} L${pts[0].x.toFixed(1)},${(padT+chartH).toFixed(1)} Z`;
 
-  // Y-axis labels (3 ticks)
   const yTicks = [0, 0.5, 1].map(frac => ({
     y: padT + chartH - frac * chartH,
     val: (frac * maxVal).toFixed(0),
@@ -122,7 +119,6 @@ function renderTrendChart() {
       font-family="var(--font-mono)" font-size="9" fill="var(--text3)" text-anchor="end">$${t.val}</text>`
   ).join('');
 
-  // X-axis labels
   const xLabels = pts
     .filter(p => p.label)
     .map(p =>
@@ -130,7 +126,6 @@ function renderTrendChart() {
         font-family="var(--font-mono)" font-size="9" fill="var(--text3)" text-anchor="middle">${p.label}</text>`
     ).join('');
 
-  // Dots on data points
   const dots = pts
     .filter(p => p.total > 0)
     .map(p =>
@@ -162,11 +157,12 @@ function renderTrendChart() {
 // TRANSACTION MODAL (add + edit)
 // ===========================
 let _txEditId = null;
+
 function openTxModal(editId = null) {
   _txEditId = editId;
 
   if (editId !== null) {
-    const t = bTransactions.find(t => t.id === editId);
+    const t = window.bTransactions.find(t => t.id === editId);
     if (!t) return;
     document.getElementById('txModalTitle').textContent = 'Edit Transaction';
     document.getElementById('txModalSaveBtn').textContent = 'Save Changes';
@@ -175,23 +171,20 @@ function openTxModal(editId = null) {
     document.getElementById('txAmount').value = t.amount;
     document.getElementById('txDate').value = t.date;
     document.getElementById('txCat').value = t.cat;
-    txTypeB = t.type;
+    window.txTypeB = t.type;
   } else {
     document.getElementById('txModalTitle').textContent = 'Add Transaction';
     document.getElementById('txModalSaveBtn').textContent = 'Add Transaction';
     document.getElementById('txModalDeleteBtn').style.display = 'none';
-    // CLEAR ALL FIELDS for new transaction
     document.getElementById('txDesc').value = '';
     document.getElementById('txAmount').value = '';
     document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('txCat').value = 'food';
-    txTypeB = 'expense';
+    window.txTypeB = 'expense';
   }
 
-  // Update button styles
-  document.getElementById('btnExpense').className = txTypeB === 'expense' ? 'btn btn-primary' : 'btn btn-ghost';
-  document.getElementById('btnIncome').className = txTypeB === 'income' ? 'btn btn-primary' : 'btn btn-ghost';
-  
+  document.getElementById('btnExpense').className = window.txTypeB === 'expense' ? 'btn btn-primary' : 'btn btn-ghost';
+  document.getElementById('btnIncome').className = window.txTypeB === 'income' ? 'btn btn-primary' : 'btn btn-ghost';
   document.getElementById('txModal').style.display = 'flex';
 }
 
@@ -200,7 +193,7 @@ function closeTxModal() {
 }
 
 function setTxType(t) {
-  txTypeB = t;
+  window.txTypeB = t;
   document.getElementById('btnExpense').className = t === 'expense' ? 'btn btn-primary' : 'btn btn-ghost';
   document.getElementById('btnIncome').className  = t === 'income'  ? 'btn btn-primary' : 'btn btn-ghost';
 }
@@ -220,11 +213,11 @@ async function saveTx() {
   
   if (_txEditId !== null) {
     // Update existing transaction
-    const t = bTransactions.find(t => t.id === _txEditId);
+    const t = window.bTransactions.find(t => t.id === _txEditId);
     if (t) { 
       t.desc = desc; 
       t.amount = amount; 
-      t.type = txTypeB; 
+      t.type = window.txTypeB; 
       t.cat = cat; 
       t.date = date;
       transactionId = _txEditId;
@@ -232,18 +225,18 @@ async function saveTx() {
   } else {
     // Create new transaction
     transactionId = Date.now();
-    bTransactions.push({ 
+    window.bTransactions.push({ 
       id: transactionId, 
       desc, 
       amount, 
-      type: txTypeB, 
+      type: window.txTypeB, 
       cat, 
       date 
     });
   }
 
   // Save to localStorage
-  localStorage.setItem('soyuco_tx', JSON.stringify(bTransactions));
+  localStorage.setItem('soyuco_tx', JSON.stringify(window.bTransactions));
   
   // Sync to cloud if logged in
   if (window.currentUser) {
@@ -256,7 +249,7 @@ async function saveTx() {
           user_id: window.currentUser.id,
           description: desc,
           amount: amount,
-          type: txTypeB,
+          type: window.txTypeB,
           category: cat,
           date: date
         });
@@ -272,29 +265,20 @@ async function saveTx() {
   
   closeTxModal();
   renderBudget();
-  window.showToast('Transaction saved!', 'success');
+  if (window.showToast) window.showToast('Transaction saved!', 'success');
 }
 
 async function deleteTxModal() {
   if (_txEditId === null) return;
   
   const transactionId = _txEditId;
-  bTransactions = bTransactions.filter(t => t.id !== transactionId);
-  localStorage.setItem('soyuco_tx', JSON.stringify(bTransactions));
+  window.bTransactions = window.bTransactions.filter(t => t.id !== transactionId);
+  localStorage.setItem('soyuco_tx', JSON.stringify(window.bTransactions));
   
-  // Delete from cloud if logged in
   if (window.currentUser) {
     try {
       const { supabase } = await import('./supabase-client.js');
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', transactionId);
-      if (error) {
-        console.error('Error deleting transaction from cloud:', error);
-      } else {
-        console.log('Transaction deleted from cloud');
-      }
+      await supabase.from('transactions').delete().eq('id', transactionId);
     } catch (err) {
       console.error('Cloud sync error:', err);
     }
@@ -302,13 +286,7 @@ async function deleteTxModal() {
   
   closeTxModal();
   renderBudget();
-  window.showToast('Transaction deleted!', 'success');
-}
-
-function deleteTx(id) {
-  bTransactions = bTransactions.filter(t => t.id !== id);
-  localStorage.setItem('soyuco_tx', JSON.stringify(bTransactions));
-  renderBudget();
+  if (window.showToast) window.showToast('Transaction deleted!', 'success');
 }
 
 // ===========================
@@ -318,11 +296,11 @@ let _savingsGoalId = null;
 
 function openSavingsModal(goalId) {
   _savingsGoalId = goalId;
-  const g = bGoals.find(g => g.id === goalId);
+  const g = window.bGoals.find(g => g.id === goalId);
   if (!g) return;
   document.getElementById('savingsModalGoalName').textContent = g.name;
   document.getElementById('savingsModalCurrent').textContent  = `$${g.saved.toFixed(2)}`;
-  document.getElementById('savingsModalAmount').value         = '';
+  document.getElementById('savingsModalAmount').value = '';
   openModal('savingsModal');
 }
 
@@ -333,30 +311,22 @@ async function applySavings(isAdd) {
     return;
   }
   
-  const g = bGoals.find(g => g.id === _savingsGoalId);
+  const g = window.bGoals.find(g => g.id === _savingsGoalId);
   if (!g) return;
   
   g.saved = Math.max(0, g.saved + (isAdd ? amount : -amount));
-  localStorage.setItem('soyuco_goals', JSON.stringify(bGoals));
+  localStorage.setItem('soyuco_goals', JSON.stringify(window.bGoals));
   
-  // Sync to cloud if logged in
   if (window.currentUser) {
     try {
       const { supabase } = await import('./supabase-client.js');
-      const { error } = await supabase
-        .from('goals')
-        .upsert({ 
-          id: g.id,
-          user_id: window.currentUser.id,
-          name: g.name,
-          target: g.target,
-          saved: g.saved
-        });
-      if (error) {
-        console.error('Error updating goal savings in cloud:', error);
-      } else {
-        console.log('Goal savings updated in cloud');
-      }
+      await supabase.from('goals').upsert({ 
+        id: g.id,
+        user_id: window.currentUser.id,
+        name: g.name,
+        target: g.target,
+        saved: g.saved
+      });
     } catch (err) {
       console.error('Cloud sync error:', err);
     }
@@ -364,15 +334,13 @@ async function applySavings(isAdd) {
   
   closeModal('savingsModal');
   renderBudget();
-  window.showToast(`$${amount.toFixed(2)} ${isAdd ? 'added to' : 'removed from'} savings!`, 'success');
+  if (window.showToast) window.showToast(`$${amount.toFixed(2)} ${isAdd ? 'added to' : 'removed from'} savings!`, 'success');
 }
 
-
-
 function openGoalModal() {
-  document.getElementById('goalName').value   = '';
+  document.getElementById('goalName').value = '';
   document.getElementById('goalTarget').value = '';
-  document.getElementById('goalSaved').value  = '';
+  document.getElementById('goalSaved').value = '';
   document.getElementById('goalModal').style.display = 'flex';
 }
 
@@ -392,27 +360,19 @@ async function saveGoal() {
 
   const goalId = Date.now();
   const newGoal = { id: goalId, name, target, saved };
-  bGoals.push(newGoal);
-  localStorage.setItem('soyuco_goals', JSON.stringify(bGoals));
+  window.bGoals.push(newGoal);
+  localStorage.setItem('soyuco_goals', JSON.stringify(window.bGoals));
   
-  // Sync to cloud if logged in
   if (window.currentUser) {
     try {
       const { supabase } = await import('./supabase-client.js');
-      const { error } = await supabase
-        .from('goals')
-        .upsert({ 
-          id: goalId,
-          user_id: window.currentUser.id,
-          name: name,
-          target: target,
-          saved: saved
-        });
-      if (error) {
-        console.error('Error saving goal to cloud:', error);
-      } else {
-        console.log('Goal saved to cloud');
-      }
+      await supabase.from('goals').upsert({ 
+        id: goalId,
+        user_id: window.currentUser.id,
+        name: name,
+        target: target,
+        saved: saved
+      });
     } catch (err) {
       console.error('Cloud sync error:', err);
     }
@@ -420,59 +380,41 @@ async function saveGoal() {
   
   closeGoalModal();
   renderBudget();
-  window.showToast('Goal saved!', 'success');
+  if (window.showToast) window.showToast('Goal saved!', 'success');
 }
 
 async function deleteGoal(id) {
-  bGoals = bGoals.filter(g => g.id !== id);
-  localStorage.setItem('soyuco_goals', JSON.stringify(bGoals));
+  window.bGoals = window.bGoals.filter(g => g.id !== id);
+  localStorage.setItem('soyuco_goals', JSON.stringify(window.bGoals));
   
-  // Delete from cloud if logged in
   if (window.currentUser) {
     try {
       const { supabase } = await import('./supabase-client.js');
-      const { error } = await supabase
-        .from('goals')
-        .delete()
-        .eq('id', id);
-      if (error) {
-        console.error('Error deleting goal from cloud:', error);
-      } else {
-        console.log('Goal deleted from cloud');
-      }
+      await supabase.from('goals').delete().eq('id', id);
     } catch (err) {
       console.error('Cloud sync error:', err);
     }
   }
   
   renderBudget();
-  window.showToast('Goal deleted!', 'success');
+  if (window.showToast) window.showToast('Goal deleted!', 'success');
 }
 
 async function deleteLimit(cat) {
-  bLimits = bLimits.filter(l => l.cat !== cat);
-  localStorage.setItem('soyuco_limits', JSON.stringify(bLimits));
+  window.bLimits = window.bLimits.filter(l => l.cat !== cat);
+  localStorage.setItem('soyuco_limits', JSON.stringify(window.bLimits));
   
-  // Delete from cloud if logged in
   if (window.currentUser) {
     try {
       const { supabase } = await import('./supabase-client.js');
-      const { error } = await supabase
-        .from('budget_limits')
-        .delete()
-        .eq('category', cat);
-      if (error) {
-        console.error('Error deleting limit from cloud:', error);
-      } else {
-        console.log('Budget limit deleted from cloud');
-      }
+      await supabase.from('budget_limits').delete().eq('category', cat);
     } catch (err) {
       console.error('Cloud sync error:', err);
     }
   }
   
   renderBudget();
-  window.showToast('Budget limit deleted!', 'success');
+  if (window.showToast) window.showToast('Budget limit deleted!', 'success');
 }
 
 function openLimitModal() {
@@ -493,26 +435,18 @@ async function saveLimit() {
     return;
   }
 
-  bLimits = bLimits.filter(l => l.cat !== cat);
-  bLimits.push({ cat, amount });
-  localStorage.setItem('soyuco_limits', JSON.stringify(bLimits));
+  window.bLimits = window.bLimits.filter(l => l.cat !== cat);
+  window.bLimits.push({ cat, amount });
+  localStorage.setItem('soyuco_limits', JSON.stringify(window.bLimits));
   
-  // Sync to cloud if logged in
   if (window.currentUser) {
     try {
       const { supabase } = await import('./supabase-client.js');
-      const { error } = await supabase
-        .from('budget_limits')
-        .upsert({ 
-          user_id: window.currentUser.id,
-          category: cat,
-          amount: amount
-        });
-      if (error) {
-        console.error('Error saving limit to cloud:', error);
-      } else {
-        console.log('Budget limit saved to cloud');
-      }
+      await supabase.from('budget_limits').upsert({ 
+        user_id: window.currentUser.id,
+        category: cat,
+        amount: amount
+      });
     } catch (err) {
       console.error('Cloud sync error:', err);
     }
@@ -520,7 +454,7 @@ async function saveLimit() {
   
   closeLimitModal();
   renderBudget();
-  window.showToast('Budget limit saved!', 'success');
+  if (window.showToast) window.showToast('Budget limit saved!', 'success');
 }
 
 // ===========================
@@ -529,34 +463,33 @@ async function saveLimit() {
 
 function renderBudget() {
   renderTrendChart();
-  const income   = bTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const expenses = bTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-  const balance  = income - expenses;
+  
+  const income = window.bTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const expenses = window.bTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const balance = income - expenses;
 
-  document.getElementById('bIncome').textContent   = '$' + income.toFixed(2);
+  document.getElementById('bIncome').textContent = '$' + income.toFixed(2);
   document.getElementById('bExpenses').textContent = '$' + expenses.toFixed(2);
 
   const balEl = document.getElementById('bBalance');
-  balEl.textContent  = (balance < 0 ? '-$' : '$') + Math.abs(balance).toFixed(2);
-  balEl.style.color  = balance >= 0 ? 'var(--success)' : 'var(--danger)';
+  balEl.textContent = (balance < 0 ? '-$' : '$') + Math.abs(balance).toFixed(2);
+  balEl.style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
 
-  const totalSaved  = bGoals.reduce((s, g) => s + g.saved, 0);
-  const totalTarget = bGoals.reduce((s, g) => s + g.target, 0);
-  document.getElementById('bSavings').textContent    = '$' + totalSaved.toFixed(2);
-  document.getElementById('bSavingsPct').textContent = totalTarget > 0
-    ? Math.round(totalSaved / totalTarget * 100) + '%'
-    : '0%';
+  const totalSaved = window.bGoals.reduce((s, g) => s + g.saved, 0);
+  const totalTarget = window.bGoals.reduce((s, g) => s + g.target, 0);
+  document.getElementById('bSavings').textContent = '$' + totalSaved.toFixed(2);
+  document.getElementById('bSavingsPct').textContent = totalTarget > 0 ? Math.round(totalSaved / totalTarget * 100) + '%' : '0%';
 
-  // ---- Transactions list ----
-  const txList  = document.getElementById('txList');
+  // Transactions list
+  const txList = document.getElementById('txList');
   const txEmpty = document.getElementById('txEmpty');
 
-  if (!bTransactions.length) {
+  if (!window.bTransactions.length) {
     txList.innerHTML = '';
     txEmpty.style.display = 'block';
   } else {
     txEmpty.style.display = 'none';
-    txList.innerHTML = [...bTransactions].reverse().map(t => `
+    txList.innerHTML = [...window.bTransactions].reverse().map(t => `
       <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);">
         <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};"></div>
         <div style="flex:1;min-width:0;">
@@ -564,21 +497,18 @@ function renderBudget() {
           <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);margin-top:2px;">${CAT_LABELS[t.cat] || t.cat} · ${t.date}</div>
         </div>
         <div style="font-family:var(--font-mono);font-size:0.85rem;font-weight:600;color:${t.type === 'income' ? 'var(--success)' : 'var(--danger)'};">${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}</div>
-        <button onclick="openTxModal(${t.id})"
-          style="font-size:0.65rem;color:var(--text3);padding:2px 6px;background:none;border:1px solid transparent;border-radius:var(--radius);cursor:pointer;transition:all var(--transition);"
-          onmouseover="this.style.borderColor='var(--border)';this.style.color='var(--text)'"
-          onmouseout="this.style.borderColor='transparent';this.style.color='var(--text3)'">✎</button>
-      </div>`
-    ).join('');
+        <button onclick="openTxModal(${t.id})" style="font-size:0.65rem;color:var(--text3);padding:2px 6px;background:none;border:1px solid transparent;border-radius:var(--radius);cursor:pointer;">✎</button>
+      </div>
+    `).join('');
   }
 
-  // ---- Category breakdown ----
+  // Category breakdown
   const catTotals = {};
-  bTransactions.filter(t => t.type === 'expense').forEach(t => {
+  window.bTransactions.filter(t => t.type === 'expense').forEach(t => {
     catTotals[t.cat] = (catTotals[t.cat] || 0) + t.amount;
   });
   const catEntries = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
-  const byCat      = document.getElementById('byCat');
+  const byCat = document.getElementById('byCat');
   const byCatEmpty = document.getElementById('byCatEmpty');
 
   if (!catEntries.length) {
@@ -594,74 +524,66 @@ function renderBudget() {
           <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--accent2);">$${amt.toFixed(2)}</span>
         </div>
         <div style="height:5px;background:var(--bg3);border-radius:4px;overflow:hidden;">
-          <div style="height:100%;width:${Math.round(amt / maxV * 100)}%;background:var(--accent);border-radius:4px;transition:width 0.4s;"></div>
+          <div style="height:100%;width:${Math.round(amt / maxV * 100)}%;background:var(--accent);border-radius:4px;"></div>
         </div>
-      </div>`
-    ).join('');
+      </div>
+    `).join('');
   }
 
-  // ---- Goals ----
-  const goalsList  = document.getElementById('goalsList');
+  // Goals
+  const goalsList = document.getElementById('goalsList');
   const goalsEmpty = document.getElementById('goalsEmpty');
 
-  if (!bGoals.length) {
+  if (!window.bGoals.length) {
     goalsList.innerHTML = '';
     goalsEmpty.style.display = 'block';
   } else {
     goalsEmpty.style.display = 'none';
-    goalsList.innerHTML = bGoals.map(g => {
+    goalsList.innerHTML = window.bGoals.map(g => {
       const pct = Math.min(100, Math.round(g.saved / g.target * 100));
       const isComplete = pct >= 100;
       return `<div style="display:flex;flex-direction:column;gap:6px;padding:12px 0;border-bottom:1px solid var(--border);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-family:var(--font-ui);font-size:0.82rem;color:var(--text);font-weight:500;">
-            ${isComplete ? '🎉 ' : ''}${escHtml(g.name)}
-          </span>
+          <span style="font-family:var(--font-ui);font-size:0.82rem;color:var(--text);font-weight:500;">${isComplete ? '🎉 ' : ''}${escHtml(g.name)}</span>
           <span style="display:flex;align-items:center;gap:8px;">
             <span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--accent2);">${pct}%</span>
-            <button onclick="deleteGoal(${g.id})" style="font-size:0.65rem;color:var(--text3);background:none;border:none;cursor:pointer;"
-              onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text3)'">✕</button>
+            <button onclick="deleteGoal(${g.id})" style="font-size:0.65rem;color:var(--text3);background:none;border:none;cursor:pointer;">✕</button>
           </span>
         </div>
         <div style="height:7px;background:var(--bg3);border-radius:8px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:8px;transition:width 0.4s;"></div>
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:8px;"></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">
           <span style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text3);">$${g.saved.toFixed(2)} of $${g.target.toFixed(2)}</span>
-          <button onclick="openSavingsModal(${g.id})"
-            style="font-family:var(--font-ui);font-size:0.65rem;padding:3px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;transition:all var(--transition);"
-            onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
-            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">± Add / Remove</button>
+          <button onclick="openSavingsModal(${g.id})" style="font-family:var(--font-ui);font-size:0.65rem;padding:3px 8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text2);cursor:pointer;">± Add / Remove</button>
         </div>
       </div>`;
     }).join('');
   }
 
-  // ---- Limits ----
-  const limitsList  = document.getElementById('limitsList');
+  // Limits
+  const limitsList = document.getElementById('limitsList');
   const limitsEmpty = document.getElementById('limitsEmpty');
 
-  if (!bLimits.length) {
+  if (!window.bLimits.length) {
     limitsList.innerHTML = '';
     limitsEmpty.style.display = 'block';
   } else {
     limitsEmpty.style.display = 'none';
-    limitsList.innerHTML = bLimits.map(l => {
+    limitsList.innerHTML = window.bLimits.map(l => {
       const spent = catTotals[l.cat] || 0;
-      const pct   = Math.min(100, Math.round(spent / l.amount * 100));
-      const col   = pct >= 100 ? 'var(--danger)' : pct >= 80 ? 'var(--accent2)' : 'var(--success)';
+      const pct = Math.min(100, Math.round(spent / l.amount * 100));
+      const col = pct >= 100 ? 'var(--danger)' : pct >= 80 ? 'var(--accent2)' : 'var(--success)';
       return `<div style="display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px solid var(--border);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-family:var(--font-ui);font-size:0.8rem;color:var(--text);">${CAT_LABELS[l.cat] || l.cat}</span>
           <span style="display:flex;align-items:center;gap:8px;">
             <span style="font-family:var(--font-mono);font-size:0.65rem;color:${col};">$${spent.toFixed(0)} / $${l.amount.toFixed(0)}</span>
-            <button onclick="deleteLimit('${l.cat}')"
-              style="font-size:0.6rem;color:var(--text3);padding:1px 4px;background:none;border:none;cursor:pointer;"
-              onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--text3)'">✕</button>
+            <button onclick="deleteLimit('${l.cat}')" style="font-size:0.6rem;color:var(--text3);padding:1px 4px;background:none;border:none;cursor:pointer;">✕</button>
           </span>
         </div>
         <div style="height:5px;background:var(--bg3);border-radius:4px;overflow:hidden;">
-          <div style="height:100%;width:${pct}%;background:${col};border-radius:4px;transition:width 0.4s;"></div>
+          <div style="height:100%;width:${pct}%;background:${col};border-radius:4px;"></div>
         </div>
       </div>`;
     }).join('');
