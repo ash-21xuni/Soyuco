@@ -8,42 +8,57 @@ function renderAiInsights() {
   const doneTodos    = todayTodos.filter(t => t.done).length;
   const habitsDone   = habits.reduce((s, h) => s + h.days.filter(Boolean).length, 0);
   const moodValues   = Object.values(moodHistory).filter(Boolean);
-  const avgMood      = moodValues.length
-    ? Math.round(moodValues.reduce((s, v) => s + v, 0) / moodValues.length * 10) / 10
-    : 0;
+  const avgMood      = moodValues.length ? Math.round(moodValues.reduce((s, v) => s + v, 0) / moodValues.length * 10) / 10 : 0;
   const moodLabels   = ['–', 'Awful', 'Meh', 'Okay', 'Good', 'Great'];
 
   document.getElementById('aiInsights').innerHTML = `
     <div class="ai-section-title">Your Week at a Glance</div>
-    <div class="ai-insights">
-      <div class="ai-insight-card">
-        <div class="ai-insight-icon">📓</div>
-        <div class="ai-insight-label">Journal Entries</div>
-        <div class="ai-insight-value">${totalEntries}</div>
-        <div class="ai-insight-sub">Total written</div>
-      </div>
-      <div class="ai-insight-card">
-        <div class="ai-insight-icon">☑</div>
-        <div class="ai-insight-label">Today's Tasks</div>
-        <div class="ai-insight-value">${doneTodos}/${todayTodos.length}</div>
-        <div class="ai-insight-sub">${todayTodos.length ? Math.round(doneTodos / todayTodos.length * 100) : 0}% complete</div>
-      </div>
-      <div class="ai-insight-card">
-        <div class="ai-insight-icon">◈</div>
-        <div class="ai-insight-label">Habit Streak</div>
-        <div class="ai-insight-value">${habitsDone}</div>
-        <div class="ai-insight-sub">Completions this week</div>
-      </div>
-      <div class="ai-insight-card">
-        <div class="ai-insight-icon">😊</div>
-        <div class="ai-insight-label">Avg Mood</div>
-        <div class="ai-insight-value">${avgMood || '–'}</div>
-        <div class="ai-insight-sub">${avgMood ? moodLabels[Math.round(avgMood)] : 'Not set'}</div>
+    
+    <!-- Task Summary Box -->
+    <div class="ai-task-summary-box">
+      <span class="summary-label">📋 Tasks Completed Today</span>
+      <div class="summary-progress">
+        <span class="summary-value">${doneTodos}/${todayTodos.length}</span>
+        <div class="progress-bar">
+          <div class="fill" style="width: ${todayTodos.length ? Math.round(doneTodos / todayTodos.length * 100) : 0}%"></div>
+        </div>
+        <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text3);">
+          ${todayTodos.length ? Math.round(doneTodos / todayTodos.length * 100) : 0}%
+        </span>
       </div>
     </div>
+    
+    <!-- 4 Boxes in a Horizontal Row -->
+    <div class="ai-insights-grid">
+      <div class="ai-insight-card">
+        <div style="font-size:1.5rem;margin-bottom:4px;">📓</div>
+        <div style="font-family:var(--font-ui);font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Entries</div>
+        <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--text);">${totalEntries}</div>
+        <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text3);">Total written</div>
+      </div>
+      <div class="ai-insight-card">
+        <div style="font-size:1.5rem;margin-bottom:4px;">☑</div>
+        <div style="font-family:var(--font-ui);font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Tasks</div>
+        <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--text);">${doneTodos}/${todayTodos.length}</div>
+        <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text3);">${todayTodos.length ? Math.round(doneTodos / todayTodos.length * 100) : 0}% done</div>
+      </div>
+      <div class="ai-insight-card">
+        <div style="font-size:1.5rem;margin-bottom:4px;">◈</div>
+        <div style="font-family:var(--font-ui);font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Habits</div>
+        <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--text);">${habitsDone}</div>
+        <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text3);">Completions this week</div>
+      </div>
+      <div class="ai-insight-card">
+        <div style="font-size:1.5rem;margin-bottom:4px;">😊</div>
+        <div style="font-family:var(--font-ui);font-size:0.6rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;">Mood</div>
+        <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;color:var(--text);">${avgMood || '–'}</div>
+        <div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text3);">${avgMood ? moodLabels[Math.round(avgMood)] : 'Not set'}</div>
+      </div>
+    </div>
+    
     ${aiMessages.length === 0 ? `
       <div class="ai-section-title">What would you like to do?</div>
-      <div style="font-family:var(--font-ui);font-size:0.83rem;color:var(--text2);line-height:1.7;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;">
+      <div style="font-family:var(--font-ui);font-size:0.83rem;color:var(--text2);line-height:1.7;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;">
         <strong style="color:var(--accent2);">⬡ Your AI planner can:</strong><br>
         • Build a complete hourly schedule for your day<br>
         • Suggest tasks and priorities based on your goals<br>

@@ -1,11 +1,11 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.7.17 Chrome/128.0.6613.36 Electron/32.0.1 Safari/537.36" version="24.7.17">
   <diagram name="Page-1" id="Z_RnJYw8HpLAuOBS58o4">
-    <mxGraphModel dx="974" dy="456" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1120" dy="524" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="vIv0GGofDIMRJwX6vlFP-2" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
-          <mxGeometry x="150" y="50" width="30" height="60" as="geometry" />
+          <mxGeometry x="160" y="450" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="vIv0GGofDIMRJwX6vlFP-3" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
           <mxGeometry x="230" y="50" width="380" height="1000" as="geometry" />
@@ -13,11 +13,11 @@
         <mxCell id="vIv0GGofDIMRJwX6vlFP-4" value="Database" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
           <mxGeometry x="660" y="440" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="vIv0GGofDIMRJwX6vlFP-5" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Use Cases of Soyuco&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#FF3399;" parent="1" vertex="1">
-          <mxGeometry x="317.5" y="10" width="205" height="30" as="geometry" />
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-5" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Use Cases of Soyuco Application&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="283.75" y="10" width="272.5" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="vIv0GGofDIMRJwX6vlFP-6" value="Key Considerations:&lt;div&gt;&lt;ul&gt;&lt;li&gt;Mood Buttons don&#39;t actually work✅&lt;/li&gt;&lt;li&gt;Theme needs to be saved✅&lt;/li&gt;&lt;li&gt;There is a database --&amp;gt; need to configure how it works upon loading cloud data&lt;/li&gt;&lt;li&gt;Need to have two HTML pages - Login, Index&lt;/li&gt;&lt;ul&gt;&lt;li&gt;Can only access index after logging in&lt;/li&gt;&lt;li&gt;Login page needs to have all product information&lt;/li&gt;&lt;li&gt;No local storage note saving, cloud only&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;Need to consider using React framework&lt;/li&gt;&lt;li&gt;Settings and help need to be configured --&amp;gt; separate pages&lt;/li&gt;&lt;li&gt;Repeating tasks need to be configured&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#9933FF;" parent="1" vertex="1">
-          <mxGeometry x="860" y="170" width="830" height="190" as="geometry" />
+        <mxCell id="vIv0GGofDIMRJwX6vlFP-6" value="Key Considerations:&lt;div&gt;&lt;ul&gt;&lt;li&gt;Mood Buttons don&#39;t actually work✅&lt;/li&gt;&lt;li&gt;Theme needs to be saved✅&lt;/li&gt;&lt;li&gt;There is a database --&amp;gt; need to configure how it works upon loading cloud data✅&lt;/li&gt;&lt;li&gt;Need to have two HTML pages - Login, Index✅&lt;/li&gt;&lt;ul&gt;&lt;li&gt;Can only access index after logging in✅&lt;/li&gt;&lt;li&gt;Login page needs to have all product information&lt;/li&gt;&lt;li&gt;No local storage note saving, cloud only✅&lt;/li&gt;&lt;/ul&gt;&lt;li&gt;Need to consider using React framework&lt;/li&gt;&lt;li&gt;Settings and help need to be configured --&amp;gt; separate pages&lt;/li&gt;&lt;li&gt;Repeating tasks need to be configured&lt;/li&gt;&lt;li&gt;Need to create notifications&lt;/li&gt;&lt;/ul&gt;&lt;div&gt;Current errors that need fixing:&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;ul&gt;&lt;li&gt;Landing page needs to be completed&lt;/li&gt;&lt;li&gt;Day Planner section changing calendar buttons need fixing&lt;/li&gt;&lt;li&gt;Daily Habits doesn&#39;t reset daily or show historical records - consider if it just sets up your plan instead of tracks&lt;/li&gt;&lt;li&gt;Spending Metrics graph does not work&lt;/li&gt;&lt;li&gt;AI planner task tracker is not in div box&lt;/li&gt;&lt;li&gt;AI planner is not configured yet&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#9933FF;" parent="1" vertex="1">
+          <mxGeometry x="860" y="170" width="830" height="330" as="geometry" />
         </mxCell>
         <mxCell id="vIv0GGofDIMRJwX6vlFP-8" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Additional Notes&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#9933FF;" parent="1" vertex="1">
           <mxGeometry x="860" y="10" width="205" height="30" as="geometry" />
@@ -39,6 +39,39 @@
         </mxCell>
         <mxCell id="vIv0GGofDIMRJwX6vlFP-14" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Activity Diagram of Soyuco&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeColor=#0066CC;" parent="1" vertex="1">
           <mxGeometry x="296" y="1140" width="257" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-1" value="Edit Journal Entry" style="ellipse;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="270" y="90" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-2" value="Delete Journal Entry" style="ellipse;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="270" y="150" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-3" value="Search Entries" style="ellipse;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="270" y="210" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-4" value="Add Tags to Entry" style="ellipse;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="270" y="270" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-5" value="Create Journal Entry" style="ellipse;whiteSpace=wrap;html=1;strokeColor=#FF3399;" parent="1" vertex="1">
+          <mxGeometry x="460" y="180" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-7" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" style="endArrow=open;startArrow=none;endFill=0;startFill=0;endSize=8;html=1;verticalAlign=bottom;dashed=1;labelBackgroundColor=none;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" parent="1" source="rLL01j5jCNyfB29nbyLJ-1" target="rLL01j5jCNyfB29nbyLJ-5" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="380" y="290" as="sourcePoint" />
+            <mxPoint x="460" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-8" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" style="endArrow=open;startArrow=none;endFill=0;startFill=0;endSize=8;html=1;verticalAlign=bottom;dashed=1;labelBackgroundColor=none;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="rLL01j5jCNyfB29nbyLJ-2" target="rLL01j5jCNyfB29nbyLJ-5" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="380" y="190" as="sourcePoint" />
+            <mxPoint x="485" y="266" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rLL01j5jCNyfB29nbyLJ-10" value="&amp;lt;&amp;lt;extend&amp;gt;&amp;gt;" style="endArrow=open;startArrow=none;endFill=0;startFill=0;endSize=8;html=1;verticalAlign=bottom;dashed=1;labelBackgroundColor=none;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" parent="1" source="rLL01j5jCNyfB29nbyLJ-4" target="rLL01j5jCNyfB29nbyLJ-5" edge="1">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="380" y="240" as="sourcePoint" />
+            <mxPoint x="485" y="224" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
