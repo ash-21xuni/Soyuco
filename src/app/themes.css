@@ -940,6 +940,36 @@ main { padding-top: 0px; }
 }
 .login-eye-btn:hover { color: var(--text); }
 
+.switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition, 0.2s), border-color var(--transition, 0.2s);
+}
+.switch.on {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg2);
+  transition: transform var(--transition, 0.2s);
+}
+.switch.on .switch-knob {
+  transform: translateX(18px);
+  background: var(--bg);
+}
+
 /* =========================================
    SIDEBAR & MAIN APP STYLES (Original)
 ========================================= */
@@ -2595,3 +2625,33 @@ option {
   cursor: pointer;
 }
 .login-eye-btn:hover { color: var(--text); }
+
+.switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background var(--transition, 0.2s), border-color var(--transition, 0.2s);
+}
+.switch.on {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg2);
+  transition: transform var(--transition, 0.2s);
+}
+.switch.on .switch-knob {
+  transform: translateX(18px);
+  background: var(--bg);
+}

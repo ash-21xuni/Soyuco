@@ -89,6 +89,27 @@ export function Topbar() {
               </div>
             </div>
             <button
+              onClick={() => {
+                setMenuOpen(false);
+                router.push("/settings");
+              }}
+              style={{
+                display: "block",
+                width: "100%",
+                textAlign: "left",
+                padding: "10px 12px",
+                fontFamily: "var(--font-ui)",
+                fontSize: "0.75rem",
+                color: "var(--text2)",
+                background: "none",
+                border: "none",
+                borderBottom: "1px solid var(--border)",
+                cursor: "pointer",
+              }}
+            >
+              ⚙ Account Settings
+            </button>
+            <button
               onClick={handleSignOut}
               style={{
                 display: "block",

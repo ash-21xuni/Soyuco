@@ -10,10 +10,12 @@ import { JournalProvider } from "@/lib/journal/journal-context";
 import { PlannerProvider } from "@/lib/planner/planner-context";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { ToastProvider } from "@/lib/toast/toast-context";
+import { useJournalReminder } from "@/lib/notifications/reminder";
 
 export default function AppShellLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { user, loading } = useAuth();
+  useJournalReminder();
 
   useEffect(() => {
     if (!loading && !user) {

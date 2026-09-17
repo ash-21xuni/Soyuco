@@ -23,6 +23,7 @@ type AuthContextValue = {
   ) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
+  deleteAccount: () => Promise<{ error: string | null }>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -72,6 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           options: { redirectTo: `${window.location.origin}/auth/callback` },
         });
         return { error: error?.message ?? null };
+      },
+      async deleteAccount() {
+        const { error } = await supabase.rpc("delete_own_account");
+        if (error) return { error: error.message };
+        await supabase.auth.signOut();
+        return { error: null };
       },
     }),
     [session, loading],
