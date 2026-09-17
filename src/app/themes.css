@@ -888,6 +888,58 @@ main { padding-top: 0px; }
 }
 .form-hidden { display: none; }
 
+.login-btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-ui);
+}
+.login-btn-google:hover { border-color: var(--accent); transform: translateY(-1px); }
+.login-btn-google:disabled { opacity: 0.6; cursor: default; transform: none; }
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text3);
+  font-size: 0.75rem;
+  margin: 20px 0;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+.login-divider span { padding: 0 12px; }
+.login-password-wrap { position: relative; }
+.login-password-wrap .login-input { padding-right: 42px; }
+.login-eye-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  cursor: pointer;
+}
+.login-eye-btn:hover { color: var(--text); }
+
 /* =========================================
    SIDEBAR & MAIN APP STYLES (Original)
 ========================================= */
@@ -2491,3 +2543,55 @@ option {
   display: none;
 }
 .form-hidden { display: none; }
+
+.login-btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-ui);
+}
+.login-btn-google:hover { border-color: var(--accent); transform: translateY(-1px); }
+.login-btn-google:disabled { opacity: 0.6; cursor: default; transform: none; }
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text3);
+  font-size: 0.75rem;
+  margin: 20px 0;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+.login-divider span { padding: 0 12px; }
+.login-password-wrap { position: relative; }
+.login-password-wrap .login-input { padding-right: 42px; }
+.login-eye-btn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  cursor: pointer;
+}
+.login-eye-btn:hover { color: var(--text); }
