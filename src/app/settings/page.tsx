@@ -9,6 +9,7 @@ import { NotificationsSection } from "@/components/settings/NotificationsSection
 import { DangerZoneSection } from "@/components/settings/DangerZoneSection";
 import { HelpSection } from "@/components/settings/HelpSection";
 import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 
 type Tab = "profile" | "preferences" | "notifications" | "help";
 
@@ -30,7 +31,8 @@ export default function SettingsPage() {
   const [tab, setTab] = useState<Tab>("profile");
 
   return (
-    <div className="journal-layout">
+    <div className="journal-layout" id="settings-view">
+      <ScrollReveal container="#settings-view" />
       <div className="entry-list" style={{ width: 260 }}>
         <div className="entry-list-header">
           <Link
@@ -84,7 +86,8 @@ export default function SettingsPage() {
           </div>
         </div>
         <div className="editor-body">
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Keyed by tab so switching tabs replays the enter animation. */}
+          <div key={tab} className="tab-enter" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {tab === "profile" && (
               <>
                 <ProfileSection />

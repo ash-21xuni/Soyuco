@@ -14,6 +14,7 @@ import { useJournalReminder } from "@/lib/notifications/reminder";
 import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
 import { useSplash } from "@/components/splash/SplashProvider";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 
 // Keeps the splash up until the first cloud pull lands, so a fresh device
 // never shows empty journal/planner screens that then pop full.
@@ -50,6 +51,7 @@ export default function AppShellLayout({ children }: { children: ReactNode }) {
                 <main id="main">
                   <Topbar />
                   <div id="content">{children}</div>
+                  <ScrollReveal container="#content" />
                 </main>
               </div>
             </BudgetProvider>
