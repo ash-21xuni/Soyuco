@@ -36,23 +36,25 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     aiTitle: "$ AI_PLANNER --run",
   },
   lavender: { ...DEFAULT_COPY, empty: "✨" },
+  // Premium theme ids are kept stable for saved preferences; display names are
+  // Sunny Reef (spongebob), Queen Bee (meangirls) and Pixel Quarry (minecraft).
   spongebob: {
-    empty: "🧽",
-    emptyTitle: "I'm ready!",
+    empty: "🐠",
+    emptyTitle: "Ready, set, splash!",
     schedule: "🕐 Today's Adventures",
     tasks: "📋 Chores (don't skip!)",
     habits: "🌟 Good Habits",
-    quote: "🍍 Words of Wisdom",
-    aiTitle: "🧽 Krabby AI Planner",
+    quote: "🐚 Words of Wisdom",
+    aiTitle: "🐠 Reef AI Planner",
   },
   meangirls: {
     empty: "💅",
     emptyTitle: "Start writing, babe",
     schedule: "💗 My Schedule",
-    tasks: "💕 On Wednesdays We Task",
+    tasks: "💕 Top Priorities",
     habits: "✨ Glow-Up Habits",
     quote: "👑 Quote of the Day",
-    aiTitle: "💅 AI Planner (fetch!)",
+    aiTitle: "💅 AI Planner, Darling",
   },
   minecraft: {
     empty: "⛏",
@@ -79,33 +81,30 @@ export const QUOTES: Quote[] = [
   },
 ];
 
-export const SPONGEBOB_QUOTES: Quote[] = [
-  { text: "I'm ready! I'm ready! I'm ready!", author: "SpongeBob SquarePants" },
-  {
-    text: "If you believe in yourself and with a tiny pinch of magic, all your dreams can come true.",
-    author: "SpongeBob SquarePants",
-  },
-  { text: "I don't need a license to drive a sandwich.", author: "SpongeBob SquarePants" },
-  { text: "Imagination!", author: "SpongeBob SquarePants" },
+export const REEF_QUOTES: Quote[] = [
+  { text: "Every tide brings a fresh start.", author: "Sunny Reef" },
+  { text: "Bubbles up! Today is a brand-new adventure.", author: "Sunny Reef" },
+  { text: "Even the smallest shell holds the whole song of the sea.", author: "Sunny Reef" },
+  { text: "Stay bright, stay curious, and ride the current.", author: "Sunny Reef" },
 ];
 
-export const MEANGIRLS_QUOTES: Quote[] = [
-  { text: "On Wednesdays we wear pink.", author: "Mean Girls" },
-  { text: "You can't sit with us.", author: "Mean Girls" },
-  { text: "She doesn't even go here.", author: "Mean Girls" },
-  { text: "Get in loser, we're going shopping.", author: "Mean Girls" },
+export const QUEEN_BEE_QUOTES: Quote[] = [
+  { text: "Confidence is the best accessory.", author: "Queen Bee" },
+  { text: "Be the main character of your own story.", author: "Queen Bee" },
+  { text: "Pink is a power colour.", author: "Queen Bee" },
+  { text: "Write it down, then make it happen.", author: "Queen Bee" },
 ];
 
-export const MINECRAFT_QUOTES: Quote[] = [
-  { text: "ACHIEVEMENT UNLOCKED: STARTED A JOURNAL.", author: "Steve" },
-  { text: "DIAMONDS ARE EVERYWHERE. YOU JUST HAVE TO DIG.", author: "Minecraft Wisdom" },
-  { text: "DON'T MINE STRAIGHT DOWN. (AND DON'T SKIP JOURNALING.)", author: "Steve" },
-  { text: "BUILD YOUR DAY BLOCK BY BLOCK.", author: "Minecraft Wisdom" },
+export const PIXEL_QUARRY_QUOTES: Quote[] = [
+  { text: "ACHIEVEMENT UNLOCKED: STARTED A JOURNAL.", author: "Quarry Wisdom" },
+  { text: "GEMS ARE EVERYWHERE. YOU JUST HAVE TO DIG.", author: "Quarry Wisdom" },
+  { text: "EVERY GREAT BUILD STARTS WITH ONE BLOCK.", author: "Quarry Wisdom" },
+  { text: "BUILD YOUR DAY BLOCK BY BLOCK.", author: "Quarry Wisdom" },
 ];
 
 export function quotePoolForTheme(theme: ThemeId): Quote[] {
-  if (theme === "spongebob") return SPONGEBOB_QUOTES;
-  if (theme === "meangirls") return MEANGIRLS_QUOTES;
-  if (theme === "minecraft") return MINECRAFT_QUOTES;
+  if (theme === "spongebob") return REEF_QUOTES;
+  if (theme === "meangirls") return QUEEN_BEE_QUOTES;
+  if (theme === "minecraft") return PIXEL_QUARRY_QUOTES;
   return QUOTES;
 }

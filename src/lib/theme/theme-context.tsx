@@ -20,9 +20,9 @@ export const THEMES = [
 ] as const;
 
 export const PREMIUM_THEMES = [
-  { id: "spongebob", title: "SpongeBob 🧽" },
-  { id: "meangirls", title: "Mean Girls 💅" },
-  { id: "minecraft", title: "Minecraft ⛏" },
+  { id: "spongebob", title: "Sunny Reef" },
+  { id: "meangirls", title: "Queen Bee" },
+  { id: "minecraft", title: "Pixel Quarry" },
 ] as const;
 
 export type ThemeId =

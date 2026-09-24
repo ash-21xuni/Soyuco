@@ -1255,7 +1255,10 @@ main { padding-top: 0px; }
   text-transform: uppercase;
   padding: 8px 8px 4px;
 }
-.premium-crown { font-size: 0.85rem; }
+.premium-crown {
+  display: inline-flex;
+  color: var(--accent);
+}
 .premium-badge {
   display: inline-block;
   padding: 1px 5px;
@@ -2341,7 +2344,7 @@ option {
   display: inline-block;
 }
 
-/* Minecraft cursor */
+/* Pixel Quarry cursor */
 [data-theme="minecraft"] * { cursor: crosshair; }
 [data-theme="minecraft"] button,
 [data-theme="minecraft"] .swatch,

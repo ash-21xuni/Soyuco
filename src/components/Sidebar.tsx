@@ -9,6 +9,7 @@ import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
 import { PREMIUM_THEMES, THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
 import { useToast } from "@/lib/toast/toast-context";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const NAV_ITEMS = [
   { view: "journal", href: "/journal", icon: "✦", label: "Journal" },
@@ -176,7 +177,10 @@ export function Sidebar() {
         </div>
 
         <div className="premium-label">
-          <span className="premium-crown">👑</span> Premium
+          <span className="premium-crown">
+            <SettingsIcon name="crown" size={13} />
+          </span>
+          Premium
           <span className="premium-badge">PRO</span>
         </div>
         <div className="theme-swatches">
