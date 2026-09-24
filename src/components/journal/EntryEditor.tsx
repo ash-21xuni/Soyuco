@@ -1,12 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useJournal } from "@/lib/journal/journal-context";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { TaskItem, TaskList } from "@tiptap/extension-list";
+import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
+import { Color, TextStyle } from "@tiptap/extension-text-style";
+import Highlight from "@tiptap/extension-highlight";
+import { Placeholder } from "@tiptap/extensions";
+import { useJournal, type JournalEntry } from "@/lib/journal/journal-context";
+import { bodyToHtml, bodyToText, textToHtml } from "@/lib/journal/body";
 import { useTheme } from "@/lib/theme/theme-context";
 import { THEME_COPY } from "@/lib/theme/theme-copy";
 import { useToast } from "@/lib/toast/toast-context";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { PromptModal } from "@/components/modals/PromptModal";
+import { FormatToolbar, TableToolbar } from "@/components/journal/FormatToolbar";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { completeText } from "@/lib/ai/client";
 
 const FONT_OPTIONS = [
@@ -29,36 +39,11 @@ function wordCount(text: string) {
 }
 
 export function EntryEditor() {
-  const {
-    entries,
-    collections,
-    currentEntryId,
-    updateEntry,
-    saveEntryToCloud,
-    deleteEntry,
-    addTag,
-    toggleEntryCollection,
-  } = useJournal();
-  const { showToast } = useToast();
+  const { entries, currentEntryId } = useJournal();
   const { theme } = useTheme();
   const copy = THEME_COPY[theme];
 
   const entry = entries.find((e) => e.id === currentEntryId) ?? null;
-
-  const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
-  const [fontSize, setFontSize] = useState(17);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [tagModalOpen, setTagModalOpen] = useState(false);
-  const [aiAssisting, setAiAssisting] = useState(false);
-  const titleRef = useRef<HTMLInputElement>(null);
-
-  const prevEntryId = useRef<number | null>(null);
-  useEffect(() => {
-    if (entry && entry.id !== prevEntryId.current) {
-      titleRef.current?.focus();
-    }
-    prevEntryId.current = entry?.id ?? null;
-  }, [entry]);
 
   if (!entry) {
     return (
@@ -74,28 +59,72 @@ export function EntryEditor() {
     );
   }
 
+  // Keyed so each entry gets a fresh editor loaded with its own content.
+  return <EntryEditorView key={entry.id} entry={entry} />;
+}
+
+function EntryEditorView({ entry }: { entry: JournalEntry }) {
+  const { collections, updateEntry, saveEntryToCloud, deleteEntry, addTag, toggleEntryCollection } =
+    useJournal();
+  const { showToast } = useToast();
+
+  const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
+  const [fontSize, setFontSize] = useState(17);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [tagModalOpen, setTagModalOpen] = useState(false);
+  const [aiAssisting, setAiAssisting] = useState(false);
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      TextStyle,
+      Color,
+      Highlight.configure({ multicolor: true }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Placeholder.configure({
+        placeholder: "What's on your mind today? Let your thoughts flow freely…",
+      }),
+    ],
+    // Legacy plain-text bodies are converted on load; they're only rewritten
+    // as HTML once the entry is actually edited.
+    content: bodyToHtml(entry.body),
+    immediatelyRender: false,
+    editorProps: { attributes: { class: "rich-editor-content" } },
+    onUpdate: ({ editor: e }) => updateEntry(entry.id, { body: e.getHTML() }),
+  });
+
+  useEffect(() => {
+    titleRef.current?.focus();
+  }, []);
+
+  const plainBody = bodyToText(entry.body);
+
   async function handleSave() {
-    if (!entry) return;
     const { error } = await saveEntryToCloud(entry.id);
     showToast(error ? `Save failed: ${error}` : "Entry saved!", error ? "error" : "success");
   }
 
   async function handleConfirmDelete() {
-    if (!entry) return;
     await deleteEntry(entry.id);
     setDeleteOpen(false);
   }
 
   async function handleAiAssist() {
-    if (!entry) return;
-    if (!entry.body.trim() && !entry.title.trim()) {
+    if (!editor) return;
+    if (!plainBody.trim() && !entry.title.trim()) {
       showToast("Write something first!", "error");
       return;
     }
 
     setAiAssisting(true);
-    const prompt = entry.body.trim()
-      ? `You are a thoughtful journal writing assistant. The user has started a journal entry titled "${entry.title || "Untitled"}". Continue it naturally in their voice — about 2-3 more paragraphs. Don't add a title, just continue the text:\n\n${entry.body}`
+    const prompt = plainBody.trim()
+      ? `You are a thoughtful journal writing assistant. The user has started a journal entry titled "${entry.title || "Untitled"}". Continue it naturally in their voice — about 2-3 more paragraphs. Don't add a title, just continue the text:\n\n${plainBody}`
       : `Start a journal entry titled "${entry.title}". Write 2-3 paragraphs in a personal, reflective, first-person voice.`;
 
     const { text, error } = await completeText(prompt);
@@ -106,8 +135,7 @@ export function EntryEditor() {
       return;
     }
 
-    const body = entry.body + (entry.body && !entry.body.endsWith("\n") ? "\n\n" : "") + text;
-    updateEntry(entry.id, { body });
+    editor.chain().focus("end").insertContent(textToHtml(text.trim())).run();
   }
 
   return (
@@ -133,33 +161,32 @@ export function EntryEditor() {
           onChange={(e) => setFontSize(Number(e.target.value) || 17)}
         />
         <div className="editor-toolbar-sep" />
-        <button className="tool-btn" title="Bold">
-          <b>B</b>
-        </button>
-        <button className="tool-btn" title="Italic">
-          <i>I</i>
-        </button>
-        <button className="tool-btn" title="Underline">
-          <u>U</u>
-        </button>
+        {editor && <FormatToolbar editor={editor} />}
         <div className="editor-toolbar-sep" />
-        <button className="tool-btn" onClick={handleAiAssist} disabled={aiAssisting}>
+        <button className="tool-btn tool-btn-labelled" onClick={handleAiAssist} disabled={aiAssisting}>
           {aiAssisting ? (
             <>
               <span className="spin">⬡</span> Writing…
             </>
           ) : (
-            "⬡ AI Assist"
+            <>
+              <SettingsIcon name="sparkles" size={14} /> AI Assist
+            </>
           )}
         </button>
         <div className="editor-toolbar-sep" />
-        <button className="tool-btn" onClick={handleSave}>
-          💾 Save
+        <button className="tool-btn tool-btn-labelled" onClick={handleSave}>
+          <SettingsIcon name="save" size={14} /> Save
         </button>
-        <button className="tool-btn" style={{ color: "var(--danger)" }} onClick={() => setDeleteOpen(true)}>
-          🗑 Delete
+        <button
+          className="tool-btn tool-btn-labelled"
+          style={{ color: "var(--danger)" }}
+          onClick={() => setDeleteOpen(true)}
+        >
+          <SettingsIcon name="trash" size={14} /> Delete
         </button>
       </div>
+      {editor && <TableToolbar editor={editor} />}
 
       <input
         ref={titleRef}
@@ -172,11 +199,15 @@ export function EntryEditor() {
       />
 
       <div className="entry-meta">
-        <div className="meta-item">📅 {formatDate(entry.date)}</div>
-        <div className="meta-item editable" onClick={() => setTagModalOpen(true)}>
-          🏷 {entry.tags.length ? entry.tags.join(", ") : "Add tag"}
+        <div className="meta-item">
+          <SettingsIcon name="calendar" size={13} /> {formatDate(entry.date)}
         </div>
-        <div className="meta-item word-count">📝 {wordCount(entry.body)} words</div>
+        <div className="meta-item editable" onClick={() => setTagModalOpen(true)}>
+          <SettingsIcon name="tag" size={13} /> {entry.tags.length ? entry.tags.join(", ") : "Add tag"}
+        </div>
+        <div className="meta-item word-count">
+          <SettingsIcon name="fileText" size={13} /> {wordCount(plainBody)} words
+        </div>
       </div>
 
       <div
@@ -226,13 +257,7 @@ export function EntryEditor() {
       </div>
 
       <div className="editor-body">
-        <textarea
-          className="editor-textarea"
-          placeholder="What's on your mind today? Let your thoughts flow freely…"
-          style={{ fontFamily, fontSize }}
-          value={entry.body}
-          onChange={(e) => updateEntry(entry.id, { body: e.target.value })}
-        />
+        <EditorContent editor={editor} className="rich-editor" style={{ fontFamily, fontSize }} />
       </div>
 
       <ConfirmModal

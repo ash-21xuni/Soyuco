@@ -11,6 +11,7 @@ import { planDay, type AiHistoryMessage } from "@/lib/ai/client";
 import { formatTime, type AiMessage, type PlanItem } from "@/lib/ai/types";
 import { AiInsights } from "@/components/ai/AiInsights";
 import { AiThread } from "@/components/ai/AiThread";
+import { bodyToText } from "@/lib/journal/body";
 
 const CHIPS = [
   { emoji: "💼", label: "Productive", text: "Productive work day with deep focus blocks and regular breaks" },
@@ -60,7 +61,7 @@ export default function AiPlannerPage() {
     const todayKey = new Date().toDateString();
     const todayTasks = todos.filter((t) => t.day === todayKey).map((t) => t.text);
     const habitsList = habits.map((h) => h.name);
-    const recentEntries = entries.slice(0, 3).map((e) => `"${e.title || "Untitled"}": ${e.body.substring(0, 100)}`);
+    const recentEntries = entries.slice(0, 3).map((e) => `"${e.title || "Untitled"}": ${bodyToText(e.body).substring(0, 100)}`);
 
     const { text: response, error } = await planDay({
       prompt: text,

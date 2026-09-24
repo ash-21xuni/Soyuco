@@ -3214,3 +3214,208 @@ option {
     scroll-behavior: auto;
   }
 }
+
+/* =========================================
+   RICH TEXT JOURNAL EDITOR (Tiptap)
+========================================= */
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 28px;
+}
+.tool-btn.active {
+  background: var(--surface);
+  color: var(--accent2);
+  border-color: var(--border);
+}
+.tool-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.tool-btn.danger {
+  color: var(--danger);
+}
+
+.swatch-menu {
+  position: relative;
+}
+.swatch-menu-trigger {
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 3px;
+}
+.swatch-menu-bar {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+.swatch-menu-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  width: 164px;
+  padding: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.swatch-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.swatch-menu-item {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  transition: transform var(--transition);
+}
+.swatch-menu-item:hover {
+  transform: scale(1.12);
+}
+.swatch-menu-item.active {
+  border-color: var(--text);
+}
+.swatch-menu-clear {
+  width: 100%;
+  margin-top: 10px;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--text2);
+}
+.swatch-menu-clear:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.table-toolbar-label {
+  margin-right: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.rich-editor {
+  min-height: 100%;
+  line-height: 1.85;
+  color: var(--text);
+}
+.rich-editor-content {
+  min-height: 100%;
+  outline: none;
+  caret-color: var(--accent);
+}
+.rich-editor-content > * + * {
+  margin-top: 0.35em;
+}
+.rich-editor-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--text3);
+  pointer-events: none;
+}
+.rich-editor-content ul,
+.rich-editor-content ol {
+  padding-left: 1.6em;
+}
+.rich-editor-content ul {
+  list-style: disc;
+}
+.rich-editor-content ol {
+  list-style: decimal;
+}
+.rich-editor-content li::marker {
+  color: var(--accent);
+}
+.rich-editor-content li > p {
+  margin: 0;
+}
+
+.rich-editor-content ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0.2em;
+}
+.rich-editor-content ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.rich-editor-content ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  margin-top: 0.42em;
+  user-select: none;
+}
+.rich-editor-content ul[data-type="taskList"] li > label input {
+  width: 1em;
+  height: 1em;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.rich-editor-content ul[data-type="taskList"] li > div {
+  flex: 1;
+  min-width: 0;
+}
+.rich-editor-content ul[data-type="taskList"] li[data-checked="true"] > div {
+  color: var(--text3);
+  text-decoration: line-through;
+}
+
+.rich-editor-content table {
+  width: 100%;
+  margin: 0.6em 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  overflow: hidden;
+  font-size: 0.92em;
+}
+.rich-editor-content th,
+.rich-editor-content td {
+  position: relative;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.rich-editor-content th {
+  background: var(--surface);
+  font-weight: 600;
+  text-align: left;
+}
+.rich-editor-content th > p,
+.rich-editor-content td > p {
+  margin: 0;
+}
+.rich-editor-content .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ai-glow);
+  pointer-events: none;
+}
+
+.rich-editor-content mark {
+  padding: 0.05em 0.15em;
+  border-radius: 3px;
+  color: inherit;
+}

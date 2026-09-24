@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useJournal } from "@/lib/journal/journal-context";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { useCollapsed } from "@/lib/useCollapsed";
+import { bodyToText } from "@/lib/journal/body";
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -27,7 +28,7 @@ export function EntryList() {
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     let list = entries.filter(
-      (e) => e.title.toLowerCase().includes(q) || e.body.toLowerCase().includes(q),
+      (e) => e.title.toLowerCase().includes(q) || bodyToText(e.body).toLowerCase().includes(q),
     );
     if (activeCollectionId !== null) {
       list = list.filter((e) => e.collections.includes(activeCollectionId));
@@ -110,7 +111,7 @@ export function EntryList() {
               <div className="entry-card-date">{formatDate(e.date)}</div>
               <div className="entry-card-title">{e.title || "Untitled"}</div>
               <div className="entry-card-preview">
-                {e.body ? e.body.substring(0, 120) : <em>No content</em>}
+                {bodyToText(e.body) ? bodyToText(e.body).substring(0, 120) : <em>No content</em>}
               </div>
               <div className="entry-card-tags">
                 {e.tags.map((t) => (
