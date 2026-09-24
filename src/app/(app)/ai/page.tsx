@@ -128,36 +128,39 @@ export default function AiPlannerPage() {
 
   return (
     <div className="ai-layout">
-      <div className="ai-hero">
-        <div className="ai-hero-title">{copy.aiTitle}</div>
-        <div className="ai-hero-sub">Describe your day, goals, or constraints — I&apos;ll build your perfect schedule.</div>
-        <div className="ai-input-row">
-          <textarea
-            ref={textareaRef}
-            className="ai-prompt-box"
-            rows={2}
-            placeholder="e.g. I have a team meeting at 2pm, need to finish a report, want to exercise, and have dinner with family at 7pm…"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) send(prompt);
-            }}
-          />
-          <button className="ai-send-btn" onClick={() => send(prompt)} disabled={sending}>
-            <span>{sending ? "⬡ Planning…" : "⬡ Plan My Day"}</span>
-          </button>
+      {/* One scroll container, so the banner scrolls away with the content. */}
+      <div className="page-scroll">
+        <div className="ai-hero page-hero">
+          <div className="ai-hero-title">{copy.aiTitle}</div>
+          <div className="ai-hero-sub">Describe your day, goals, or constraints — I&apos;ll build your perfect schedule.</div>
+          <div className="ai-input-row">
+            <textarea
+              ref={textareaRef}
+              className="ai-prompt-box"
+              rows={2}
+              placeholder="e.g. I have a team meeting at 2pm, need to finish a report, want to exercise, and have dinner with family at 7pm…"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) send(prompt);
+              }}
+            />
+            <button className="ai-send-btn" onClick={() => send(prompt)} disabled={sending}>
+              <span>{sending ? "⬡ Planning…" : "⬡ Plan My Day"}</span>
+            </button>
+          </div>
+          <div className="ai-chips">
+            {CHIPS.map((chip) => (
+              <div key={chip.label} className="ai-chip" onClick={() => fillChip(chip.text)}>
+                {chip.emoji} {chip.label}
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="ai-chips">
-          {CHIPS.map((chip) => (
-            <div key={chip.label} className="ai-chip" onClick={() => fillChip(chip.text)}>
-              {chip.emoji} {chip.label}
-            </div>
-          ))}
+        <div className="page-body">
+          <AiInsights hasMessages={messages.length > 0} />
+          <AiThread messages={messages} sending={sending} onRegenerate={regeneratePlan} onApply={applyPlan} />
         </div>
-      </div>
-      <div className="ai-body">
-        <AiInsights hasMessages={messages.length > 0} />
-        <AiThread messages={messages} sending={sending} onRegenerate={regeneratePlan} onApply={applyPlan} />
       </div>
     </div>
   );

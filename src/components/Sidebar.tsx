@@ -10,6 +10,7 @@ import { usePlanner } from "@/lib/planner/planner-context";
 import { PREMIUM_THEMES, THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
 import { useToast } from "@/lib/toast/toast-context";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { useCollapsed } from "@/lib/useCollapsed";
 
 const NAV_ITEMS = [
   { view: "journal", href: "/journal", icon: "✦", label: "Journal" },
@@ -62,6 +63,7 @@ export function Sidebar() {
     deleteCollection,
   } = useJournal();
 
+  const [collapsed, toggleCollapsed] = useCollapsed("soyuco_sidebar_collapsed");
   const [newCollectionOpen, setNewCollectionOpen] = useState(false);
   const [deleteCollectionId, setDeleteCollectionId] = useState<number | null>(null);
 
@@ -70,7 +72,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside id="sidebar">
+    <aside id="sidebar" className={collapsed ? "collapsed" : undefined}>
       <div className="sidebar-header">
         <div className="logo-row">
           <div className="logo-img-slot">
@@ -80,6 +82,16 @@ export function Sidebar() {
             <span>Soyuco</span>
             <div className="logo-dot" />
           </div>
+          <button
+            type="button"
+            className="panel-toggle"
+            onClick={toggleCollapsed}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <SettingsIcon name={collapsed ? "panelOpen" : "panelClose"} />
+          </button>
         </div>
         <div className="date-display">{dateLabel}</div>
       </div>
@@ -91,56 +103,59 @@ export function Sidebar() {
             key={item.view}
             href={item.href}
             className={`nav-item${item.aiNav ? " ai-nav" : ""}${pathname === item.href ? " active" : ""}`}
+            title={collapsed ? item.label : undefined}
           >
-            <span className="icon">{item.icon}</span> {item.label}
+            <span className="icon">{item.icon}</span> <span className="nav-text">{item.label}</span>
             {item.view === "journal" && <span className="count">{entries.length}</span>}
           </Link>
         ))}
 
-        <div className="nav-label" style={{ marginTop: 12 }}>
-          Collections
+        <div className="sidebar-collections">
+          <div className="nav-label" style={{ marginTop: 12 }}>
+            Collections
+          </div>
+          {collections.map((c) => {
+            const count = entries.filter((e) => e.collections.includes(c.id)).length;
+            return (
+              <div
+                key={c.id}
+                className={`nav-item${activeCollectionId === c.id ? " active" : ""}`}
+                style={{ justifyContent: "space-between" }}
+                onClick={() => {
+                  selectCollection(c.id);
+                  goToJournal();
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span className="icon">◇</span> {c.name}
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span className="count">{count}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteCollectionId(c.id);
+                    }}
+                    style={{
+                      fontSize: "0.6rem",
+                      color: "var(--text3)",
+                      padding: "1px 4px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      lineHeight: 1,
+                    }}
+                  >
+                    ✕
+                  </button>
+                </span>
+              </div>
+            );
+          })}
+          <button className="nav-item" onClick={() => setNewCollectionOpen(true)}>
+            <span className="icon">+</span> New Collection
+          </button>
         </div>
-        {collections.map((c) => {
-          const count = entries.filter((e) => e.collections.includes(c.id)).length;
-          return (
-            <div
-              key={c.id}
-              className={`nav-item${activeCollectionId === c.id ? " active" : ""}`}
-              style={{ justifyContent: "space-between" }}
-              onClick={() => {
-                selectCollection(c.id);
-                goToJournal();
-              }}
-            >
-              <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span className="icon">◇</span> {c.name}
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span className="count">{count}</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteCollectionId(c.id);
-                  }}
-                  style={{
-                    fontSize: "0.6rem",
-                    color: "var(--text3)",
-                    padding: "1px 4px",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    lineHeight: 1,
-                  }}
-                >
-                  ✕
-                </button>
-              </span>
-            </div>
-          );
-        })}
-        <button className="nav-item" onClick={() => setNewCollectionOpen(true)}>
-          <span className="icon">+</span> New Collection
-        </button>
       </div>
 
       <div className="mood-bar">
@@ -182,6 +197,9 @@ export function Sidebar() {
           </span>
           Premium
           <span className="premium-badge">PRO</span>
+          <Link href="/marketplace" className="market-btn" aria-label="Marketplace" title="Marketplace">
+            <SettingsIcon name="shoppingBag" size={14} />
+          </Link>
         </div>
         <div className="theme-swatches">
           {PREMIUM_THEMES.map((t) => (

@@ -13,6 +13,7 @@ const TITLES: Record<string, string> = {
   "/planner": "Day Planner",
   "/ai": "AI Day Planner",
   "/budget": "Budget Planner",
+  "/marketplace": "Marketplace",
 };
 
 export function Topbar() {
@@ -43,6 +44,14 @@ export function Topbar() {
   return (
     <div id="topbar">
       <div className="topbar-title">{TITLES[pathname] ?? "Soyuco"}</div>
+      <button
+        className="btn btn-ghost"
+        onClick={() => router.push("/marketplace")}
+        style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px" }}
+      >
+        <SettingsIcon name="shoppingBag" size={15} />
+        <span style={{ fontSize: "0.8rem" }}>Marketplace</span>
+      </button>
       <div style={{ position: "relative" }} ref={areaRef}>
         <button
           className="btn btn-ghost"

@@ -8,21 +8,26 @@ import { BudgetLimits } from "@/components/budget/BudgetLimits";
 export default function BudgetPage() {
   return (
     <div className="ai-layout">
-      <div className="ai-hero">
-        <div className="ai-hero-title">◎ Budget Planner</div>
-        <div className="ai-hero-sub">Track your income, expenses, and savings goals — all in one place.</div>
-      </div>
-      <div className="ai-body">
-        <SummaryStrip />
-        <TrendChart />
-        <div className="planner-grid">
-          <div className="planner-col">
-            <TransactionList />
+      {/* One scroll container, so the banner scrolls away with the content. */}
+      <div className="page-scroll">
+        <div className="ai-hero page-hero">
+          <div className="ai-hero-title">◎ Budget Planner</div>
+          <div className="ai-hero-sub">
+            Track your income, expenses, and savings goals — all in one place.
           </div>
-          <div className="planner-col">
-            <CategoryBreakdown />
-            <SavingsGoals />
-            <BudgetLimits />
+        </div>
+        <div className="page-body">
+          <SummaryStrip />
+          <TrendChart />
+          <div className="planner-grid">
+            <div className="planner-col">
+              <TransactionList />
+            </div>
+            <div className="planner-col">
+              <CategoryBreakdown />
+              <SavingsGoals />
+              <BudgetLimits />
+            </div>
           </div>
         </div>
       </div>
