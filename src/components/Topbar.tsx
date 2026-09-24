@@ -81,7 +81,8 @@ export function Topbar() {
               position: "absolute",
               top: "calc(100% + 8px)",
               right: 0,
-              width: 200,
+              minWidth: 220,
+              maxWidth: "min(340px, calc(100vw - 32px))",
               background: "var(--bg2)",
               border: "1px solid var(--border)",
               borderRadius: "var(--radius-lg)",
@@ -99,7 +100,15 @@ export function Topbar() {
                   {displayName(user)}
                 </div>
               )}
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--text)", marginTop: 4 }}>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.7rem",
+                  color: "var(--text)",
+                  marginTop: 4,
+                  overflowWrap: "anywhere",
+                }}
+              >
                 {user?.email}
               </div>
             </div>
