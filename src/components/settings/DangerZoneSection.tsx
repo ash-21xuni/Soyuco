@@ -5,6 +5,7 @@ import { useState } from "react";
 import { PromptModal } from "@/components/modals/PromptModal";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { useToast } from "@/lib/toast/toast-context";
+import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
 
 export function DangerZoneSection() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export function DangerZoneSection() {
   return (
     <div className="planner-card" style={{ borderColor: "var(--danger)" }}>
       <div className="planner-card-header">
-        <div className="planner-card-title" style={{ color: "var(--danger)" }}>⚠ Danger Zone</div>
+        <SettingsCardTitle icon="alert" color="var(--danger)">Danger Zone</SettingsCardTitle>
       </div>
       <div className="planner-card-body" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
         <div>

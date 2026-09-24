@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/lib/toast/toast-context";
+import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
 
 export function ProfileSection() {
   const { user } = useAuth();
@@ -44,7 +45,7 @@ export function ProfileSection() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">◉ Profile</div>
+        <SettingsCardTitle icon="user">Profile</SettingsCardTitle>
         {isGoogleLinked && (
           <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.65rem", color: "var(--text3)" }}>
             Signed in with Google

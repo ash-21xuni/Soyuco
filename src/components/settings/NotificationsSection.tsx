@@ -7,6 +7,7 @@ import {
   REMINDER_TIME_KEY,
 } from "@/lib/notifications/reminder";
 import { useToast } from "@/lib/toast/toast-context";
+import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
 
 function readStoredEnabled() {
   if (typeof window === "undefined") return false;
@@ -50,7 +51,7 @@ export function NotificationsSection() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">🔔 Notifications</div>
+        <SettingsCardTitle icon="bell">Notifications</SettingsCardTitle>
       </div>
       <div className="planner-card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/lib/toast/toast-context";
+import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
 
 export function PasswordSection() {
   const { user } = useAuth();
@@ -40,7 +41,7 @@ export function PasswordSection() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">🔒 Password</div>
+        <SettingsCardTitle icon="lock">Password</SettingsCardTitle>
       </div>
       <div className="planner-card-body">
         {!hasPassword && (

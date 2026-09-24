@@ -8,14 +8,15 @@ import { AppearanceSection } from "@/components/settings/AppearanceSection";
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { DangerZoneSection } from "@/components/settings/DangerZoneSection";
 import { HelpSection } from "@/components/settings/HelpSection";
+import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
 
 type Tab = "profile" | "preferences" | "notifications" | "help";
 
-const TABS: { id: Tab; icon: string; label: string }[] = [
-  { id: "profile", icon: "◉", label: "Profile" },
-  { id: "preferences", icon: "🎨", label: "Preferences" },
-  { id: "notifications", icon: "🔔", label: "Notifications" },
-  { id: "help", icon: "❓", label: "Help" },
+const TABS: { id: Tab; icon: SettingsIconName; label: string }[] = [
+  { id: "profile", icon: "user", label: "Profile" },
+  { id: "preferences", icon: "palette", label: "Preferences" },
+  { id: "notifications", icon: "bell", label: "Notifications" },
+  { id: "help", icon: "help", label: "Help" },
 ];
 
 const TAB_TITLES: Record<Tab, string> = {
@@ -35,9 +36,9 @@ export default function SettingsPage() {
           <Link
             href="/journal"
             className="nav-btn"
-            style={{ display: "inline-flex", marginBottom: 14 }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 14 }}
           >
-            ← Journal
+            <SettingsIcon name="arrowLeft" size={14} /> Journal
           </Link>
           <div
             style={{
@@ -45,9 +46,12 @@ export default function SettingsPage() {
               fontSize: "1.1rem",
               fontStyle: "italic",
               color: "var(--text)",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
             }}
           >
-            ⚙ Settings
+            <SettingsIcon name="settings" size={18} /> Settings
           </div>
         </div>
         <div className="nav-section">
@@ -58,7 +62,9 @@ export default function SettingsPage() {
               className={`nav-item${tab === t.id ? " active" : ""}`}
               onClick={() => setTab(t.id)}
             >
-              <span className="icon">{t.icon}</span> {t.label}
+              <span className="icon" style={{ display: "inline-flex", justifyContent: "center" }}>
+                <SettingsIcon name={t.icon} />
+              </span> {t.label}
             </button>
           ))}
         </div>
@@ -78,7 +84,7 @@ export default function SettingsPage() {
           </div>
         </div>
         <div className="editor-body">
-          <div style={{ maxWidth: 680, display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {tab === "profile" && (
               <>
                 <ProfileSection />

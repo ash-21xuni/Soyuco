@@ -1,6 +1,7 @@
 "use client";
 
 import { useToast } from "@/lib/toast/toast-context";
+import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
 
 const FAQS = [
   {
@@ -28,7 +29,7 @@ export function HelpSection() {
     <>
       <div className="planner-card">
         <div className="planner-card-header">
-          <div className="planner-card-title">❓ Frequently Asked Questions</div>
+          <SettingsCardTitle icon="help">Frequently Asked Questions</SettingsCardTitle>
         </div>
         <div className="planner-card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {FAQS.map((item) => (
@@ -46,7 +47,7 @@ export function HelpSection() {
 
       <div className="planner-card">
         <div className="planner-card-header">
-          <div className="planner-card-title">✉ Contact & Feedback</div>
+          <SettingsCardTitle icon="mail">Contact & Feedback</SettingsCardTitle>
         </div>
         <div className="planner-card-body" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
           <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", color: "var(--text2)" }}>

@@ -2,6 +2,7 @@
 
 import { PREMIUM_THEMES, THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
 import { useToast } from "@/lib/toast/toast-context";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function AppearanceSection() {
   const { theme, setTheme } = useTheme();
@@ -10,7 +11,7 @@ export function AppearanceSection() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">🎨 Appearance</div>
+        <SettingsCardTitle icon="palette">Appearance</SettingsCardTitle>
       </div>
       <div className="planner-card-body">
         <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.72rem", color: "var(--text3)", marginBottom: 10 }}>
@@ -29,7 +30,7 @@ export function AppearanceSection() {
         </div>
 
         <div className="premium-label" style={{ marginTop: 16 }}>
-          <span className="premium-crown">👑</span> Premium
+          <span className="premium-crown"><SettingsIcon name="crown" size={13} /></span> Premium
           <span className="premium-badge">PRO</span>
         </div>
         <div className="theme-swatches">
@@ -48,7 +49,7 @@ export function AppearanceSection() {
           className="custom-theme-btn"
           onClick={() => showToast("Theme customization is coming soon.", "info")}
         >
-          ✦ Customize Theme
+          <SettingsIcon name="sparkles" size={14} /> Customize Theme
         </button>
       </div>
     </div>
