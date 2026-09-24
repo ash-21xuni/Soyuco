@@ -53,6 +53,8 @@ function readJson<T>(key: string, fallback: T): T {
 }
 
 type PlannerContextValue = {
+  /** True once the initial cloud pull for this sign-in has finished. */
+  synced: boolean;
   plannerDay: Date;
   calendarMonth: Date;
   todos: Todo[];
@@ -84,6 +86,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [habits, setHabits] = useState<Habit[]>(() => readJson(HABITS_KEY, DEFAULT_HABITS));
   const [events, setEvents] = useState<EventsMap>(() => readJson(EVENTS_KEY, {}));
   const [moodHistory, setMoodHistory] = useState<MoodHistory>(() => readJson(MOOD_KEY, {}));
+  const [synced, setSynced] = useState(false);
 
   useEffect(() => {
     window.localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
@@ -103,7 +106,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     let cancelled = false;
 
-    supabase
+    const todosPull = supabase
       .from("todos")
       .select("*")
       .then(({ data, error }) => {
@@ -119,7 +122,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         );
       });
 
-    supabase
+    const habitsPull = supabase
       .from("habits")
       .select("*")
       .then(({ data, error }) => {
@@ -127,7 +130,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         setHabits(data.map((r) => ({ id: r.id, name: r.name, days: r.days })));
       });
 
-    supabase
+    const eventsPull = supabase
       .from("events")
       .select("*")
       .then(({ data, error }) => {
@@ -141,7 +144,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         setEvents(map);
       });
 
-    supabase
+    const moodPull = supabase
       .from("mood_history")
       .select("*")
       .then(({ data, error }) => {
@@ -153,6 +156,9 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         setMoodHistory(map);
       });
 
+    const markSynced = () => !cancelled && setSynced(true);
+    Promise.all([todosPull, habitsPull, eventsPull, moodPull]).then(markSynced, markSynced);
+
     return () => {
       cancelled = true;
     };
@@ -160,6 +166,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<PlannerContextValue>(
     () => ({
+      synced,
       plannerDay,
       calendarMonth,
       todos,
@@ -299,7 +306,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [plannerDay, calendarMonth, todos, habits, events, moodHistory, user],
+    [synced, plannerDay, calendarMonth, todos, habits, events, moodHistory, user],
   );
 
   return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;

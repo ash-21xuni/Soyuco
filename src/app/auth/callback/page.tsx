@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
+import { useSplash } from "@/components/splash/SplashProvider";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
   const [timedOut, setTimedOut] = useState(false);
+  useSplash(!timedOut);
 
   useEffect(() => {
     if (!loading && user) {

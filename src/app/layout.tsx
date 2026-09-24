@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/lib/supabase/auth-context";
+import { SplashProvider } from "@/components/splash/SplashProvider";
 import "./themes.css";
 
 export const metadata: Metadata = {
-  title: "Soyuco — The Private Sanctuary",
+  title: "Soyuco",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <SplashProvider>{children}</SplashProvider>
+        </AuthProvider>
       </body>
     </html>
   );

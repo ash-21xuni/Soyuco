@@ -36,6 +36,8 @@ function readJson<T>(key: string, fallback: T): T {
 }
 
 type JournalContextValue = {
+  /** True once the initial cloud pull for this sign-in has finished. */
+  synced: boolean;
   entries: JournalEntry[];
   collections: Collection[];
   activeCollectionId: number | null;
@@ -62,6 +64,7 @@ export function JournalProvider({ children }: { children: ReactNode }) {
   );
   const [activeCollectionId, setActiveCollectionId] = useState<number | null>(null);
   const [currentEntryId, setCurrentEntryId] = useState<number | null>(null);
+  const [synced, setSynced] = useState(false);
 
   // Persist to localStorage whenever entries/collections change.
   useEffect(() => {
@@ -92,7 +95,11 @@ export function JournalProvider({ children }: { children: ReactNode }) {
             collections: row.collections ?? [],
           })),
         );
-      });
+      })
+      .then(
+        () => !cancelled && setSynced(true),
+        () => !cancelled && setSynced(true),
+      );
 
     return () => {
       cancelled = true;
@@ -101,6 +108,7 @@ export function JournalProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<JournalContextValue>(
     () => ({
+      synced,
       entries,
       collections,
       activeCollectionId,
@@ -198,7 +206,7 @@ export function JournalProvider({ children }: { children: ReactNode }) {
         setActiveCollectionId((cur) => (cur === id ? null : id));
       },
     }),
-    [entries, collections, activeCollectionId, currentEntryId, user],
+    [synced, entries, collections, activeCollectionId, currentEntryId, user],
   );
 
   return <JournalContext.Provider value={value}>{children}</JournalContext.Provider>;

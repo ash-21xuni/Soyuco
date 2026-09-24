@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
+import { useSplash } from "@/components/splash/SplashProvider";
 
 type Tab = "login" | "signup";
 
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  useSplash(loading || !!user || googleSubmitting);
 
   useEffect(() => {
     if (!loading && user) {
