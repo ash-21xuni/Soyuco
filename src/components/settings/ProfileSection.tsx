@@ -5,12 +5,13 @@ import { useAuth } from "@/lib/supabase/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { useToast } from "@/lib/toast/toast-context";
 import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
+import { profileName } from "@/lib/supabase/display-name";
 
 export function ProfileSection() {
   const { user } = useAuth();
   const { showToast } = useToast();
 
-  const [displayName, setDisplayName] = useState(user?.user_metadata?.display_name ?? "");
+  const [displayName, setDisplayName] = useState(() => profileName(user));
   const [email, setEmail] = useState(user?.email ?? "");
   const [savingName, setSavingName] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);

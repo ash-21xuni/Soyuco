@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { useJournal } from "@/lib/journal/journal-context";
 import { useToast } from "@/lib/toast/toast-context";
+import { displayName } from "@/lib/supabase/display-name";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const TITLES: Record<string, string> = {
   "/journal": "Journal",
@@ -49,7 +51,6 @@ export function Topbar() {
         >
           <span
             style={{
-              fontWeight: "bold",
               width: 22,
               height: 22,
               display: "flex",
@@ -60,10 +61,10 @@ export function Topbar() {
               borderRadius: "50%",
             }}
           >
-            ◉
+            <SettingsIcon name="user" size={14} />
           </span>
-          <span style={{ fontSize: "0.8rem" }}>{user?.email?.split("@")[0] ?? "..."}</span>
-          <span style={{ fontSize: "0.7rem" }}>▼</span>
+          <span style={{ fontSize: "0.8rem" }}>{displayName(user) || "..."}</span>
+          <SettingsIcon name="chevronDown" size={14} />
         </button>
         {menuOpen && (
           <div
@@ -84,6 +85,11 @@ export function Topbar() {
               <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.65rem", color: "var(--text3)" }}>
                 Signed in as
               </div>
+              {displayName(user) !== user?.email?.split("@")[0] && (
+                <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.8rem", color: "var(--text)", marginTop: 4 }}>
+                  {displayName(user)}
+                </div>
+              )}
               <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--text)", marginTop: 4 }}>
                 {user?.email}
               </div>
@@ -94,7 +100,9 @@ export function Topbar() {
                 router.push("/settings");
               }}
               style={{
-                display: "block",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
                 width: "100%",
                 textAlign: "left",
                 padding: "10px 12px",
@@ -107,12 +115,14 @@ export function Topbar() {
                 cursor: "pointer",
               }}
             >
-              ⚙ Account Settings
+              <SettingsIcon name="settings" size={14} /> Account Settings
             </button>
             <button
               onClick={handleSignOut}
               style={{
-                display: "block",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
                 width: "100%",
                 textAlign: "left",
                 padding: "10px 12px",
@@ -124,7 +134,7 @@ export function Topbar() {
                 cursor: "pointer",
               }}
             >
-              🚪 Sign Out
+              <SettingsIcon name="logOut" size={14} /> Sign Out
             </button>
           </div>
         )}
