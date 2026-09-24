@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { PromptModal } from "@/components/modals/PromptModal";
+import { OwnedThemesModal } from "@/components/modals/OwnedThemesModal";
 import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
 import { PREMIUM_THEMES, THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
@@ -65,6 +66,7 @@ export function Sidebar() {
 
   const [collapsed, toggleCollapsed] = useCollapsed("soyuco_sidebar_collapsed");
   const [newCollectionOpen, setNewCollectionOpen] = useState(false);
+  const [ownedThemesOpen, setOwnedThemesOpen] = useState(false);
   const [deleteCollectionId, setDeleteCollectionId] = useState<number | null>(null);
 
   function goToJournal() {
@@ -178,7 +180,18 @@ export function Sidebar() {
       </div>
 
       <div className="theme-section">
-        <div className="theme-label">Theme</div>
+        <div className="theme-label-row">
+          <div className="theme-label">Theme</div>
+          <button
+            type="button"
+            className="sidebar-icon-btn"
+            onClick={() => setOwnedThemesOpen(true)}
+            aria-label="Show all owned themes"
+            title="Show all owned themes"
+          >
+            <SettingsIcon name="moreHorizontal" size={16} />
+          </button>
+        </div>
         <div className="theme-swatches">
           {THEMES.map((t) => (
             <div
@@ -197,7 +210,7 @@ export function Sidebar() {
           </span>
           Premium
           <span className="premium-badge">PRO</span>
-          <Link href="/marketplace" className="market-btn" aria-label="Marketplace" title="Marketplace">
+          <Link href="/marketplace" className="sidebar-icon-btn" aria-label="Marketplace" title="Marketplace">
             <SettingsIcon name="shoppingBag" size={14} />
           </Link>
         </div>
@@ -221,6 +234,7 @@ export function Sidebar() {
         </button>
       </div>
 
+      <OwnedThemesModal open={ownedThemesOpen} onClose={() => setOwnedThemesOpen(false)} />
       <PromptModal
         open={newCollectionOpen}
         title="New Collection"
