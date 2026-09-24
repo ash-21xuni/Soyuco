@@ -19,7 +19,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Soyuco — A Sanctuary for Your Private Reflections",
+  title: "Soyuco",
 };
 
 function Icon({ name }: { name: string }) {
