@@ -210,7 +210,13 @@ export function Sidebar() {
           </span>
           Premium
           <span className="premium-badge">PRO</span>
-          <Link href="/marketplace" className="sidebar-icon-btn" aria-label="Marketplace" title="Marketplace">
+          <Link
+            href="/marketplace"
+            className={`sidebar-icon-btn${pathname === "/marketplace" ? " active" : ""}`}
+            aria-current={pathname === "/marketplace" ? "page" : undefined}
+            aria-label="Marketplace"
+            title="Marketplace"
+          >
             <SettingsIcon name="shoppingBag" size={14} />
           </Link>
         </div>

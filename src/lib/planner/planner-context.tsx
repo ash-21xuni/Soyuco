@@ -15,6 +15,7 @@ import { normalizeTodo, toDbDate, type Repeat } from "@/lib/planner/tasks";
 import { reportWrite } from "@/lib/supabase/write";
 import { DEFAULT_SCHEDULE_HOURS, weekStartKey } from "@/lib/planner/time";
 import { eventsFromLegacyMap, normalizeEvent, type CalendarEvent } from "@/lib/planner/events";
+import { normalizeLayout, type PlannerLayout } from "@/lib/planner/layout";
 
 export type Priority = "high" | "med" | "low";
 export type Todo = {
@@ -159,6 +160,9 @@ type PlannerContextValue = {
   deleteHabit: (id: number) => void;
   /** When on, habit ticks clear at the start of every week (Sunday). */
   habitsResetWeekly: boolean;
+  /** Arrangement of the Day Planner cards, synced with the account. */
+  plannerLayout: PlannerLayout;
+  setPlannerLayout: (layout: PlannerLayout) => Promise<{ error: string | null }>;
   /** First and last hour slots the schedule shows (0–23, inclusive). */
   scheduleHours: { start: number; end: number };
   setScheduleHours: (start: number, end: number) => Promise<{ error: string | null }>;
@@ -190,6 +194,8 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   // week was last reset and a stale device can't wipe this week's ticks.
   const habitsResetWeekly = user?.user_metadata?.habits_reset_weekly === true;
   const habitsWeekStart: string | undefined = user?.user_metadata?.habits_week_start;
+  const savedLayout = user?.user_metadata?.planner_layout;
+  const plannerLayout = useMemo(() => normalizeLayout(savedLayout), [savedLayout]);
   const scheduleStart = Number(user?.user_metadata?.schedule_start_hour ?? DEFAULT_SCHEDULE_HOURS.start);
   const scheduleEnd = Number(user?.user_metadata?.schedule_end_hour ?? DEFAULT_SCHEDULE_HOURS.end);
   const habitsRef = useRef(habits);
@@ -492,6 +498,12 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       habitsResetWeekly,
       habitHistory,
       scheduleHours: { start: scheduleStart, end: scheduleEnd },
+      plannerLayout,
+
+      async setPlannerLayout(layout) {
+        const { error } = await supabase.auth.updateUser({ data: { planner_layout: layout } });
+        return { error: error?.message ?? null };
+      },
 
       async setScheduleHours(start, end) {
         const { error } = await supabase.auth.updateUser({
@@ -533,7 +545,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [synced, plannerDay, calendarMonth, todos, habits, events, moodHistory, user, habitsResetWeekly, habitHistory, scheduleStart, scheduleEnd],
+    [synced, plannerDay, calendarMonth, todos, habits, events, moodHistory, user, habitsResetWeekly, habitHistory, scheduleStart, scheduleEnd, plannerLayout],
   );
 
   return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;

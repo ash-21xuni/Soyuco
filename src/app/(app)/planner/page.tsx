@@ -2,12 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { usePlanner } from "@/lib/planner/planner-context";
-import { Calendar } from "@/components/planner/Calendar";
-import { Schedule } from "@/components/planner/Schedule";
-import { Tasks } from "@/components/planner/Tasks";
-import { Habits } from "@/components/planner/Habits";
-import { MoodChart } from "@/components/planner/MoodChart";
-import { DailyQuote } from "@/components/planner/DailyQuote";
+import { PlannerBoard } from "@/components/planner/PlannerBoard";
 
 export default function PlannerPage() {
   const router = useRouter();
@@ -35,18 +30,7 @@ export default function PlannerPage() {
         </button>
       </div>
 
-      <div className="planner-grid">
-        <div className="planner-col">
-          <Calendar />
-          <Schedule />
-        </div>
-        <div className="planner-col">
-          <Tasks />
-          <Habits />
-          <MoodChart />
-          <DailyQuote />
-        </div>
-      </div>
+      <PlannerBoard />
     </div>
   );
 }

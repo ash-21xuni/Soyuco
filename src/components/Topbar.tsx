@@ -45,7 +45,8 @@ export function Topbar() {
     <div id="topbar">
       <div className="topbar-title">{TITLES[pathname] ?? "Soyuco"}</div>
       <button
-        className="btn btn-ghost"
+        className={`btn btn-ghost${pathname === "/marketplace" ? " active" : ""}`}
+        aria-current={pathname === "/marketplace" ? "page" : undefined}
         onClick={() => router.push("/marketplace")}
         style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px" }}
       >
