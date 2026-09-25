@@ -6,6 +6,7 @@ import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { MonthYearPicker } from "@/components/planner/MonthYearPicker";
 import { DayPeek } from "@/components/planner/DayPeek";
 import { occursOn } from "@/lib/planner/tasks";
+import { eventColorValue, eventsForDay } from "@/lib/planner/events";
 
 const WEEKDAY_HEADERS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const SHOW_DELAY_MS = 180;
@@ -59,9 +60,10 @@ export function Calendar() {
     const isToday = dayKey === today.toDateString();
     const isSelected = dayKey === plannerDay.toDateString();
     const isPeeked = peek?.dayKey === dayKey;
-    const eventCount = Object.values(events[dayKey] ?? {}).filter((e) => e.text.trim()).length;
-    const hasTasks = todos.some((t) => occursOn(t, dayKey));
-    const dotCount = Math.min(eventCount + (hasTasks ? 1 : 0), 3);
+    // Up to three dots: one per event in its colour, then one for tasks.
+    const dots = eventsForDay(events, dayKey).map((ev) => eventColorValue(ev.color));
+    if (todos.some((t) => occursOn(t, dayKey))) dots.push("var(--accent)");
+    const shownDots = dots.slice(0, 3);
 
     cells.push(
       <div
@@ -72,10 +74,10 @@ export function Calendar() {
         onMouseLeave={scheduleHide}
       >
         <span className="cal-day-num">{d}</span>
-        {dotCount > 0 && (
+        {shownDots.length > 0 && (
           <div className="cal-dots">
-            {Array.from({ length: dotCount }).map((_, i) => (
-              <div key={i} className="cal-dot" />
+            {shownDots.map((color, i) => (
+              <div key={i} className="cal-dot" style={{ background: color }} />
             ))}
           </div>
         )}

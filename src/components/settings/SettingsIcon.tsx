@@ -69,6 +69,12 @@ const PATHS = {
   ),
   chevronDown: <path d="m6 9 6 6 6-6" />,
   chevronLeft: <path d="m15 18-6-6 6-6" />,
+  plus: (
+    <>
+      <path d="M5 12h14" />
+      <path d="M12 5v14" />
+    </>
+  ),
   repeat: (
     <>
       <path d="m17 2 4 4-4 4" />

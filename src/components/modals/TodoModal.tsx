@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
 import type { Priority, TodoDetails } from "@/lib/planner/planner-context";
-import { REPEAT_OPTIONS, type Repeat } from "@/lib/planner/tasks";
+import type { RepeatRule } from "@/lib/planner/recurrence";
+import { CustomRepeatFields, RepeatSelect } from "@/components/planner/RepeatPicker";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const labelStyle: CSSProperties = {
@@ -26,7 +27,18 @@ const fieldStyle: CSSProperties = {
   colorScheme: "light dark",
 };
 
-const EMPTY_DETAILS: TodoDetails = { dueDate: null, dueTime: null, repeat: "none" };
+const EMPTY_DETAILS: TodoDetails = {
+  dueDate: null,
+  dueTime: null,
+  repeat: "none",
+  repeatDays: [],
+  repeatInterval: 1,
+};
+const NO_REPEAT: RepeatRule = { repeat: "none", repeatDays: [], repeatInterval: 1 };
+
+function ruleOf(d: TodoDetails): RepeatRule {
+  return { repeat: d.repeat, repeatDays: d.repeatDays, repeatInterval: d.repeatInterval };
+}
 
 export function TodoModal({
   open,
@@ -34,6 +46,7 @@ export function TodoModal({
   initialText,
   initialPriority,
   initialDetails = EMPTY_DETAILS,
+  startDay,
   onCancel,
   onSave,
   onDelete,
@@ -43,6 +56,8 @@ export function TodoModal({
   initialText: string;
   initialPriority: Priority;
   initialDetails?: TodoDetails;
+  /** Day key the task starts on; seeds the weekday of a new custom repeat. */
+  startDay: string;
   onCancel: () => void;
   onSave: (text: string, priority: Priority, details: TodoDetails) => void;
   onDelete: () => void;
@@ -51,7 +66,7 @@ export function TodoModal({
   const [priority, setPriority] = useState<Priority>(initialPriority);
   const [dueDate, setDueDate] = useState(initialDetails.dueDate ?? "");
   const [dueTime, setDueTime] = useState(initialDetails.dueTime ?? "");
-  const [repeat, setRepeat] = useState<Repeat>(initialDetails.repeat);
+  const [rule, setRule] = useState<RepeatRule>(ruleOf(initialDetails));
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [wasOpen, setWasOpen] = useState(open);
@@ -62,7 +77,7 @@ export function TodoModal({
       setPriority(initialPriority);
       setDueDate(initialDetails.dueDate ?? "");
       setDueTime(initialDetails.dueTime ?? "");
-      setRepeat(initialDetails.repeat);
+      setRule(ruleOf(initialDetails));
     }
   }
 
@@ -76,14 +91,14 @@ export function TodoModal({
   if (!open) return null;
 
   const hasDeadline = !!dueDate;
-  const repeats = repeat !== "none";
+  const repeats = rule.repeat !== "none";
 
   function save() {
     // A deadline means "show every day until then", so it replaces repeating.
     onSave(text, priority, {
       dueDate: dueDate || null,
       dueTime: dueDate ? dueTime || null : null,
-      repeat: dueDate ? "none" : repeat,
+      ...(dueDate ? NO_REPEAT : rule),
     });
   }
 
@@ -165,22 +180,18 @@ export function TodoModal({
               <label style={labelStyle} htmlFor="todo-repeat">
                 Repeat
               </label>
-              <select
+              <RepeatSelect
                 id="todo-repeat"
-                value={hasDeadline ? "none" : repeat}
+                rule={hasDeadline ? NO_REPEAT : rule}
+                startDay={startDay}
                 disabled={hasDeadline}
-                title={hasDeadline ? "Tasks with a deadline show every day until it" : undefined}
-                onChange={(e) => setRepeat(e.target.value as Repeat)}
+                onChange={setRule}
                 style={{ ...fieldStyle, cursor: hasDeadline ? "not-allowed" : "pointer", opacity: hasDeadline ? 0.55 : 1 }}
-              >
-                {REPEAT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
+
+          {!hasDeadline && <CustomRepeatFields rule={rule} onChange={setRule} />}
 
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             <span style={labelStyle}>Deadline (optional)</span>
@@ -191,7 +202,7 @@ export function TodoModal({
                 value={dueDate}
                 onChange={(e) => {
                   setDueDate(e.target.value);
-                  if (e.target.value) setRepeat("none");
+                  if (e.target.value) setRule(NO_REPEAT);
                 }}
                 style={{ ...fieldStyle, flex: 1 }}
               />

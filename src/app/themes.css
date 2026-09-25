@@ -1780,60 +1780,6 @@ option {
   text-transform: uppercase;
 }
 .planner-card-body { padding: 12px 16px; }
-.time-block {
-  display: flex;
-  gap: 10px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border);
-}
-.time-block:last-child { border-bottom: none; }
-.time-label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text3);
-  width: 40px;
-  flex-shrink: 0;
-  padding-top: 2px;
-}
-.time-event {
-  flex: 1;
-  padding: 6px 10px;
-  border-radius: var(--radius);
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  color: var(--text);
-  background: var(--bg3);
-  border-left: 2px solid var(--accent);
-  cursor: pointer;
-  transition: all var(--transition);
-}
-.time-event.ai-generated {
-  border-left-color: var(--accent2);
-  background: linear-gradient(135deg, var(--bg3), var(--surface));
-  position: relative;
-}
-.time-event.ai-generated::after {
-  content: "✦";
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.6rem;
-  color: var(--accent);
-  opacity: 0.6;
-}
-.time-event:hover { background: var(--bg2); }
-.time-empty {
-  flex: 1;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text3);
-  padding: 6px 0;
-  cursor: pointer;
-  transition: color var(--transition);
-}
-.time-empty:hover { color: var(--accent); }
-.time-empty:hover::before { content: "+ "; }
 .todo-item {
   display: flex;
   align-items: flex-start;
@@ -3770,4 +3716,511 @@ button.todo-check {
 }
 .day-peek-row.done .day-peek-due {
   opacity: 0.55;
+}
+
+/* =========================================
+   PLANNER SETTINGS POPUPS (habits, schedule)
+========================================= */
+.habit-reset-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  color: var(--text3);
+}
+.planner-settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+.planner-settings {
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  max-width: 94vw;
+  max-height: 86vh;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.planner-settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 10px;
+}
+.planner-settings-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--text);
+}
+.planner-settings-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  cursor: pointer;
+}
+.planner-settings-option input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.planner-settings-option-title {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.planner-settings-option-desc {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--text2);
+}
+.planner-settings-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+.planner-settings-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+.planner-settings-tab {
+  margin-bottom: -1px;
+  padding: 8px 10px;
+  border-bottom: 2px solid transparent;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--text3);
+  transition: all var(--transition);
+}
+.planner-settings-tab:hover {
+  color: var(--text);
+}
+.planner-settings-tab.active {
+  border-bottom-color: var(--accent);
+  color: var(--accent2);
+  font-weight: 600;
+}
+.planner-settings-body {
+  flex: 1;
+  min-height: 0;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.habit-history {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.habit-history-empty {
+  padding: 18px 8px;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text3);
+}
+.habit-week {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.habit-week-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.habit-week-title {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.habit-week-sub {
+  margin-top: 1px;
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  color: var(--text3);
+}
+.habit-week-pct {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent2);
+}
+.habit-week-bar {
+  height: 4px;
+  margin: 8px 0 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg3);
+}
+.habit-week-bar > div {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.habit-week-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 0;
+}
+.habit-week-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  color: var(--text2);
+}
+.habit-week-days {
+  display: flex;
+  gap: 3px;
+}
+.habit-week-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text3);
+}
+.habit-week-day.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+.habit-week-count {
+  width: 26px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-align: right;
+  color: var(--text3);
+}
+
+/* Schedule hours setting */
+.schedule-hours-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+.schedule-hours-field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.schedule-hours-field select {
+  padding: 7px 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.schedule-hours-note {
+  margin-top: 10px;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--text3);
+}
+.schedule-hours-note.is-error {
+  color: var(--danger);
+}
+.schedule-hidden-note {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 5px 8px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  text-align: left;
+  color: var(--text3);
+}
+.schedule-hidden-note:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.planner-settings-foot .btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* =========================================
+   SCHEDULE TIMELINE (Google-Calendar-style day view)
+========================================= */
+.timeline-scroll {
+  max-height: 560px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 -4px;
+  padding: 6px 4px 4px;
+}
+.timeline {
+  position: relative;
+  display: flex;
+}
+.timeline-labels {
+  flex-shrink: 0;
+  width: 44px;
+}
+.timeline-label {
+  position: relative;
+  top: -0.55em;
+  padding-right: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-align: right;
+  color: var(--text3);
+}
+.timeline-grid {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+}
+.timeline-hour {
+  border-top: 1px solid var(--border);
+}
+.timeline-event {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+  padding: 3px 7px;
+  text-align: left;
+  background: color-mix(in srgb, var(--event-color) 24%, var(--bg));
+  border-left: 3px solid var(--event-color);
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  font-family: var(--font-ui);
+  color: var(--text);
+  transition:
+    box-shadow var(--transition),
+    filter var(--transition);
+  z-index: 1;
+}
+.timeline-event:hover {
+  z-index: 2;
+  box-shadow: var(--shadow);
+  filter: brightness(1.06);
+}
+.timeline-event-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.timeline-event-title svg {
+  flex-shrink: 0;
+  color: var(--event-color);
+}
+.timeline-event-time {
+  font-size: 0.64rem;
+  color: var(--text2);
+  white-space: nowrap;
+}
+.timeline-event.compact {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+.timeline-event.compact .timeline-event-title {
+  flex: 1;
+  min-width: 0;
+}
+.timeline-now {
+  position: absolute;
+  left: -5px;
+  right: 0;
+  height: 2px;
+  background: var(--danger);
+  pointer-events: none;
+  z-index: 3;
+}
+.timeline-now::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger);
+}
+
+/* Event form */
+.event-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.event-color {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #fff;
+  transition: transform var(--transition);
+}
+.event-color:hover {
+  transform: scale(1.12);
+}
+.event-color.active {
+  box-shadow:
+    0 0 0 2px var(--bg2),
+    0 0 0 4px var(--text);
+}
+.event-form-error {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--danger);
+}
+
+/* Colour swatch beside events in the calendar hover preview */
+.day-peek-swatch {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.day-peek-row .day-peek-time {
+  width: auto;
+  min-width: 38px;
+}
+
+/* "+ Add event" hint that follows the pointer over empty timeline slots */
+.timeline-ghost {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 4px 8px;
+  border: 1px dashed var(--accent);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent2);
+  pointer-events: none;
+  animation: peek-in 0.12s ease-out;
+}
+
+/* Custom repeat (every N weeks on chosen weekdays) */
+.custom-repeat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.custom-repeat-every {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--text2);
+}
+.custom-repeat-every input {
+  width: 56px;
+  padding: 5px 8px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.custom-repeat-days {
+  display: flex;
+  gap: 6px;
+}
+.custom-repeat-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text2);
+  transition: all var(--transition);
+}
+.custom-repeat-day:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.custom-repeat-day.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
 }

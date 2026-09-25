@@ -1,37 +1,10 @@
 import type { Todo } from "./planner-context";
+import { normalizeRepeat, parseDbDate, repeatMatches, startOfDay } from "./recurrence";
 
-export type Repeat = "none" | "daily" | "weekdays" | "weekly" | "monthly";
-
-export const REPEAT_OPTIONS: { value: Repeat; label: string }[] = [
-  { value: "none", label: "Doesn't repeat" },
-  { value: "daily", label: "Every day" },
-  { value: "weekdays", label: "Every weekday (Mon–Fri)" },
-  { value: "weekly", label: "Every week" },
-  { value: "monthly", label: "Every month" },
-];
-
-export const REPEAT_SHORT: Record<Repeat, string> = {
-  none: "",
-  daily: "Daily",
-  weekdays: "Weekdays",
-  weekly: "Weekly",
-  monthly: "Monthly",
-};
+export { REPEAT_OPTIONS, repeatLabel, toDbDate, type Repeat } from "./recurrence";
 
 /** A task as it appears on one particular day. */
 export type TaskOccurrence = Todo & { dayKey: string; doneOnDay: boolean };
-
-function startOfDay(d: Date) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-/** "Fri Sep 25 2026" (the planner's day key) -> "2026-09-25" for Postgres `date`. */
-export function toDbDate(dayKey: string) {
-  const d = new Date(dayKey);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${mm}-${dd}`;
-}
 
 /**
  * Fills in fields missing from older tasks and enforces the rules: a deadline
@@ -47,14 +20,9 @@ export function normalizeTodo(raw: Partial<Todo> & Pick<Todo, "id" | "text" | "d
     priority: raw.priority ?? "med",
     dueDate,
     dueTime: dueDate ? (raw.dueTime ?? null) : null,
-    repeat: dueDate ? "none" : (raw.repeat ?? "none"),
+    ...normalizeRepeat(dueDate ? { repeat: "none" } : raw, raw.day),
     doneDates: raw.doneDates ?? [],
   };
-}
-
-function parseDbDate(value: string) {
-  const [y, m, d] = value.split("-").map(Number);
-  return new Date(y, m - 1, d);
 }
 
 /**
@@ -76,21 +44,7 @@ export function occursOn(todo: Todo, dayKey: string) {
     return !todo.done && day.getTime() === today.getTime();
   }
 
-  if (todo.repeat === "none") return todo.day === dayKey;
-
-  switch (todo.repeat) {
-    case "daily":
-      return true;
-    case "weekdays":
-      return day.getDay() >= 1 && day.getDay() <= 5;
-    case "weekly":
-      return day.getDay() === start.getDay();
-    case "monthly": {
-      // Tasks started on the 31st land on the last day of shorter months.
-      const lastOfMonth = new Date(day.getFullYear(), day.getMonth() + 1, 0).getDate();
-      return day.getDate() === Math.min(start.getDate(), lastOfMonth);
-    }
-  }
+  return repeatMatches(todo, todo.day, dayKey);
 }
 
 export function isDoneOn(todo: Todo, dayKey: string) {

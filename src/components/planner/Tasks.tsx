@@ -8,7 +8,7 @@ import { TodoModal } from "@/components/modals/TodoModal";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { useCollapsed } from "@/lib/useCollapsed";
 import {
-  REPEAT_SHORT,
+  repeatLabel,
   deadlineOf,
   deadlineState,
   deadlineWhen,
@@ -48,7 +48,7 @@ function TaskRow({
           <div className="todo-meta">
             {task.repeat !== "none" && (
               <span className="todo-badge">
-                <SettingsIcon name="repeat" size={11} /> {REPEAT_SHORT[task.repeat]}
+                <SettingsIcon name="repeat" size={11} /> {repeatLabel(task)}
               </span>
             )}
             {due &&
@@ -154,9 +154,16 @@ export function Tasks() {
         initialPriority={editing?.priority ?? "med"}
         initialDetails={
           editing
-            ? { dueDate: editing.dueDate, dueTime: editing.dueTime, repeat: editing.repeat }
+            ? {
+                dueDate: editing.dueDate,
+                dueTime: editing.dueTime,
+                repeat: editing.repeat,
+                repeatDays: editing.repeatDays,
+                repeatInterval: editing.repeatInterval,
+              }
             : undefined
         }
+        startDay={editing?.day ?? dayKey}
         onCancel={() => setOpen(false)}
         onSave={(text, priority, details) => {
           if (editId !== null) updateTodo(editId, text, priority, details);

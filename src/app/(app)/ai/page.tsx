@@ -13,6 +13,7 @@ import { AiInsights } from "@/components/ai/AiInsights";
 import { AiThread } from "@/components/ai/AiThread";
 import { bodyToText } from "@/lib/journal/body";
 import { tasksForDay } from "@/lib/planner/tasks";
+import { AI_CATEGORY_COLOR, eventsForDay, fromMinutes } from "@/lib/planner/events";
 
 const CHIPS = [
   { emoji: "💼", label: "Productive", text: "Productive work day with deep focus blocks and regular breaks" },
@@ -34,7 +35,7 @@ function buildHistory(messages: AiMessage[]): AiHistoryMessage[] {
 export default function AiPlannerPage() {
   const router = useRouter();
   const { entries } = useJournal();
-  const { plannerDay, todos, habits, saveEvent, addTodo } = usePlanner();
+  const { plannerDay, todos, habits, events, saveEvent, addTodo } = usePlanner();
   const { theme } = useTheme();
   const copy = THEME_COPY[theme];
   const { showToast } = useToast();
@@ -113,8 +114,28 @@ export default function AiPlannerPage() {
     if (msg?.role !== "assistant" || !msg.plan) return;
 
     const dayKey = plannerDay.toDateString();
-    msg.plan.forEach((item) => {
-      saveEvent(dayKey, item.hour, item.title + (item.note ? ` — ${item.note}` : ""), true);
+    const existing = eventsForDay(events, dayKey);
+    const baseId = Date.now();
+    msg.plan.forEach((item, i) => {
+      const title = item.title + (item.note ? ` — ${item.note}` : "");
+      const start = fromMinutes(item.hour * 60);
+      // Re-applying the same plan shouldn't stack duplicate blocks.
+      if (existing.some((ev) => ev.title === title && ev.start === start)) return;
+      saveEvent({
+        // Several events are created in the same millisecond; keep ids unique.
+        id: baseId + i,
+        title,
+        day: dayKey,
+        start,
+        end: item.hour >= 23 ? "23:59" : fromMinutes((item.hour + 1) * 60),
+        color: AI_CATEGORY_COLOR[item.category] ?? "lavender",
+        repeat: "none",
+        repeatDays: [],
+        repeatInterval: 1,
+        repeatUntil: null,
+        exceptions: [],
+        ai: true,
+      });
     });
 
     const workItems = msg.plan.filter((i) => i.category === "work" || i.category === "focus");

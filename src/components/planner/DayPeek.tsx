@@ -3,9 +3,9 @@
 import { useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { usePlanner } from "@/lib/planner/planner-context";
-import { hourLabel } from "@/lib/planner/time";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { deadlineOf, deadlineState, tasksForDay } from "@/lib/planner/tasks";
+import { eventColorValue, eventsForDay, timeRangeLabel } from "@/lib/planner/events";
 
 const MAX_ROWS = 5;
 
@@ -36,10 +36,7 @@ export function DayPeek({
   const ref = useRef<HTMLDivElement>(null);
   const placed = useRef(false);
 
-  const dayEvents = Object.entries(events[dayKey] ?? {})
-    .map(([hour, ev]) => ({ hour: Number(hour), ...ev }))
-    .filter((ev) => ev.text.trim())
-    .sort((a, b) => a.hour - b.hour);
+  const dayEvents = eventsForDay(events, dayKey);
   // Open tasks first, completed ones after, like the Tasks card.
   const dayTodos = tasksForDay(todos, dayKey).sort((a, b) => Number(a.doneOnDay) - Number(b.doneOnDay));
   const now = new Date();
@@ -93,9 +90,15 @@ export function DayPeek({
             <div className="day-peek-section">
               <div className="day-peek-label">Events</div>
               {dayEvents.slice(0, MAX_ROWS).map((ev) => (
-                <div key={ev.hour} className="day-peek-row">
-                  <span className="day-peek-time">{hourLabel(ev.hour)}</span>
-                  <span className="day-peek-text">{ev.text}</span>
+                <div key={ev.id} className="day-peek-row">
+                  <span className="day-peek-swatch" style={{ background: eventColorValue(ev.color) }} />
+                  <span className="day-peek-time">{timeRangeLabel(ev.start, ev.end)}</span>
+                  <span className="day-peek-text">{ev.title}</span>
+                  {ev.repeat !== "none" && (
+                    <span className="day-peek-icon" title="Repeats">
+                      <SettingsIcon name="repeat" size={11} />
+                    </span>
+                  )}
                   {ev.ai && <span className="day-peek-ai">AI</span>}
                 </div>
               ))}

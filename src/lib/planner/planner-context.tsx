@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -12,6 +13,8 @@ import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { normalizeTodo, toDbDate, type Repeat } from "@/lib/planner/tasks";
 import { reportWrite } from "@/lib/supabase/write";
+import { DEFAULT_SCHEDULE_HOURS, weekStartKey } from "@/lib/planner/time";
+import { eventsFromLegacyMap, normalizeEvent, type CalendarEvent } from "@/lib/planner/events";
 
 export type Priority = "high" | "med" | "low";
 export type Todo = {
@@ -27,18 +30,26 @@ export type Todo = {
   /** "HH:MM" deadline time (per occurrence for repeating tasks). */
   dueTime: string | null;
   repeat: Repeat;
+  /** Weekdays (0 = Sun) for a "custom" repeat. */
+  repeatDays: number[];
+  /** Every N weeks, for a "custom" repeat. */
+  repeatInterval: number;
   /** Day keys on which a repeating task was completed. */
   doneDates: string[];
 };
-export type TodoDetails = Pick<Todo, "dueDate" | "dueTime" | "repeat">;
+export type TodoDetails = Pick<Todo, "dueDate" | "dueTime" | "repeat" | "repeatDays" | "repeatInterval">;
 export type Habit = { id: number; name: string; days: boolean[] };
-export type EventEntry = { text: string; ai: boolean };
-export type EventsMap = Record<string, Record<number, EventEntry>>;
+/** Snapshot of a finished week, saved just before a weekly reset clears it. */
+export type HabitWeek = { weekStart: string; habits: Habit[] };
 export type MoodHistory = Record<string, number>;
 
 const TODOS_KEY = "soyuco_todos";
 const HABITS_KEY = "soyuco_habits";
-const EVENTS_KEY = "soyuco_events";
+const HABIT_HISTORY_KEY = "soyuco_habit_history";
+const HISTORY_WEEKS_KEPT = 104;
+/** Pre-calendar storage: one text event per hour slot. Read once to migrate. */
+const LEGACY_EVENTS_KEY = "soyuco_events";
+const EVENTS_KEY = "soyuco_calendar_events";
 const MOOD_KEY = "soyuco_mood";
 
 const DEFAULT_HABITS: Habit[] = [
@@ -70,6 +81,31 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
+function pushEvent(event: CalendarEvent, userId: string | undefined) {
+  if (!userId) return;
+  supabase
+    .from("calendar_events")
+    .upsert(
+      {
+        user_id: userId,
+        id: event.id,
+        title: event.title,
+        day: toDbDate(event.day),
+        start_time: event.start,
+        end_time: event.end,
+        color: event.color,
+        repeat: event.repeat,
+        repeat_days: event.repeatDays,
+        repeat_interval: event.repeatInterval,
+        repeat_until: event.repeatUntil,
+        exceptions: event.exceptions.map(toDbDate),
+        ai_generated: event.ai,
+      },
+      { onConflict: "user_id,id" },
+    )
+    .then(reportWrite("save event"));
+}
+
 function pushTodo(todo: Todo, userId: string | undefined) {
   if (!userId) return;
   supabase
@@ -84,10 +120,14 @@ function pushTodo(todo: Todo, userId: string | undefined) {
       due_date: todo.dueDate,
       due_time: todo.dueTime,
       repeat: todo.repeat,
+      repeat_days: todo.repeatDays,
+      repeat_interval: todo.repeatInterval,
       done_dates: todo.doneDates.map(toDbDate),
     })
     .then(reportWrite("save task"));
 }
+
+const EMPTY_WEEK = [false, false, false, false, false, false, false];
 
 type PlannerContextValue = {
   /** True once the initial cloud pull for this sign-in has finished. */
@@ -96,13 +136,19 @@ type PlannerContextValue = {
   calendarMonth: Date;
   todos: Todo[];
   habits: Habit[];
-  events: EventsMap;
+  events: CalendarEvent[];
   moodHistory: MoodHistory;
   setPlannerDay: (d: Date) => void;
   changeDay: (delta: number) => void;
   goToday: () => void;
   setCalendarMonth: (d: Date) => void;
-  saveEvent: (dayKey: string, hour: number, text: string, ai?: boolean) => void;
+  /** Creates the event (no id) or replaces the one with the same id. */
+  saveEvent: (event: Omit<CalendarEvent, "id"> & { id?: number }) => void;
+  /**
+   * Deletes an event. For a repeating event, passing `onlyDayKey` removes just
+   * that occurrence and keeps the rest of the series.
+   */
+  deleteEvent: (id: number, onlyDayKey?: string) => void;
   addTodo: (text: string, priority: Priority, details?: Partial<TodoDetails>) => void;
   updateTodo: (id: number, text: string, priority: Priority, details?: Partial<TodoDetails>) => void;
   /** Toggles a one-off task, or a repeating task's completion on `dayKey`. */
@@ -111,6 +157,14 @@ type PlannerContextValue = {
   addHabit: (name: string) => void;
   toggleHabitDay: (id: number, dayIndex: number) => void;
   deleteHabit: (id: number) => void;
+  /** When on, habit ticks clear at the start of every week (Sunday). */
+  habitsResetWeekly: boolean;
+  /** First and last hour slots the schedule shows (0–23, inclusive). */
+  scheduleHours: { start: number; end: number };
+  setScheduleHours: (start: number, end: number) => Promise<{ error: string | null }>;
+  /** Past weeks, newest first. Only recorded while weekly reset is on. */
+  habitHistory: HabitWeek[];
+  setHabitsResetWeekly: (on: boolean) => Promise<{ error: string | null }>;
   setMood: (value: number) => Promise<void>;
 };
 
@@ -122,9 +176,79 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
   const [todos, setTodos] = useState<Todo[]>(() => readJson<Todo[]>(TODOS_KEY, []).map(normalizeTodo));
   const [habits, setHabits] = useState<Habit[]>(() => readJson(HABITS_KEY, DEFAULT_HABITS));
-  const [events, setEvents] = useState<EventsMap>(() => readJson(EVENTS_KEY, {}));
+  const [habitHistory, setHabitHistory] = useState<HabitWeek[]>(() => readJson(HABIT_HISTORY_KEY, []));
+  const [events, setEvents] = useState<CalendarEvent[]>(() => {
+    if (typeof window !== "undefined" && window.localStorage.getItem(EVENTS_KEY) === null) {
+      return eventsFromLegacyMap(readJson(LEGACY_EVENTS_KEY, {}));
+    }
+    return readJson<CalendarEvent[]>(EVENTS_KEY, []).map(normalizeEvent);
+  });
   const [moodHistory, setMoodHistory] = useState<MoodHistory>(() => readJson(MOOD_KEY, {}));
   const [synced, setSynced] = useState(false);
+
+  // Stored on the account (not per browser) so every device agrees on which
+  // week was last reset and a stale device can't wipe this week's ticks.
+  const habitsResetWeekly = user?.user_metadata?.habits_reset_weekly === true;
+  const habitsWeekStart: string | undefined = user?.user_metadata?.habits_week_start;
+  const scheduleStart = Number(user?.user_metadata?.schedule_start_hour ?? DEFAULT_SCHEDULE_HOURS.start);
+  const scheduleEnd = Number(user?.user_metadata?.schedule_end_hour ?? DEFAULT_SCHEDULE_HOURS.end);
+  const habitsRef = useRef(habits);
+  useEffect(() => {
+    habitsRef.current = habits;
+  }, [habits]);
+
+  useEffect(() => {
+    if (!user || !synced || !habitsResetWeekly) return;
+    let done = false;
+
+    function resetIfNewWeek() {
+      const current = weekStartKey();
+      if (done || !user || (habitsWeekStart && habitsWeekStart >= current)) return;
+      done = true;
+
+      // Keep the finished week before wiping it. The ticks belong to the week
+      // of the last reset (which may be several weeks ago if the app sat idle).
+      const snapshot: HabitWeek = {
+        weekStart: habitsWeekStart ?? weekStartKey(new Date(Date.now() - 7 * 86_400_000)),
+        habits: habitsRef.current.map((h) => ({ id: h.id, name: h.name, days: [...h.days] })),
+      };
+      if (snapshot.habits.length) {
+        setHabitHistory((prev) =>
+          [snapshot, ...prev.filter((w) => w.weekStart !== snapshot.weekStart)]
+            .sort((a, b) => b.weekStart.localeCompare(a.weekStart))
+            .slice(0, HISTORY_WEEKS_KEPT),
+        );
+        supabase
+          .from("habit_history")
+          .upsert(
+            { user_id: user.id, week_start: snapshot.weekStart, habits: snapshot.habits },
+            { onConflict: "user_id,week_start" },
+          )
+          .then(reportWrite("save habit history"));
+      }
+
+      const cleared = habitsRef.current.map((h) => ({ ...h, days: [...EMPTY_WEEK] }));
+      setHabits(cleared);
+      if (cleared.length) {
+        supabase
+          .from("habits")
+          .upsert(cleared.map((h) => ({ ...h, user_id: user.id })))
+          .then(reportWrite("reset habits for the new week"));
+      }
+      supabase.auth
+        .updateUser({ data: { habits_week_start: current } })
+        .then(({ error }) => error && console.error("Failed to record habit reset:", error.message));
+    }
+
+    // Check now and every minute, so a week that rolls over while the app is
+    // open still resets.
+    const first = setTimeout(resetIfNewWeek, 0);
+    const timer = setInterval(resetIfNewWeek, 60_000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(timer);
+    };
+  }, [user, synced, habitsResetWeekly, habitsWeekStart]);
 
   useEffect(() => {
     window.localStorage.setItem(TODOS_KEY, JSON.stringify(todos));
@@ -132,6 +256,9 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem(HABITS_KEY, JSON.stringify(habits));
   }, [habits]);
+  useEffect(() => {
+    window.localStorage.setItem(HABIT_HISTORY_KEY, JSON.stringify(habitHistory));
+  }, [habitHistory]);
   useEffect(() => {
     window.localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
   }, [events]);
@@ -160,6 +287,8 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
               dueDate: r.due_date ?? null,
               dueTime: r.due_time ?? null,
               repeat: r.repeat ?? "none",
+              repeatDays: r.repeat_days ?? [],
+              repeatInterval: r.repeat_interval ?? 1,
               doneDates: (r.done_dates ?? []).map(localDateKeyFromDb),
             }),
           ),
@@ -175,17 +304,28 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       });
 
     const eventsPull = supabase
-      .from("events")
+      .from("calendar_events")
       .select("*")
       .then(({ data, error }) => {
         if (cancelled || error || !data || !data.length) return;
-        const map: EventsMap = {};
-        for (const row of data) {
-          const dayKey = localDateKeyFromDb(row.day);
-          if (!map[dayKey]) map[dayKey] = {};
-          map[dayKey][row.hour] = { text: row.text, ai: row.ai_generated ?? false };
-        }
-        setEvents(map);
+        setEvents(
+          data.map((r) =>
+            normalizeEvent({
+              id: Number(r.id),
+              title: r.title,
+              day: localDateKeyFromDb(r.day),
+              start: r.start_time,
+              end: r.end_time,
+              color: r.color,
+              repeat: r.repeat,
+              repeatDays: r.repeat_days ?? [],
+              repeatInterval: r.repeat_interval ?? 1,
+              repeatUntil: r.repeat_until ?? null,
+              exceptions: (r.exceptions ?? []).map(localDateKeyFromDb),
+              ai: r.ai_generated ?? false,
+            }),
+          ),
+        );
       });
 
     const moodPull = supabase
@@ -200,8 +340,18 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         setMoodHistory(map);
       });
 
+    const historyPull = supabase
+      .from("habit_history")
+      .select("week_start, habits")
+      .order("week_start", { ascending: false })
+      .limit(HISTORY_WEEKS_KEPT)
+      .then(({ data, error }) => {
+        if (cancelled || error || !data || !data.length) return;
+        setHabitHistory(data.map((r) => ({ weekStart: r.week_start, habits: r.habits ?? [] })));
+      });
+
     const markSynced = () => !cancelled && setSynced(true);
-    Promise.all([todosPull, habitsPull, eventsPull, moodPull]).then(markSynced, markSynced);
+    Promise.all([todosPull, habitsPull, eventsPull, moodPull, historyPull]).then(markSynced, markSynced);
 
     return () => {
       cancelled = true;
@@ -233,38 +383,30 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       },
       setCalendarMonth,
 
-      saveEvent(dayKey, hour, text, ai) {
-        const clean = text.trim();
-        let aiFlag = ai ?? false;
-        setEvents((prev) => {
-          const next: EventsMap = { ...prev, [dayKey]: { ...(prev[dayKey] ?? {}) } };
-          if (!clean) {
-            delete next[dayKey][hour];
-          } else {
-            const existing = next[dayKey][hour];
-            aiFlag = ai ?? existing?.ai ?? false;
-            next[dayKey][hour] = { text: clean, ai: aiFlag };
-          }
-          return next;
-        });
+      saveEvent(fields) {
+        const event = normalizeEvent({ ...fields, id: fields.id ?? Date.now() });
+        setEvents((prev) => [...prev.filter((e) => e.id !== event.id), event]);
+        pushEvent(event, user?.id);
+      },
 
-        if (!user) return;
-        const day = toDbDate(dayKey);
-        supabase
-          .from("events")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("day", day)
-          .eq("hour", hour)
-          .then(({ error }) => {
-            if (error) return reportWrite("clear event")({ error });
-            if (clean) {
-              supabase
-                .from("events")
-                .insert({ user_id: user.id, day, hour, text: clean, ai_generated: aiFlag })
-                .then(reportWrite("save event"));
-            }
-          });
+      deleteEvent(id, onlyDayKey) {
+        const event = events.find((e) => e.id === id);
+        if (!event) return;
+        if (onlyDayKey && event.repeat !== "none") {
+          const next = { ...event, exceptions: [...event.exceptions, onlyDayKey] };
+          setEvents((prev) => prev.map((e) => (e.id === id ? next : e)));
+          pushEvent(next, user?.id);
+          return;
+        }
+        setEvents((prev) => prev.filter((e) => e.id !== id));
+        if (user) {
+          supabase
+            .from("calendar_events")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("id", id)
+            .then(reportWrite("delete event"));
+        }
       },
 
       addTodo(text, priority, details) {
@@ -347,6 +489,25 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         }
       },
 
+      habitsResetWeekly,
+      habitHistory,
+      scheduleHours: { start: scheduleStart, end: scheduleEnd },
+
+      async setScheduleHours(start, end) {
+        const { error } = await supabase.auth.updateUser({
+          data: { schedule_start_hour: start, schedule_end_hour: end },
+        });
+        return { error: error?.message ?? null };
+      },
+
+      async setHabitsResetWeekly(on) {
+        // Starting from this week means switching on never wipes current ticks.
+        const { error } = await supabase.auth.updateUser({
+          data: { habits_reset_weekly: on, habits_week_start: weekStartKey() },
+        });
+        return { error: error?.message ?? null };
+      },
+
       async setMood(val) {
         const todayDate = new Date();
         const todayKey = todayDate.toDateString();
@@ -372,7 +533,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [synced, plannerDay, calendarMonth, todos, habits, events, moodHistory, user],
+    [synced, plannerDay, calendarMonth, todos, habits, events, moodHistory, user, habitsResetWeekly, habitHistory, scheduleStart, scheduleEnd],
   );
 
   return <PlannerContext.Provider value={value}>{children}</PlannerContext.Provider>;
