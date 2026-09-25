@@ -10,9 +10,27 @@ import {
 } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth-context";
+import { normalizeTodo, toDbDate, type Repeat } from "@/lib/planner/tasks";
+import { reportWrite } from "@/lib/supabase/write";
 
 export type Priority = "high" | "med" | "low";
-export type Todo = { id: number; text: string; done: boolean; priority: Priority; day: string };
+export type Todo = {
+  id: number;
+  text: string;
+  /** One-off tasks only; repeating tasks track completion per day in doneDates. */
+  done: boolean;
+  priority: Priority;
+  /** The day the task was added to; repeats count from here. */
+  day: string;
+  /** "YYYY-MM-DD" deadline for one-off tasks. */
+  dueDate: string | null;
+  /** "HH:MM" deadline time (per occurrence for repeating tasks). */
+  dueTime: string | null;
+  repeat: Repeat;
+  /** Day keys on which a repeating task was completed. */
+  doneDates: string[];
+};
+export type TodoDetails = Pick<Todo, "dueDate" | "dueTime" | "repeat">;
 export type Habit = { id: number; name: string; days: boolean[] };
 export type EventEntry = { text: string; ai: boolean };
 export type EventsMap = Record<string, Record<number, EventEntry>>;
@@ -52,6 +70,25 @@ function readJson<T>(key: string, fallback: T): T {
   }
 }
 
+function pushTodo(todo: Todo, userId: string | undefined) {
+  if (!userId) return;
+  supabase
+    .from("todos")
+    .upsert({
+      id: todo.id,
+      user_id: userId,
+      text: todo.text,
+      done: todo.done,
+      priority: todo.priority,
+      day: toDbDate(todo.day),
+      due_date: todo.dueDate,
+      due_time: todo.dueTime,
+      repeat: todo.repeat,
+      done_dates: todo.doneDates.map(toDbDate),
+    })
+    .then(reportWrite("save task"));
+}
+
 type PlannerContextValue = {
   /** True once the initial cloud pull for this sign-in has finished. */
   synced: boolean;
@@ -66,9 +103,10 @@ type PlannerContextValue = {
   goToday: () => void;
   setCalendarMonth: (d: Date) => void;
   saveEvent: (dayKey: string, hour: number, text: string, ai?: boolean) => void;
-  addTodo: (text: string, priority: Priority) => void;
-  updateTodo: (id: number, text: string, priority: Priority) => void;
-  toggleTodo: (id: number) => void;
+  addTodo: (text: string, priority: Priority, details?: Partial<TodoDetails>) => void;
+  updateTodo: (id: number, text: string, priority: Priority, details?: Partial<TodoDetails>) => void;
+  /** Toggles a one-off task, or a repeating task's completion on `dayKey`. */
+  toggleTodo: (id: number, dayKey: string) => void;
   deleteTodo: (id: number) => void;
   addHabit: (name: string) => void;
   toggleHabitDay: (id: number, dayIndex: number) => void;
@@ -82,7 +120,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [plannerDay, setPlannerDay] = useState(() => new Date());
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
-  const [todos, setTodos] = useState<Todo[]>(() => readJson(TODOS_KEY, []));
+  const [todos, setTodos] = useState<Todo[]>(() => readJson<Todo[]>(TODOS_KEY, []).map(normalizeTodo));
   const [habits, setHabits] = useState<Habit[]>(() => readJson(HABITS_KEY, DEFAULT_HABITS));
   const [events, setEvents] = useState<EventsMap>(() => readJson(EVENTS_KEY, {}));
   const [moodHistory, setMoodHistory] = useState<MoodHistory>(() => readJson(MOOD_KEY, {}));
@@ -112,13 +150,19 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
       .then(({ data, error }) => {
         if (cancelled || error || !data || !data.length) return;
         setTodos(
-          data.map((r) => ({
-            id: r.id,
-            text: r.text,
-            done: r.done,
-            priority: r.priority,
-            day: localDateKeyFromDb(r.day),
-          })),
+          data.map((r) =>
+            normalizeTodo({
+              id: r.id,
+              text: r.text,
+              done: r.done,
+              priority: r.priority,
+              day: localDateKeyFromDb(r.day),
+              dueDate: r.due_date ?? null,
+              dueTime: r.due_time ?? null,
+              repeat: r.repeat ?? "none",
+              doneDates: (r.done_dates ?? []).map(localDateKeyFromDb),
+            }),
+          ),
         );
       });
 
@@ -205,55 +249,71 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         });
 
         if (!user) return;
+        const day = toDbDate(dayKey);
         supabase
           .from("events")
           .delete()
           .eq("user_id", user.id)
-          .eq("day", dayKey)
+          .eq("day", day)
           .eq("hour", hour)
-          .then(async () => {
+          .then(({ error }) => {
+            if (error) return reportWrite("clear event")({ error });
             if (clean) {
-              await supabase
+              supabase
                 .from("events")
-                .insert({ user_id: user.id, day: dayKey, hour, text: clean, ai_generated: aiFlag });
+                .insert({ user_id: user.id, day, hour, text: clean, ai_generated: aiFlag })
+                .then(reportWrite("save event"));
             }
           });
       },
 
-      addTodo(text, priority) {
+      addTodo(text, priority, details) {
         const clean = text.trim();
         if (!clean) return;
-        const todo: Todo = { id: Date.now(), text: clean, done: false, priority, day: plannerDay.toDateString() };
+        const todo = normalizeTodo({
+          id: Date.now(),
+          text: clean,
+          priority,
+          day: plannerDay.toDateString(),
+          ...details,
+        });
         setTodos((prev) => [...prev, todo]);
-        if (user) {
-          supabase.from("todos").upsert({ ...todo, user_id: user.id });
-        }
+        pushTodo(todo, user?.id);
       },
 
-      updateTodo(id, text, priority) {
+      updateTodo(id, text, priority, details) {
         const clean = text.trim();
-        if (!clean) return;
-        setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, text: clean, priority } : t)));
         const todo = todos.find((t) => t.id === id);
-        if (user && todo) {
-          supabase.from("todos").upsert({ ...todo, text: clean, priority, user_id: user.id });
-        }
+        if (!clean || !todo) return;
+        const next = { ...todo, ...details, text: clean, priority };
+        setTodos((prev) => prev.map((t) => (t.id === id ? next : t)));
+        pushTodo(next, user?.id);
       },
 
-      toggleTodo(id) {
+      toggleTodo(id, dayKey) {
         const todo = todos.find((t) => t.id === id);
         if (!todo) return;
-        const done = !todo.done;
-        setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, done } : t)));
-        if (user) {
-          supabase.from("todos").upsert({ ...todo, done, user_id: user.id });
-        }
+        const next =
+          todo.repeat === "none"
+            ? { ...todo, done: !todo.done }
+            : {
+                ...todo,
+                doneDates: todo.doneDates.includes(dayKey)
+                  ? todo.doneDates.filter((d) => d !== dayKey)
+                  : [...todo.doneDates, dayKey],
+              };
+        setTodos((prev) => prev.map((t) => (t.id === id ? next : t)));
+        pushTodo(next, user?.id);
       },
 
       deleteTodo(id) {
         setTodos((prev) => prev.filter((t) => t.id !== id));
         if (user) {
-          supabase.from("todos").delete().eq("id", id);
+          supabase
+            .from("todos")
+            .delete()
+            .eq("id", id)
+            .then(reportWrite("delete task"));
         }
       },
 
@@ -263,7 +323,7 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         const habit: Habit = { id: Date.now(), name: clean, days: [false, false, false, false, false, false, false] };
         setHabits((prev) => [...prev, habit]);
         if (user) {
-          supabase.from("habits").upsert({ ...habit, user_id: user.id });
+          supabase.from("habits").upsert({ ...habit, user_id: user.id }).then(reportWrite("save habit"));
         }
       },
 
@@ -273,21 +333,25 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         const days = habit.days.map((d, i) => (i === dayIndex ? !d : d));
         setHabits((prev) => prev.map((h) => (h.id === id ? { ...h, days } : h)));
         if (user) {
-          supabase.from("habits").upsert({ ...habit, days, user_id: user.id });
+          supabase
+            .from("habits")
+            .upsert({ ...habit, days, user_id: user.id })
+            .then(reportWrite("update habit"));
         }
       },
 
       deleteHabit(id) {
         setHabits((prev) => prev.filter((h) => h.id !== id));
         if (user) {
-          supabase.from("habits").delete().eq("id", id);
+          supabase.from("habits").delete().eq("id", id).then(reportWrite("delete habit"));
         }
       },
 
       async setMood(val) {
         const todayDate = new Date();
         const todayKey = todayDate.toDateString();
-        const todayISO = todayDate.toISOString().split("T")[0];
+        // Local calendar date; toISOString() would give the UTC date instead.
+        const todayISO = toDbDate(todayKey);
 
         setMoodHistory((prev) => {
           const next = { ...prev, [todayKey]: val };
@@ -300,9 +364,11 @@ export function PlannerProvider({ children }: { children: ReactNode }) {
         });
 
         if (user) {
-          await supabase
-            .from("mood_history")
-            .upsert({ user_id: user.id, date: todayISO, mood_value: val }, { onConflict: "user_id, date" });
+          reportWrite("save mood")(
+            await supabase
+              .from("mood_history")
+              .upsert({ user_id: user.id, date: todayISO, mood_value: val }, { onConflict: "user_id, date" }),
+          );
         }
       },
     }),

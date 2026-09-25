@@ -10,6 +10,7 @@ import {
 } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth-context";
+import { reportWrite } from "@/lib/supabase/write";
 
 export type TxType = "expense" | "income";
 export type Category =
@@ -152,14 +153,14 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
             type: fields.type,
             category: fields.cat,
             date: fields.date,
-          });
+          }).then(reportWrite("save transaction"));
         }
       },
 
       deleteTransaction(id) {
         setTransactions((prev) => prev.filter((t) => t.id !== id));
         if (user) {
-          supabase.from("transactions").delete().eq("id", id);
+          supabase.from("transactions").delete().eq("id", id).then(reportWrite("delete transaction"));
         }
       },
 
@@ -167,7 +168,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         const id = Date.now();
         setGoals((prev) => [...prev, { id, ...fields }]);
         if (user) {
-          supabase.from("goals").upsert({ id, user_id: user.id, ...fields });
+          supabase.from("goals").upsert({ id, user_id: user.id, ...fields }).then(reportWrite("save goal"));
         }
       },
 
@@ -177,14 +178,17 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         const saved = Math.max(0, goal.saved + (isAdd ? amount : -amount));
         setGoals((prev) => prev.map((g) => (g.id === goalId ? { ...g, saved } : g)));
         if (user) {
-          supabase.from("goals").upsert({ id: goal.id, user_id: user.id, name: goal.name, target: goal.target, saved });
+          supabase
+            .from("goals")
+            .upsert({ id: goal.id, user_id: user.id, name: goal.name, target: goal.target, saved })
+            .then(reportWrite("update goal savings"));
         }
       },
 
       deleteGoal(id) {
         setGoals((prev) => prev.filter((g) => g.id !== id));
         if (user) {
-          supabase.from("goals").delete().eq("id", id);
+          supabase.from("goals").delete().eq("id", id).then(reportWrite("delete goal"));
         }
       },
 
@@ -196,8 +200,12 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
             .delete()
             .eq("user_id", user.id)
             .eq("category", cat)
-            .then(async () => {
-              await supabase.from("budget_limits").insert({ user_id: user.id, category: cat, amount });
+            .then(({ error }) => {
+              if (error) return reportWrite("clear budget limit")({ error });
+              supabase
+                .from("budget_limits")
+                .insert({ user_id: user.id, category: cat, amount })
+                .then(reportWrite("save budget limit"));
             });
         }
       },
@@ -205,7 +213,12 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
       deleteLimit(cat) {
         setLimits((prev) => prev.filter((l) => l.cat !== cat));
         if (user) {
-          supabase.from("budget_limits").delete().eq("user_id", user.id).eq("category", cat);
+          supabase
+            .from("budget_limits")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("category", cat)
+            .then(reportWrite("delete budget limit"));
         }
       },
     }),

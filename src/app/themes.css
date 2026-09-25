@@ -3419,3 +3419,355 @@ option {
   border-radius: 3px;
   color: inherit;
 }
+
+/* =========================================
+   CALENDAR: month/year picker and day peek
+========================================= */
+.cal-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 5px;
+}
+/* Let the month/year panel extend past the card instead of being clipped. */
+.planner-card.cal-card {
+  overflow: visible;
+}
+.cal-peeked:not(.cal-selected) {
+  background: var(--surface2);
+}
+
+.my-picker {
+  position: relative;
+}
+.my-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: all var(--transition);
+}
+.my-picker-trigger:hover,
+.my-picker-trigger.open {
+  background: var(--surface2);
+  border-color: var(--border);
+}
+.my-picker-trigger.open svg {
+  transform: rotate(180deg);
+}
+.my-picker-trigger svg {
+  transition: transform var(--transition);
+}
+.my-picker-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  z-index: 60;
+  width: 230px;
+  padding: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(-50%);
+  animation: peek-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.my-picker-cols {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 6px;
+}
+.my-picker-col {
+  position: relative;
+  height: 196px;
+  overflow-y: auto;
+  scroll-snap-type: y proximity;
+  overscroll-behavior: contain;
+  padding: 2px;
+  border-radius: var(--radius);
+  background: var(--bg);
+  -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+}
+.my-picker-col::before,
+.my-picker-col::after {
+  content: "";
+  display: block;
+  height: 80px;
+}
+.my-picker-opt {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  scroll-snap-align: center;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  text-align: center;
+  color: var(--text2);
+  transition: all var(--transition);
+}
+.my-picker-opt:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.my-picker-opt.current {
+  color: var(--accent2);
+}
+.my-picker-opt.selected {
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+.my-picker-today {
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--text2);
+}
+.my-picker-today:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+@keyframes peek-in {
+  from {
+    opacity: 0;
+    scale: 0.94;
+  }
+}
+.day-peek {
+  position: fixed;
+  z-index: 400;
+  width: 290px;
+  max-width: calc(100vw - 24px);
+  padding: 10px 12px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-ui);
+  animation: peek-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    top 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    left 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.day-peek-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.day-peek-date {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text);
+}
+.day-peek-badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.day-peek-section + .day-peek-section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.day-peek-label {
+  margin-bottom: 4px;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.day-peek-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-size: 0.76rem;
+  color: var(--text);
+}
+.day-peek-time {
+  flex-shrink: 0;
+  width: 38px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--accent2);
+}
+.day-peek-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.day-peek-row.done .day-peek-text {
+  color: var(--text3);
+  text-decoration: line-through;
+}
+.day-peek-ai {
+  flex-shrink: 0;
+  padding: 0 5px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--accent2);
+}
+.day-peek-check {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--text3);
+}
+.day-peek-check.priority-high {
+  color: var(--danger);
+}
+.day-peek-check.priority-med {
+  color: var(--accent);
+}
+.day-peek-check.priority-low {
+  color: var(--success);
+}
+.day-peek-more {
+  margin-top: 2px;
+  font-size: 0.66rem;
+  color: var(--text3);
+}
+.day-peek-empty {
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: var(--text3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-peek,
+  .my-picker-pop {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* =========================================
+   TASKS: deadlines and repeats
+========================================= */
+button.todo-check {
+  padding: 0;
+}
+.todo-main {
+  flex: 1;
+  min-width: 0;
+}
+.todo-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 3px;
+}
+.todo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 0.64rem;
+  color: var(--text3);
+}
+.todo-due.is-soon {
+  border-color: var(--accent);
+  color: var(--accent2);
+}
+.todo-due.is-overdue {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.todo-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 5px;
+  border-radius: var(--radius);
+  color: var(--text3);
+  transition: all var(--transition);
+}
+.todo-edit:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.day-peek-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--text3);
+}
+
+/* Overdue notice and Keep-style completed section */
+.todo-due.is-overdue {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  font-weight: 600;
+}
+.todo-completed {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.todo-completed-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--text3);
+  transition: color var(--transition);
+}
+.todo-completed-toggle:hover {
+  color: var(--text);
+}
+.todo-item.is-done .todo-priority,
+.todo-item.is-done .todo-badge {
+  opacity: 0.55;
+}
+
+/* Due tag beside each task in the calendar hover preview */
+.day-peek-due {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.62rem;
+  color: var(--text3);
+  white-space: nowrap;
+}
+.day-peek-due.is-today {
+  font-weight: 700;
+  color: var(--accent2);
+}
+.day-peek-due.is-overdue {
+  font-weight: 700;
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.day-peek-row.done .day-peek-due {
+  opacity: 0.55;
+}

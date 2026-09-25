@@ -1,11 +1,47 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { usePlanner } from "@/lib/planner/planner-context";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { MonthYearPicker } from "@/components/planner/MonthYearPicker";
+import { DayPeek } from "@/components/planner/DayPeek";
+import { occursOn } from "@/lib/planner/tasks";
 
 const WEEKDAY_HEADERS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const SHOW_DELAY_MS = 180;
+const HIDE_DELAY_MS = 120;
+
+type Peek = { dayKey: string; anchor: DOMRect };
 
 export function Calendar() {
-  const { calendarMonth, plannerDay, events, setPlannerDay, setCalendarMonth } = usePlanner();
+  const { calendarMonth, plannerDay, events, todos, setPlannerDay, setCalendarMonth } = usePlanner();
+  const [peek, setPeek] = useState<Peek | null>(null);
+  const showTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(
+    () => () => {
+      clearTimeout(showTimer.current);
+      clearTimeout(hideTimer.current);
+    },
+    [],
+  );
+
+  // First hover waits a beat; once a peek is open it follows the pointer
+  // from cell to cell straight away.
+  function hoverDay(dayKey: string, el: HTMLElement) {
+    clearTimeout(hideTimer.current);
+    clearTimeout(showTimer.current);
+    const next = { dayKey, anchor: el.getBoundingClientRect() };
+    if (peek) setPeek(next);
+    else showTimer.current = setTimeout(() => setPeek(next), SHOW_DELAY_MS);
+  }
+
+  function scheduleHide() {
+    clearTimeout(showTimer.current);
+    clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setPeek(null), HIDE_DELAY_MS);
+  }
 
   const year = calendarMonth.getFullYear();
   const month = calendarMonth.getMonth();
@@ -22,13 +58,18 @@ export function Calendar() {
     const dayKey = cellDate.toDateString();
     const isToday = dayKey === today.toDateString();
     const isSelected = dayKey === plannerDay.toDateString();
-    const dotCount = Math.min(Object.keys(events[dayKey] ?? {}).length, 3);
+    const isPeeked = peek?.dayKey === dayKey;
+    const eventCount = Object.values(events[dayKey] ?? {}).filter((e) => e.text.trim()).length;
+    const hasTasks = todos.some((t) => occursOn(t, dayKey));
+    const dotCount = Math.min(eventCount + (hasTasks ? 1 : 0), 3);
 
     cells.push(
       <div
         key={d}
-        className={`cal-cell${isToday ? " cal-today" : ""}${isSelected ? " cal-selected" : ""}`}
+        className={`cal-cell${isToday ? " cal-today" : ""}${isSelected ? " cal-selected" : ""}${isPeeked ? " cal-peeked" : ""}`}
         onClick={() => setPlannerDay(new Date(year, month, d))}
+        onMouseEnter={(e) => hoverDay(dayKey, e.currentTarget)}
+        onMouseLeave={scheduleHide}
       >
         <span className="cal-day-num">{d}</span>
         {dotCount > 0 && (
@@ -43,31 +84,26 @@ export function Calendar() {
   }
 
   return (
-    <div className="planner-card">
+    <div className="planner-card cal-card">
       <div className="planner-card-header" style={{ padding: "8px 12px" }}>
         <button
-          className="nav-btn"
-          style={{ padding: "3px 7px", fontSize: "0.75rem" }}
+          className="nav-btn cal-nav"
+          aria-label="Previous month"
           onClick={() => setCalendarMonth(new Date(year, month - 1, 1))}
         >
-          ◀
+          <SettingsIcon name="chevronLeft" size={14} />
         </button>
-        <div
-          className="planner-card-title"
-          style={{ textTransform: "none", fontSize: "0.78rem", letterSpacing: 0, color: "var(--text)" }}
-        >
-          {calendarMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-        </div>
+        <MonthYearPicker value={calendarMonth} onChange={setCalendarMonth} />
         <button
-          className="nav-btn"
-          style={{ padding: "3px 7px", fontSize: "0.75rem" }}
+          className="nav-btn cal-nav"
+          aria-label="Next month"
           onClick={() => setCalendarMonth(new Date(year, month + 1, 1))}
         >
-          ▶
+          <SettingsIcon name="chevronRight" size={14} />
         </button>
       </div>
       <div className="planner-card-body" style={{ padding: "6px 10px 10px" }}>
-        <div className="cal-grid">
+        <div className="cal-grid" onMouseLeave={scheduleHide}>
           {WEEKDAY_HEADERS.map((d) => (
             <div key={d} className="cal-day-header">
               {d}
@@ -76,6 +112,15 @@ export function Calendar() {
           {cells}
         </div>
       </div>
+
+      {peek && (
+        <DayPeek
+          dayKey={peek.dayKey}
+          anchor={peek.anchor}
+          onPointerEnter={() => clearTimeout(hideTimer.current)}
+          onPointerLeave={scheduleHide}
+        />
+      )}
     </div>
   );
 }

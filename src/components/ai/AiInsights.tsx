@@ -2,6 +2,7 @@
 
 import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
+import { tasksForDay } from "@/lib/planner/tasks";
 
 const MOOD_LABELS = ["–", "Awful", "Meh", "Okay", "Good", "Great"];
 
@@ -10,8 +11,8 @@ export function AiInsights({ hasMessages }: { hasMessages: boolean }) {
   const { todos, habits, moodHistory } = usePlanner();
 
   const todayKey = new Date().toDateString();
-  const todayTodos = todos.filter((t) => t.day === todayKey);
-  const doneTodos = todayTodos.filter((t) => t.done).length;
+  const todayTodos = tasksForDay(todos, todayKey);
+  const doneTodos = todayTodos.filter((t) => t.doneOnDay).length;
   const habitsDone = habits.reduce((s, h) => s + h.days.filter(Boolean).length, 0);
   const moodValues = Object.values(moodHistory).filter(Boolean);
   const avgMood = moodValues.length ? Math.round((moodValues.reduce((s, v) => s + v, 0) / moodValues.length) * 10) / 10 : 0;
