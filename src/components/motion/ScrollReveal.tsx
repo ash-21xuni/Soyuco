@@ -33,8 +33,11 @@ export function ScrollReveal({ container }: { container: string }) {
     }
 
     const timers = new Set<ReturnType<typeof setTimeout>>();
+    // Cards hidden by this run that haven't finished revealing yet.
+    const pending = new Set<HTMLElement>();
 
     const finish = (el: HTMLElement) => {
+      pending.delete(el);
       el.classList.remove("reveal", "is-revealed");
       el.style.transitionDelay = "";
     };
@@ -63,6 +66,7 @@ export function ScrollReveal({ container }: { container: string }) {
       if (el.dataset.revealed) return;
       el.dataset.revealed = "1";
       el.classList.add("reveal");
+      pending.add(el);
       io.observe(el);
     };
 
@@ -87,6 +91,13 @@ export function ScrollReveal({ container }: { container: string }) {
       mo.disconnect();
       io.disconnect();
       timers.forEach(clearTimeout);
+      // Un-hide anything still waiting and forget it, so a remount (e.g. React
+      // Strict Mode's double effect in dev) can pick it up again instead of
+      // leaving it invisible.
+      pending.forEach((el) => {
+        finish(el);
+        delete el.dataset.revealed;
+      });
     };
   }, [container]);
 
