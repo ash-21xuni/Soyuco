@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useEditorState, type Editor } from "@tiptap/react";
 import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
+import { DEFAULT_TEXT_BOX_WIDTH } from "@/components/journal/extensions/TextBox";
 
 // Text colours are mid-tone so they read on both light and dark themes.
 const TEXT_COLORS = [
@@ -144,7 +145,7 @@ function SwatchMenu({
   );
 }
 
-export function FormatToolbar({ editor }: { editor: Editor }) {
+export function FormatToolbar({ editor, onPickImage }: { editor: Editor; onPickImage: () => void }) {
   const state = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
@@ -224,6 +225,20 @@ export function FormatToolbar({ editor }: { editor: Editor }) {
         label="Insert table"
         active={state.table}
         onClick={() => chain().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+      />
+      <ToolButton icon="image" label="Insert image" onClick={onPickImage} />
+      <ToolButton
+        icon="textBox"
+        label="Insert text box"
+        onClick={() =>
+          chain()
+            .insertContent({
+              type: "textBox",
+              attrs: { width: DEFAULT_TEXT_BOX_WIDTH, wrap: "right" },
+              content: [{ type: "paragraph" }],
+            })
+            .run()
+        }
       />
       <ToolButton
         icon="clearFormat"

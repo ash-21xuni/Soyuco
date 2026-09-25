@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
-import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
+import {
+  Table,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@tiptap/extension-table";
 import { Color, TextStyle } from "@tiptap/extension-text-style";
 import Highlight from "@tiptap/extension-highlight";
 import { Placeholder } from "@tiptap/extensions";
+import type { Editor } from "@tiptap/react";
+import { JournalImage } from "@/components/journal/extensions/JournalImage";
+import { TextBox } from "@/components/journal/extensions/TextBox";
+import { IMAGE_MIME_TYPES, uploadJournalImage } from "@/lib/journal/images";
+import { useAuth } from "@/lib/supabase/auth-context";
 import { useJournal, type JournalEntry } from "@/lib/journal/journal-context";
 import { bodyToHtml, bodyToText, textToHtml } from "@/lib/journal/body";
 import { useTheme } from "@/lib/theme/theme-context";
@@ -15,7 +25,10 @@ import { THEME_COPY } from "@/lib/theme/theme-copy";
 import { useToast } from "@/lib/toast/toast-context";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { PromptModal } from "@/components/modals/PromptModal";
-import { FormatToolbar, TableToolbar } from "@/components/journal/FormatToolbar";
+import {
+  FormatToolbar,
+  TableToolbar,
+} from "@/components/journal/FormatToolbar";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { completeText } from "@/lib/ai/client";
 
@@ -31,7 +44,11 @@ const FONT_OPTIONS = [
 ];
 
 function formatDate(ts: number) {
-  return new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return new Date(ts).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function wordCount(text: string) {
@@ -64,8 +81,14 @@ export function EntryEditor() {
 }
 
 function EntryEditorView({ entry }: { entry: JournalEntry }) {
-  const { collections, updateEntry, saveEntryToCloud, deleteEntry, addTag, toggleEntryCollection } =
-    useJournal();
+  const {
+    collections,
+    updateEntry,
+    saveEntryToCloud,
+    deleteEntry,
+    addTag,
+    toggleEntryCollection,
+  } = useJournal();
   const { showToast } = useToast();
 
   const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
@@ -74,6 +97,31 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
   const [tagModalOpen, setTagModalOpen] = useState(false);
   const [aiAssisting, setAiAssisting] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
+
+  // Uploads each image to private storage, then inserts it at `pos` (or the cursor).
+  const insertImages = useCallback(
+    async (ed: Editor, files: File[], pos?: number) => {
+      if (!user) return;
+      for (const file of files) {
+        showToast(`Uploading ${file.name || "image"}…`, "info");
+        const result = await uploadJournalImage(file, user.id);
+        if ("error" in result) {
+          showToast(`Couldn't add image: ${result.error}`, "error");
+          continue;
+        }
+        const image = {
+          type: "image",
+          attrs: { path: result.path, wrap: "center" },
+        };
+        if (typeof pos === "number")
+          ed.chain().insertContentAt(pos, image).focus().run();
+        else ed.chain().focus().insertContent(image).run();
+      }
+    },
+    [user, showToast],
+  );
 
   const editor = useEditor({
     extensions: [
@@ -87,8 +135,11 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
       TableRow,
       TableHeader,
       TableCell,
+      JournalImage,
+      TextBox,
       Placeholder.configure({
-        placeholder: "What's on your mind today? Let your thoughts flow freely…",
+        placeholder:
+          "What's on your mind today? Let your thoughts flow freely…",
       }),
     ],
     // Legacy plain-text bodies are converted on load; they're only rewritten
@@ -103,11 +154,44 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
     titleRef.current?.focus();
   }, []);
 
+  // Paste or drop image files straight into the entry.
+  useEffect(() => {
+    if (!editor) return;
+    const imagesIn = (list: FileList | undefined | null) =>
+      Array.from(list ?? []).filter((f) => IMAGE_MIME_TYPES.includes(f.type));
+    editor.setOptions({
+      editorProps: {
+        ...editor.options.editorProps,
+        handlePaste: (_view, event) => {
+          const files = imagesIn(event.clipboardData?.files);
+          if (!files.length) return false;
+          event.preventDefault();
+          insertImages(editor, files);
+          return true;
+        },
+        handleDrop: (view, event, _slice, moved) => {
+          const files = imagesIn(event.dataTransfer?.files);
+          if (moved || !files.length) return false;
+          event.preventDefault();
+          const pos = view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY,
+          })?.pos;
+          insertImages(editor, files, pos);
+          return true;
+        },
+      },
+    });
+  }, [editor, insertImages]);
+
   const plainBody = bodyToText(entry.body);
 
   async function handleSave() {
     const { error } = await saveEntryToCloud(entry.id);
-    showToast(error ? `Save failed: ${error}` : "Entry saved!", error ? "error" : "success");
+    showToast(
+      error ? `Save failed: ${error}` : "Entry saved!",
+      error ? "error" : "success",
+    );
   }
 
   async function handleConfirmDelete() {
@@ -161,9 +245,30 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
           onChange={(e) => setFontSize(Number(e.target.value) || 17)}
         />
         <div className="editor-toolbar-sep" />
-        {editor && <FormatToolbar editor={editor} />}
+        {editor && (
+          <FormatToolbar
+            editor={editor}
+            onPickImage={() => fileInputRef.current?.click()}
+          />
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept={IMAGE_MIME_TYPES.join(",")}
+          multiple
+          hidden
+          onChange={(e) => {
+            const files = Array.from(e.target.files ?? []);
+            e.target.value = "";
+            if (editor && files.length) insertImages(editor, files);
+          }}
+        />
         <div className="editor-toolbar-sep" />
-        <button className="tool-btn tool-btn-labelled" onClick={handleAiAssist} disabled={aiAssisting}>
+        <button
+          className="tool-btn tool-btn-labelled"
+          onClick={handleAiAssist}
+          disabled={aiAssisting}
+        >
           {aiAssisting ? (
             <>
               <span className="spin">⬡</span> Writing…
@@ -188,76 +293,102 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
       </div>
       {editor && <TableToolbar editor={editor} />}
 
-      <input
-        ref={titleRef}
-        className="entry-title-input"
-        type="text"
-        placeholder="Untitled entry…"
-        style={{ fontFamily }}
-        value={entry.title}
-        onChange={(e) => updateEntry(entry.id, { title: e.target.value })}
-      />
+      {/* Title, tags and collections scroll away with the writing; the toolbar stays. */}
+      <div className="entry-scroll">
+        <input
+          ref={titleRef}
+          className="entry-title-input"
+          type="text"
+          placeholder="Untitled entry…"
+          style={{ fontFamily }}
+          value={entry.title}
+          onChange={(e) => updateEntry(entry.id, { title: e.target.value })}
+        />
 
-      <div className="entry-meta">
-        <div className="meta-item">
-          <SettingsIcon name="calendar" size={13} /> {formatDate(entry.date)}
+        <div className="entry-meta">
+          <div className="meta-item">
+            <SettingsIcon name="calendar" size={13} /> {formatDate(entry.date)}
+          </div>
+          <div
+            className="meta-item editable"
+            onClick={() => setTagModalOpen(true)}
+          >
+            <SettingsIcon name="tag" size={13} />{" "}
+            {entry.tags.length ? entry.tags.join(", ") : "Add tag"}
+          </div>
+          <div className="meta-item word-count">
+            <SettingsIcon name="fileText" size={13} /> {wordCount(plainBody)}{" "}
+            words
+          </div>
         </div>
-        <div className="meta-item editable" onClick={() => setTagModalOpen(true)}>
-          <SettingsIcon name="tag" size={13} /> {entry.tags.length ? entry.tags.join(", ") : "Add tag"}
-        </div>
-        <div className="meta-item word-count">
-          <SettingsIcon name="fileText" size={13} /> {wordCount(plainBody)} words
-        </div>
-      </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          padding: "8px 32px",
-          borderBottom: "1px solid var(--border)",
-          flexWrap: "wrap",
-        }}
-      >
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: "var(--text3)" }}>
-          ◇ Collections:
-        </span>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          {collections.length === 0 ? (
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: "var(--text3)" }}>
-              No collections yet
-            </span>
-          ) : (
-            collections.map((c) => (
-              <label
-                key={c.id}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "8px 32px",
+            borderBottom: "1px solid var(--border)",
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.68rem",
+              color: "var(--text3)",
+            }}
+          >
+            ◇ Collections:
+          </span>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            {collections.length === 0 ? (
+              <span
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontFamily: "var(--font-ui)",
-                  fontSize: "0.78rem",
-                  color: "var(--text2)",
-                  cursor: "pointer",
-                  padding: "3px 0",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.68rem",
+                  color: "var(--text3)",
                 }}
               >
-                <input
-                  type="checkbox"
-                  checked={entry.collections.includes(c.id)}
-                  onChange={(e) => toggleEntryCollection(entry.id, c.id, e.target.checked)}
-                  style={{ accentColor: "var(--accent)", cursor: "pointer" }}
-                />
-                {c.name}
-              </label>
-            ))
-          )}
+                No collections yet
+              </span>
+            ) : (
+              collections.map((c) => (
+                <label
+                  key={c.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontFamily: "var(--font-ui)",
+                    fontSize: "0.78rem",
+                    color: "var(--text2)",
+                    cursor: "pointer",
+                    padding: "3px 0",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={entry.collections.includes(c.id)}
+                    onChange={(e) =>
+                      toggleEntryCollection(entry.id, c.id, e.target.checked)
+                    }
+                    style={{ accentColor: "var(--accent)", cursor: "pointer" }}
+                  />
+                  {c.name}
+                </label>
+              ))
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="editor-body">
-        <EditorContent editor={editor} className="rich-editor" style={{ fontFamily, fontSize }} />
+        <div className="editor-body">
+          <EditorContent
+            editor={editor}
+            className="rich-editor"
+            style={{ fontFamily, fontSize }}
+          />
+        </div>
       </div>
 
       <ConfirmModal

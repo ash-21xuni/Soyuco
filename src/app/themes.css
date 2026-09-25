@@ -4224,3 +4224,214 @@ button.todo-check {
   border-color: var(--accent);
   color: var(--bg);
 }
+
+/* =========================================
+   JOURNAL IMAGES & TEXT BOXES (Word-style wrapping)
+========================================= */
+.rich-editor-content::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.jimg,
+.jbox {
+  position: relative;
+  max-width: 100%;
+}
+/* Wrap text: float to one side and let paragraphs flow around it. */
+.jwrap-left {
+  float: left;
+  clear: left;
+  margin: 0.3em 1.2em 0.6em 0;
+}
+.jwrap-right {
+  float: right;
+  clear: right;
+  margin: 0.3em 0 0.6em 1.2em;
+}
+/* In line: on its own line, centred. */
+.jwrap-center {
+  clear: both;
+  margin: 0.8em auto;
+}
+
+.jimg {
+  line-height: 0;
+  border-radius: 6px;
+}
+.jimg.jwrap-center {
+  width: fit-content;
+}
+.jimg img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  border-radius: 6px;
+}
+.jimg.is-active {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.jimg-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 140px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text3);
+}
+
+.jbox {
+  padding: 4px 12px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: border-color var(--transition);
+}
+.jbox:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+.jbox.is-active {
+  border-color: var(--accent);
+}
+.jbox-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 26px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.jbox:hover .jbox-bar,
+.jbox.is-active .jbox-bar {
+  opacity: 1;
+}
+.jbox-bar .jlayout-bar {
+  position: static;
+  transform: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+.jbox-grip {
+  display: inline-flex;
+  padding: 3px 2px;
+  border-radius: 4px;
+  color: var(--text3);
+  cursor: grab;
+}
+.jbox-grip:active {
+  cursor: grabbing;
+}
+.jbox-content {
+  line-height: 1.6;
+}
+.jbox-content > * + * {
+  margin-top: 0.3em;
+}
+
+/* Floating layout options bar above a selected image */
+.jlayout-bar {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  line-height: 1;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.jlayout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius);
+  color: var(--text2);
+  transition: all var(--transition);
+}
+.jlayout-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.jlayout-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+}
+.jlayout-btn.danger:hover {
+  color: var(--danger);
+}
+.jlayout-sep {
+  width: 1px;
+  height: 16px;
+  margin: 0 3px;
+  background: var(--border);
+}
+
+/* Width handles on the left and right edges */
+.jresize-handle {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  width: 8px;
+  height: 34px;
+  border: 1.5px solid var(--bg);
+  border-radius: 4px;
+  background: var(--accent);
+  cursor: ew-resize;
+  transform: translateY(-50%);
+  touch-action: none;
+}
+.jresize-handle.left {
+  left: -5px;
+}
+.jresize-handle.right {
+  right: -5px;
+}
+.jbox .jresize-handle {
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.jbox:hover .jresize-handle,
+.jbox.is-active .jresize-handle {
+  opacity: 1;
+}
+
+.rich-editor-content .ProseMirror-selectednode.jbox {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Journal entry: one scroll area for title, meta, collections and body */
+.entry-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.entry-scroll > .editor-body {
+  flex: none;
+  overflow: visible;
+}
+@media (prefers-reduced-motion: reduce) {
+  .entry-scroll {
+    scroll-behavior: auto;
+  }
+}

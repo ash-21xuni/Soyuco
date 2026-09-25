@@ -69,6 +69,53 @@ const PATHS = {
   ),
   chevronDown: <path d="m6 9 6 6 6-6" />,
   chevronLeft: <path d="m15 18-6-6 6-6" />,
+  image: (
+    <>
+      <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+    </>
+  ),
+  textBox: (
+    <>
+      <rect width="18" height="18" x="3" y="3" rx="2" />
+      <path d="M7 8h10" />
+      <path d="M12 8v9" />
+    </>
+  ),
+  wrapLeft: (
+    <>
+      <rect width="8" height="8" x="3" y="5" rx="1" />
+      <path d="M15 6h6" />
+      <path d="M15 12h6" />
+      <path d="M3 18h18" />
+    </>
+  ),
+  wrapCenter: (
+    <>
+      <path d="M3 4h18" />
+      <rect width="10" height="8" x="7" y="8" rx="1" />
+      <path d="M3 20h18" />
+    </>
+  ),
+  wrapRight: (
+    <>
+      <rect width="8" height="8" x="13" y="5" rx="1" />
+      <path d="M3 6h6" />
+      <path d="M3 12h6" />
+      <path d="M3 18h18" />
+    </>
+  ),
+  grip: (
+    <>
+      <circle cx="9" cy="5" r="1" />
+      <circle cx="9" cy="12" r="1" />
+      <circle cx="9" cy="19" r="1" />
+      <circle cx="15" cy="5" r="1" />
+      <circle cx="15" cy="12" r="1" />
+      <circle cx="15" cy="19" r="1" />
+    </>
+  ),
   plus: (
     <>
       <path d="M5 12h14" />
