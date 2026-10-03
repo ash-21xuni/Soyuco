@@ -1,18 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { ConfirmModal } from "@/components/modals/ConfirmModal";
+import { CoinAmount } from "@/components/wallet/CoinAmount";
 import {
   CATALOG,
   TIERS,
   TIER_ORDER,
-  formatPrice,
+  formatCoins,
   type ThemeListing,
   type ThemePreview,
   type Tier,
 } from "@/lib/marketplace/catalog";
 import { useTheme } from "@/lib/theme/theme-context";
 import { useToast } from "@/lib/toast/toast-context";
+import { useWallet } from "@/lib/wallet/wallet-context";
 
 type Filter = "all" | Tier;
 
@@ -61,15 +65,51 @@ function PreviewMock({
   );
 }
 
-function ThemeCard({ listing }: { listing: ThemeListing }) {
-  const { theme, setTheme } = useTheme();
+function ThemeCard({
+  listing,
+  highlighted,
+}: {
+  listing: ThemeListing;
+  highlighted: boolean;
+}) {
+  const { savedTheme, previewing, setTheme, previewTheme } = useTheme();
   const { showToast } = useToast();
+  const { balance, loaded, buyTheme, ownsTheme, setBuyCoinsOpen } = useWallet();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [buying, setBuying] = useState(false);
+  const cardRef = useRef<HTMLElement>(null);
   const tier = TIERS[listing.tier];
-  const active = listing.themeId !== undefined && theme === listing.themeId;
+  const active = listing.themeId !== undefined && savedTheme === listing.themeId;
+  const isPreviewing =
+    listing.themeId !== undefined && previewing === listing.themeId;
+  const owned = listing.themeId !== undefined && ownsTheme(listing.themeId);
+
+  useEffect(() => {
+    if (highlighted) {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [highlighted]);
+  // Until the balance loads, offer Unlock; the server has the final say anyway.
+  const affordable = !loaded || balance >= tier.price;
+
+  async function confirmPurchase() {
+    setConfirmOpen(false);
+    if (!listing.themeId || buying) return;
+    setBuying(true);
+    const result = await buyTheme(listing.themeId);
+    setBuying(false);
+    if (!result.ok) {
+      showToast(result.error, "error");
+      return;
+    }
+    setTheme(listing.themeId);
+    showToast(`${listing.name} unlocked and applied.`, "success");
+  }
 
   return (
     <article
-      className={`market-card${listing.placeholder ? " is-placeholder" : ""}`}
+      ref={cardRef}
+      className={`market-card${listing.placeholder ? " is-placeholder" : ""}${highlighted ? " is-highlighted" : ""}`}
     >
       <PreviewMock
         preview={listing.preview}
@@ -78,7 +118,7 @@ function ThemeCard({ listing }: { listing: ThemeListing }) {
       <div className="market-card-body">
         <div className="market-card-head">
           <h3 className="market-card-name">{listing.name}</h3>
-          <span className="market-price">{formatPrice(tier.price)}</span>
+          <CoinAmount coins={tier.price} className="market-price" />
         </div>
         <div className="market-card-meta">
           <span className={`market-tier market-tier-${listing.tier}`}>
@@ -88,6 +128,15 @@ function ThemeCard({ listing }: { listing: ThemeListing }) {
             <span className="market-tier market-tier-placeholder">
               Placeholder
             </span>
+          )}
+          {owned ? (
+            <span className="market-tier">Owned</span>
+          ) : (
+            !listing.placeholder && (
+              <span className="market-tier market-tier-locked">
+                <SettingsIcon name="lock" size={10} /> Locked
+              </span>
+            )
           )}
           {active && (
             <span className="market-tier market-tier-active">In use</span>
@@ -104,36 +153,95 @@ function ThemeCard({ listing }: { listing: ThemeListing }) {
             <button className="btn btn-ghost" disabled>
               Coming soon
             </button>
+          ) : owned ? (
+            <button
+              className="btn btn-primary"
+              disabled={active}
+              onClick={() => {
+                if (!listing.themeId) return;
+                setTheme(listing.themeId);
+                showToast(`${listing.name} applied.`, "success");
+              }}
+            >
+              {active ? "In use" : "Apply"}
+            </button>
           ) : (
             <>
               <button
                 className="btn btn-ghost"
-                disabled={active}
                 onClick={() => {
                   if (!listing.themeId) return;
-                  setTheme(listing.themeId);
-                  showToast(`Previewing ${listing.name}.`, "info");
+                  if (isPreviewing) {
+                    previewTheme(null);
+                    return;
+                  }
+                  previewTheme(listing.themeId);
+                  showToast(
+                    `Previewing ${listing.name}. It switches back when you leave the marketplace.`,
+                    "info",
+                  );
                 }}
               >
-                {active ? "Previewing" : "Preview"}
+                {isPreviewing ? "Stop preview" : "Preview"}
               </button>
-              <button
-                className="btn btn-primary"
-                onClick={() => showToast("Checkout is coming soon.", "info")}
-              >
-                <SettingsIcon name="shoppingBag" size={14} /> Buy{" "}
-                {formatPrice(tier.price)}
-              </button>
+              {affordable ? (
+                <button
+                  className="btn btn-primary"
+                  disabled={buying}
+                  onClick={() => setConfirmOpen(true)}
+                >
+                  {buying ? "Unlocking…" : <>Unlock <CoinAmount coins={tier.price} /></>}
+                </button>
+              ) : (
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setBuyCoinsOpen(true)}
+                >
+                  <SettingsIcon name="wallet" size={14} /> Get Soyucoins
+                </button>
+              )}
             </>
           )}
         </div>
       </div>
+      <ConfirmModal
+        open={confirmOpen}
+        title={`Unlock ${listing.name}?`}
+        message={`This spends ${formatCoins(tier.price)} Soyucoins. You'll have ${formatCoins(Math.max(0, balance - tier.price))} left, and the theme is yours to keep.`}
+        confirmLabel="Unlock"
+        tone="primary"
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={confirmPurchase}
+      />
     </article>
   );
 }
 
 export default function MarketplacePage() {
+  // useSearchParams needs a Suspense boundary above it.
+  return (
+    <Suspense fallback={null}>
+      <Marketplace />
+    </Suspense>
+  );
+}
+
+function Marketplace() {
   const [filter, setFilter] = useState<Filter>("all");
+  const { balance, setBuyCoinsOpen } = useWallet();
+  const { previewTheme } = useTheme();
+  // Set when arriving from a locked theme in the sidebar: ?theme=<ThemeId>.
+  const highlight = useSearchParams().get("theme");
+
+  // Make sure the highlighted theme isn't hidden by a tier filter.
+  const [prevHighlight, setPrevHighlight] = useState(highlight);
+  if (prevHighlight !== highlight) {
+    setPrevHighlight(highlight);
+    if (highlight) setFilter("all");
+  }
+
+  // Previews are only for browsing here; leaving puts the saved theme back.
+  useEffect(() => () => previewTheme(null), [previewTheme]);
 
   const listings = useMemo(
     () =>
@@ -154,8 +262,19 @@ export default function MarketplacePage() {
             <SettingsIcon name="shoppingBag" size={16} /> Theme Marketplace
           </div>
           <div className="ai-hero-sub">
-            Make Soyuco yours. Every theme is a once-off purchase, priced by how
-            much it transforms the app.
+            Make Soyuco yours. Unlock themes with Soyucoins, priced by how much
+            each one transforms the app. Every theme is yours to keep.
+          </div>
+          <div className="market-wallet">
+            <span className="market-wallet-label">Your balance</span>
+            <CoinAmount coins={balance} size={16} className="market-wallet-balance" />
+            <button
+              type="button"
+              className="btn btn-ghost market-wallet-btn"
+              onClick={() => setBuyCoinsOpen(true)}
+            >
+              <SettingsIcon name="wallet" size={14} /> Get Soyucoins
+            </button>
           </div>
         </div>
 
@@ -167,9 +286,11 @@ export default function MarketplacePage() {
                   <span className="market-tier-card-name">
                     {TIERS[t].label}
                   </span>
-                  <span className="market-tier-card-price">
-                    {formatPrice(TIERS[t].price)}
-                  </span>
+                  <CoinAmount
+                    coins={TIERS[t].price}
+                    size={18}
+                    className="market-tier-card-price"
+                  />
                 </div>
                 <ul className="market-features">
                   {TIERS[t].includes.map((f) => (
@@ -196,14 +317,18 @@ export default function MarketplacePage() {
               >
                 {f === "all"
                   ? "All themes"
-                  : `${TIERS[f].label} · ${formatPrice(TIERS[f].price)}`}
+                  : `${TIERS[f].label} · ${formatCoins(TIERS[f].price)} coins`}
               </button>
             ))}
           </div>
 
           <div className="market-grid">
             {listings.map((l) => (
-              <ThemeCard key={l.id} listing={l} />
+              <ThemeCard
+                key={l.id}
+                listing={l}
+                highlighted={!!highlight && l.themeId === highlight}
+              />
             ))}
           </div>
         </div>

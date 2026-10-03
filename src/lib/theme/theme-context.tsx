@@ -32,9 +32,19 @@ export type ThemeId =
 const STORAGE_KEY = "soyuco_theme";
 
 type ThemeContextValue = {
+  /** The theme on screen: the preview if there is one, otherwise the saved theme. */
   theme: ThemeId;
+  /** The theme the user picked, which persists across visits. */
+  savedTheme: ThemeId;
+  /** A theme being tried on in the marketplace. Never saved. */
+  previewing: ThemeId | null;
   setTheme: (theme: ThemeId) => void;
+  previewTheme: (theme: ThemeId | null) => void;
 };
+
+export function isPremiumTheme(theme: ThemeId) {
+  return PREMIUM_THEMES.some((t) => t.id === theme);
+}
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -44,7 +54,9 @@ function readStoredTheme(): ThemeId {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeId>(readStoredTheme);
+  const [savedTheme, setThemeState] = useState<ThemeId>(readStoredTheme);
+  const [previewing, setPreviewing] = useState<ThemeId | null>(null);
+  const theme = previewing ?? savedTheme;
 
   useEffect(() => {
     document.body.dataset.theme = theme;
@@ -56,12 +68,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const value = useMemo<ThemeContextValue>(
     () => ({
       theme,
+      savedTheme,
+      previewing,
       setTheme(next) {
         setThemeState(next);
+        setPreviewing(null);
         window.localStorage.setItem(STORAGE_KEY, next);
       },
+      previewTheme: setPreviewing,
     }),
-    [theme],
+    [theme, savedTheme, previewing],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

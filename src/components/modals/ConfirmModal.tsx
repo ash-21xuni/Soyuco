@@ -7,6 +7,7 @@ export function ConfirmModal({
   title,
   message,
   confirmLabel = "Delete",
+  tone = "danger",
   onCancel,
   onConfirm,
 }: {
@@ -14,6 +15,7 @@ export function ConfirmModal({
   title: string;
   message: string;
   confirmLabel?: string;
+  tone?: "danger" | "primary";
   onCancel: () => void;
   onConfirm: () => void;
 }) {
@@ -72,7 +74,11 @@ export function ConfirmModal({
           <button className="btn btn-ghost" onClick={onCancel}>
             Cancel
           </button>
-          <button className="btn" style={{ background: "var(--danger)", color: "#fff" }} onClick={onConfirm}>
+          <button
+            className={tone === "primary" ? "btn btn-primary" : "btn"}
+            style={tone === "primary" ? undefined : { background: "var(--danger)", color: "#fff" }}
+            onClick={onConfirm}
+          >
             {confirmLabel}
           </button>
         </div>

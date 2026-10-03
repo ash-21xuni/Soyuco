@@ -8,7 +8,8 @@ import { PromptModal } from "@/components/modals/PromptModal";
 import { OwnedThemesModal } from "@/components/modals/OwnedThemesModal";
 import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
-import { PREMIUM_THEMES, THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
+import { THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
+import { PremiumSwatches } from "@/components/PremiumSwatches";
 import { useToast } from "@/lib/toast/toast-context";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { useCollapsed } from "@/lib/useCollapsed";
@@ -220,17 +221,7 @@ export function Sidebar() {
             <SettingsIcon name="shoppingBag" size={14} />
           </Link>
         </div>
-        <div className="theme-swatches">
-          {PREMIUM_THEMES.map((t) => (
-            <div
-              key={t.id}
-              className={`swatch${theme === t.id ? " active" : ""}`}
-              data-t={t.id}
-              title={t.title}
-              onClick={() => setTheme(t.id as ThemeId)}
-            />
-          ))}
-        </div>
+        <PremiumSwatches />
 
         <button
           className="custom-theme-btn"

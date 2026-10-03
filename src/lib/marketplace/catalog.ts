@@ -2,22 +2,22 @@ import type { ThemeId } from "@/lib/theme/theme-context";
 
 export type Tier = "essential" | "enhanced" | "signature";
 
-// Price scales with how much a theme changes: colours only, then pattern and
-// themed copy, then bespoke effects.
+// Price (in Soyucoins) scales with how much a theme changes: colours only,
+// then pattern and themed copy, then bespoke effects.
 export const TIERS: Record<Tier, { label: string; price: number; includes: string[] }> = {
   essential: {
     label: "Essential",
-    price: 29,
+    price: 300,
     includes: ["Colour palette", "Font pairing"],
   },
   enhanced: {
     label: "Enhanced",
-    price: 39,
+    price: 400,
     includes: ["Everything in Essential", "Background pattern", "Themed headings & quotes"],
   },
   signature: {
     label: "Signature",
-    price: 49,
+    price: 500,
     includes: ["Everything in Enhanced", "Custom cursor & shapes", "Special effects"],
   },
 };
@@ -125,6 +125,33 @@ export const CATALOG: ThemeListing[] = [
   placeholder(6, "signature"),
 ];
 
-export function formatPrice(rands: number) {
+export type CoinPack = {
+  id: string;
+  coins: number;
+  /** Price in rand. */
+  price: number;
+  badge?: string;
+};
+
+// 1000 Soyucoins = R100 is the reference rate; smaller packs cost a little more
+// per coin and larger ones a little less.
+export const COIN_PACKS: CoinPack[] = [
+  { id: "coins-300", coins: 300, price: 40 },
+  { id: "coins-500", coins: 500, price: 60 },
+  { id: "coins-1000", coins: 1000, price: 100, badge: "Popular" },
+  { id: "coins-2500", coins: 2500, price: 225, badge: "Best value" },
+];
+
+/** Percentage saved per coin compared with the smallest pack. */
+export function packSaving(pack: CoinPack) {
+  const base = COIN_PACKS[0].price / COIN_PACKS[0].coins;
+  return Math.round((1 - pack.price / pack.coins / base) * 100);
+}
+
+export function formatRands(rands: number) {
   return `R${rands}`;
+}
+
+export function formatCoins(coins: number) {
+  return coins.toLocaleString("en-ZA");
 }

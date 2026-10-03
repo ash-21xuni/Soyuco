@@ -2998,6 +2998,178 @@ option {
   opacity: 0.55;
   cursor: default;
 }
+.market-actions a.btn {
+  text-decoration: none;
+}
+
+/* =========================================
+   SOYUCOINS
+========================================= */
+.coin-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.market-wallet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.market-wallet-label {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.market-wallet-balance {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: var(--accent2);
+}
+.market-wallet-btn {
+  padding: 4px 10px;
+  text-decoration: none;
+}
+
+.coin-balance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.coin-balance-amount {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: var(--accent2);
+}
+.coin-balance-hint {
+  flex-basis: 100%;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: var(--text3);
+}
+.coin-packs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.coin-pack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition);
+}
+.coin-pack:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.coin-pack.is-featured {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--surface), var(--bg3));
+}
+.coin-pack-badge {
+  position: absolute;
+  top: -9px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.coin-pack-coins {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--text);
+}
+.coin-pack-price {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--accent2);
+}
+.coin-pack-saving {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  color: var(--text3);
+}
+.coin-pack {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.coin-pack.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.buy-coins-modal {
+  width: 520px;
+}
+.buy-coins-modal .coin-packs {
+  margin-top: 18px;
+}
+
+/* Premium swatches the user hasn't bought yet. */
+button.swatch {
+  position: relative;
+  padding: 0;
+}
+.swatch.is-locked {
+  filter: saturate(0.55);
+}
+.swatch-lock {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+.market-tier-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text3);
+}
+
+/* Theme card opened from a locked sidebar swatch. */
+.market-card.is-highlighted {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+  animation: market-card-pulse 1.4s ease-out 2;
+}
+@keyframes market-card-pulse {
+  0% { box-shadow: 0 0 0 2px var(--accent); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 2px var(--accent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .market-card.is-highlighted { animation: none; }
+}
+.owned-themes-empty {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text3);
+}
 
 /* =========================================
    OWNED THEMES POPUP

@@ -4,17 +4,19 @@ import Link from "next/link";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { PREMIUM_THEMES, THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
-
-// Purchases aren't tracked yet, so every theme the app ships counts as owned.
-const GROUPS = [
-  { label: "Free", themes: THEMES },
-  { label: "Premium", themes: PREMIUM_THEMES },
-] as const;
+import { useWallet } from "@/lib/wallet/wallet-context";
 
 export function OwnedThemesModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { theme, setTheme } = useTheme();
+  const { ownsTheme } = useWallet();
   useEscapeToClose(open, onClose);
   if (!open) return null;
+
+  // Free themes are always owned; premium ones once unlocked with Soyucoins.
+  const groups = [
+    { label: "Free", themes: THEMES },
+    { label: "Premium", themes: PREMIUM_THEMES.filter((t) => ownsTheme(t.id)) },
+  ];
 
   return (
     <div
@@ -32,9 +34,14 @@ export function OwnedThemesModal({ open, onClose }: { open: boolean; onClose: ()
         </div>
 
         <div className="owned-themes-body">
-          {GROUPS.map((group) => (
+          {groups.map((group) => (
             <section key={group.label}>
               <div className="owned-themes-group">{group.label}</div>
+              {group.themes.length === 0 && (
+                <div className="owned-themes-empty">
+                  No premium themes yet. Unlock one in the marketplace with Soyucoins.
+                </div>
+              )}
               <div className="owned-themes-grid">
                 {group.themes.map((t) => {
                   const active = theme === t.id;

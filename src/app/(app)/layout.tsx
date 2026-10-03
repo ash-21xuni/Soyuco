@@ -4,12 +4,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Topbar } from "@/components/Topbar";
+import { BuyCoinsModal } from "@/components/modals/BuyCoinsModal";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { BudgetProvider } from "@/lib/budget/budget-context";
 import { JournalProvider } from "@/lib/journal/journal-context";
 import { PlannerProvider } from "@/lib/planner/planner-context";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { ToastProvider } from "@/lib/toast/toast-context";
+import { WalletProvider } from "@/lib/wallet/wallet-context";
 import { useJournalReminder } from "@/lib/notifications/reminder";
 import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
@@ -42,21 +44,24 @@ export default function AppShellLayout({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <JournalProvider>
-          <PlannerProvider>
-            <BudgetProvider>
-              <SplashUntilSynced />
-              <div id="app">
-                <Sidebar />
-                <main id="main">
-                  <Topbar />
-                  <div id="content">{children}</div>
-                  <ScrollReveal container="#content" />
-                </main>
-              </div>
-            </BudgetProvider>
-          </PlannerProvider>
-        </JournalProvider>
+        <WalletProvider>
+          <JournalProvider>
+            <PlannerProvider>
+              <BudgetProvider>
+                <SplashUntilSynced />
+                <div id="app">
+                  <Sidebar />
+                  <main id="main">
+                    <Topbar />
+                    <div id="content">{children}</div>
+                    <ScrollReveal container="#content" />
+                  </main>
+                </div>
+                <BuyCoinsModal />
+              </BudgetProvider>
+            </PlannerProvider>
+          </JournalProvider>
+        </WalletProvider>
       </ToastProvider>
     </ThemeProvider>
   );
