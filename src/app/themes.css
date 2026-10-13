@@ -4708,3 +4708,117 @@ button.todo-check {
   border-color: var(--accent);
   color: var(--text);
 }
+
+/* =========================================
+   RESIZABLE & DOCKABLE SIDE PANELS
+   (main sidebar and journal entry list)
+========================================= */
+#sidebar,
+.sidebar-header,
+.entry-list {
+  position: relative;
+}
+#sidebar.side-right,
+.entry-list.side-right {
+  order: 2;
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+/* Collapse/expand arrows point the other way when docked on the right. */
+.side-right .panel-toggle[aria-expanded] svg {
+  transform: scaleX(-1);
+}
+
+/* Drag edge: sits over the panel's border without taking up space. */
+.panel-resizer {
+  position: relative;
+  z-index: 11;
+  flex: 0 0 8px;
+  margin: 0 -4px;
+  cursor: col-resize;
+  touch-action: none;
+}
+.panel-resizer.side-right {
+  order: 1;
+}
+.panel-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.panel-resizer:hover::after,
+.panel-resizer:focus-visible::after,
+body.panel-resizing .panel-resizer::after {
+  opacity: 1;
+}
+.panel-resizer:focus-visible {
+  outline: none;
+}
+body.panel-resizing,
+body.panel-resizing * {
+  cursor: col-resize !important;
+  user-select: none;
+}
+body.panel-resizing #sidebar,
+body.panel-resizing .entry-list {
+  transition: none;
+}
+
+/* Docking: grab a panel's header (or its grip) and drop it on either side. */
+.sidebar-header,
+.entry-list-header,
+.entry-list.collapsed {
+  cursor: grab;
+}
+.panel-dock-grip {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 12px;
+  border-radius: 999px;
+  color: var(--text3);
+  cursor: grab;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition:
+    opacity var(--transition),
+    background var(--transition);
+  touch-action: none;
+}
+[data-panel]:hover .panel-dock-grip,
+.panel-dock-grip:focus-visible {
+  opacity: 1;
+}
+.panel-dock-grip:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+[data-panel].is-docking {
+  opacity: 0.55;
+}
+body.panel-docking,
+body.panel-docking * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+.panel-dock-preview {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  transition: left 0.15s ease;
+}
