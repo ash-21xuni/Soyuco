@@ -33,6 +33,7 @@ import {
   FormatToolbar,
   TableToolbar,
 } from "@/components/journal/FormatToolbar";
+import { ToolbarScroller } from "@/components/journal/ToolbarScroller";
 import {
   SettingsIcon,
   type SettingsIconName,
@@ -137,6 +138,7 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
     saveError,
     updateEntry,
     saveEntryToCloud,
+    selectEntry,
     deleteEntry,
     addTag,
     toggleEntryCollection,
@@ -255,6 +257,12 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [handleSave]);
 
+  // Closing pushes any edit still waiting on the autosave delay.
+  function handleClose() {
+    if (saveStatus[entry.id] === "pending") void saveEntryToCloud(entry.id);
+    selectEntry(null);
+  }
+
   async function handleConfirmDelete() {
     await deleteEntry(entry.id);
     setDeleteOpen(false);
@@ -285,7 +293,21 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div className="editor-toolbar">
+      <ToolbarScroller
+        className="editor-toolbar"
+        label="Formatting"
+        trailing={
+          <button
+            type="button"
+            className="tool-btn editor-close-btn"
+            onClick={handleClose}
+            title="Close entry"
+            aria-label="Close entry"
+          >
+            <SettingsIcon name="close" size={15} />
+          </button>
+        }
+      >
         <select
           className="font-family-picker"
           value={fontFamily}
@@ -363,7 +385,7 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
         >
           <SettingsIcon name="trash" size={14} /> Delete
         </button>
-      </div>
+      </ToolbarScroller>
       {editor && <TableToolbar editor={editor} />}
 
       {/* Title, tags and collections scroll away with the writing; the toolbar stays. */}

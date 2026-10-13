@@ -1601,9 +1601,9 @@ main { padding-top: 0px; }
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   flex-shrink: 0;
-  flex-wrap: wrap;
 }
 .editor-toolbar-sep {
+  flex-shrink: 0;
   width: 1px;
   height: 20px;
   background: var(--border);
@@ -3404,10 +3404,8 @@ button.swatch {
   border-radius: 2px;
 }
 .swatch-menu-pop {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 50;
+  position: fixed;
+  z-index: 1100;
   width: 164px;
   padding: 10px;
   background: var(--bg2);
@@ -3450,13 +3448,74 @@ button.swatch {
 
 .table-toolbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
   padding: 6px 24px;
   border-bottom: 1px solid var(--border);
   background: var(--bg2);
 }
+/* One-line toolbars: overflow scrolls sideways behind arrow buttons. */
+.toolbar-scroller {
+  flex-wrap: nowrap;
+}
+.toolbar-scroll-track {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.toolbar-scroll-track::-webkit-scrollbar {
+  display: none;
+}
+.toolbar-scroller.can-left .toolbar-scroll-track {
+  mask-image: linear-gradient(to right, transparent, #000 24px);
+}
+.toolbar-scroller.can-right .toolbar-scroll-track {
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+.toolbar-scroller.can-left.can-right .toolbar-scroll-track {
+  mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+.toolbar-scroll-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+}
+.table-toolbar .toolbar-scroll-inner {
+  gap: 4px;
+}
+.toolbar-scroll-inner > * {
+  flex-shrink: 0;
+}
+.toolbar-scroll-inner .tool-btn,
+.toolbar-scroll-inner .save-indicator {
+  white-space: nowrap;
+}
+.toolbar-scroll-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.editor-close-btn {
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+.toolbar-scroll-btn:hover {
+  color: var(--accent2);
+  border-color: var(--accent);
+}
+
 .table-toolbar-label {
   margin-right: 6px;
   font-family: var(--font-ui);
