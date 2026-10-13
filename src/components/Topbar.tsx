@@ -185,7 +185,7 @@ export function Topbar() {
       </div>
       {pathname === "/journal" && (
         <button className="btn btn-primary" style={{ padding: "5px 12px" }} onClick={() => createEntry()}>
-          ✦ New Entry
+          <SettingsIcon name="plus" size={14} /> New Entry
         </button>
       )}
     </div>

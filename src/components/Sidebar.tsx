@@ -11,26 +11,32 @@ import { usePlanner } from "@/lib/planner/planner-context";
 import { THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
 import { PremiumSwatches } from "@/components/PremiumSwatches";
 import { useToast } from "@/lib/toast/toast-context";
-import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
 import { useCollapsed } from "@/lib/useCollapsed";
 import { usePanelLayout } from "@/lib/usePanelLayout";
 import { PanelResizer, usePanelDock } from "@/components/SidePanel";
 
-const NAV_ITEMS = [
-  { view: "journal", href: "/journal", icon: "✦", label: "Journal" },
-  { view: "planner", href: "/planner", icon: "◈", label: "Day Planner" },
-  { view: "ai", href: "/ai", icon: "⬡", label: "AI Planner", aiNav: true },
-  { view: "budget", href: "/budget", icon: "◎", label: "Budget" },
+const NAV_ITEMS: {
+  view: string;
+  href: string;
+  icon: SettingsIconName;
+  label: string;
+  aiNav?: boolean;
+}[] = [
+  { view: "journal", href: "/journal", icon: "bookOpen", label: "Journal" },
+  { view: "planner", href: "/planner", icon: "layoutDashboard", label: "Day Planner" },
+  { view: "ai", href: "/ai", icon: "sparkles", label: "AI Planner", aiNav: true },
+  { view: "budget", href: "/budget", icon: "wallet", label: "Budget" },
 ];
 
 const SIDEBAR_BOUNDS = { defaultWidth: 265, minWidth: 220, maxWidth: 420 };
 
-const MOOD_EMOJIS = [
-  { emoji: "😔", title: "Awful" },
-  { emoji: "😐", title: "Meh" },
-  { emoji: "🙂", title: "Okay" },
-  { emoji: "😊", title: "Good" },
-  { emoji: "🤩", title: "Great" },
+const MOODS: { icon: SettingsIconName; title: string }[] = [
+  { icon: "moodAwful", title: "Awful" },
+  { icon: "moodMeh", title: "Meh" },
+  { icon: "moodOkay", title: "Okay" },
+  { icon: "moodGood", title: "Good" },
+  { icon: "moodGreat", title: "Great" },
 ];
 
 function useSidebarDate() {
@@ -121,7 +127,9 @@ export function Sidebar() {
               className={`nav-item${item.aiNav ? " ai-nav" : ""}${pathname === item.href ? " active" : ""}`}
               title={collapsed ? item.label : undefined}
             >
-              <span className="icon">{item.icon}</span> <span className="nav-text">{item.label}</span>
+              <span className="icon">
+                <SettingsIcon name={item.icon} size={16} />
+              </span> <span className="nav-text">{item.label}</span>
               {item.view === "journal" && <span className="count">{entries.length}</span>}
             </Link>
           ))}
@@ -143,7 +151,10 @@ export function Sidebar() {
                   }}
                 >
                   <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span className="icon">◇</span> {c.name}
+                    <span className="icon">
+                      <SettingsIcon name="folder" size={14} />
+                    </span>{" "}
+                    {c.name}
                   </span>
                   <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <span className="count">{count}</span>
@@ -161,15 +172,19 @@ export function Sidebar() {
                         cursor: "pointer",
                         lineHeight: 1,
                       }}
+                      aria-label={`Delete collection ${c.name}`}
                     >
-                      ✕
+                      <SettingsIcon name="close" size={11} />
                     </button>
                   </span>
                 </div>
               );
             })}
             <button className="nav-item" onClick={() => setNewCollectionOpen(true)}>
-              <span className="icon">+</span> New Collection
+              <span className="icon">
+                <SettingsIcon name="plus" size={14} />
+              </span>{" "}
+              New Collection
             </button>
           </div>
         </div>
@@ -177,9 +192,9 @@ export function Sidebar() {
         <div className="mood-bar">
           <div className="mood-label">Today&apos;s mood</div>
           <div className="mood-emojis">
-            {MOOD_EMOJIS.map((mood, i) => (
+            {MOODS.map((mood, i) => (
               <span
-                key={mood.emoji}
+                key={mood.title}
                 className={`mood-emoji${todayMood === i + 1 ? " selected" : ""}`}
                 title={mood.title}
                 onClick={async () => {
@@ -187,7 +202,7 @@ export function Sidebar() {
                   showToast(`Mood saved: ${mood.title}`, "success");
                 }}
               >
-                {mood.emoji}
+                <SettingsIcon name={mood.icon} size={20} />
               </span>
             ))}
           </div>
@@ -240,7 +255,7 @@ export function Sidebar() {
             className="custom-theme-btn"
             onClick={() => showToast("Theme customization is coming soon.", "info")}
           >
-            ✦ Customize Theme
+            <SettingsIcon name="palette" size={14} /> Customize Theme
           </button>
         </div>
 

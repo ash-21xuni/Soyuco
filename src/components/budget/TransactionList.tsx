@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { CAT_LABELS, useBudget, type Transaction } from "@/lib/budget/budget-context";
+import { CAT_ICONS, CAT_LABELS, useBudget, type Transaction } from "@/lib/budget/budget-context";
 import { TxModal } from "@/components/modals/TxModal";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function TransactionList() {
   const { transactions, saveTransaction, deleteTransaction } = useBudget();
@@ -14,7 +15,7 @@ export function TransactionList() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">◈ Transactions</div>
+        <SettingsCardTitle icon="arrowLeftRight">Transactions</SettingsCardTitle>
         <button
           className="btn btn-ghost"
           style={{ fontSize: "0.68rem", padding: "3px 8px" }}
@@ -39,8 +40,8 @@ export function TransactionList() {
                 <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.82rem", color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {t.desc}
                 </div>
-                <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text3)", marginTop: 2 }}>
-                  {CAT_LABELS[t.cat] ?? t.cat} · {t.date}
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text3)", marginTop: 2, display: "flex", alignItems: "center", gap: 5 }}>
+                  <SettingsIcon name={CAT_ICONS[t.cat] ?? "tag"} size={12} /> {CAT_LABELS[t.cat] ?? t.cat} · {t.date}
                 </div>
               </div>
               <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.85rem", fontWeight: 600, color: t.type === "income" ? "var(--success)" : "var(--danger)" }}>
@@ -52,8 +53,9 @@ export function TransactionList() {
                   setOpen(true);
                 }}
                 style={{ fontSize: "0.65rem", color: "var(--text3)", padding: "2px 6px", background: "none", border: "1px solid transparent", borderRadius: "var(--radius)", cursor: "pointer" }}
+                aria-label="Edit transaction"
               >
-                ✎
+                <SettingsIcon name="pencil" size={12} />
               </button>
             </div>
           ))

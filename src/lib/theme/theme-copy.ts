@@ -1,7 +1,9 @@
 import type { ThemeId } from "./theme-context";
+import type { SettingsIconName } from "@/components/settings/SettingsIcon";
 
 export type ThemeCopy = {
-  empty: string;
+  /** Icon shown on the empty journal screen. */
+  empty: SettingsIconName;
   emptyTitle: string;
   schedule: string;
   tasks: string;
@@ -11,23 +13,23 @@ export type ThemeCopy = {
 };
 
 const DEFAULT_COPY: ThemeCopy = {
-  empty: "✦",
+  empty: "penLine",
   emptyTitle: "Begin your story",
-  schedule: "⏱ Schedule",
-  tasks: "☑ Tasks",
-  habits: "◈ Habits",
-  quote: "✦ Daily Spark",
-  aiTitle: "⬡ AI Day Planner",
+  schedule: "Schedule",
+  tasks: "Tasks",
+  habits: "Habits",
+  quote: "Daily Spark",
+  aiTitle: "AI Day Planner",
 };
 
 export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
   default: DEFAULT_COPY,
-  parchment: { ...DEFAULT_COPY, empty: "✒" },
-  ocean: { ...DEFAULT_COPY, empty: "🌊" },
-  forest: { ...DEFAULT_COPY, empty: "🌿" },
-  rose: { ...DEFAULT_COPY, empty: "🌸" },
+  parchment: { ...DEFAULT_COPY, empty: "feather" },
+  ocean: { ...DEFAULT_COPY, empty: "waves" },
+  forest: { ...DEFAULT_COPY, empty: "leaf" },
+  rose: { ...DEFAULT_COPY, empty: "flower" },
   terminal: {
-    empty: ">_",
+    empty: "terminal",
     emptyTitle: "$ ./begin_story.sh",
     schedule: "# SCHEDULE",
     tasks: "# TASKS",
@@ -35,35 +37,35 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     quote: "# QUOTE",
     aiTitle: "$ AI_PLANNER --run",
   },
-  lavender: { ...DEFAULT_COPY, empty: "✨" },
+  lavender: { ...DEFAULT_COPY, empty: "sparkles" },
   // Premium theme ids are kept stable for saved preferences; display names are
   // Sunny Reef (spongebob), Queen Bee (meangirls) and Pixel Quarry (minecraft).
   spongebob: {
-    empty: "🐠",
+    empty: "fish",
     emptyTitle: "Ready, set, splash!",
-    schedule: "🕐 Today's Adventures",
-    tasks: "📋 Chores (don't skip!)",
-    habits: "🌟 Good Habits",
-    quote: "🐚 Words of Wisdom",
-    aiTitle: "🐠 Reef AI Planner",
+    schedule: "Today's Adventures",
+    tasks: "Chores (don't skip!)",
+    habits: "Good Habits",
+    quote: "Words of Wisdom",
+    aiTitle: "Reef AI Planner",
   },
   meangirls: {
-    empty: "💅",
+    empty: "crown",
     emptyTitle: "Start writing, babe",
-    schedule: "💗 My Schedule",
-    tasks: "💕 Top Priorities",
-    habits: "✨ Glow-Up Habits",
-    quote: "👑 Quote of the Day",
-    aiTitle: "💅 AI Planner, Darling",
+    schedule: "My Schedule",
+    tasks: "Top Priorities",
+    habits: "Glow-Up Habits",
+    quote: "Quote of the Day",
+    aiTitle: "AI Planner, Darling",
   },
   minecraft: {
-    empty: "⛏",
+    empty: "pickaxe",
     emptyTitle: "NEW WORLD CREATED",
-    schedule: "⏱ TODAY'S QUESTS",
-    tasks: "📦 INVENTORY TASKS",
-    habits: "⚔ DAILY SKILLS",
-    quote: "📜 WISDOM SCROLL",
-    aiTitle: "🤖 AI QUEST MASTER",
+    schedule: "TODAY'S QUESTS",
+    tasks: "INVENTORY TASKS",
+    habits: "DAILY SKILLS",
+    quote: "WISDOM SCROLL",
+    aiTitle: "AI QUEST MASTER",
   },
 };
 

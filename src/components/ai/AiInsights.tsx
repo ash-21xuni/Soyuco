@@ -3,6 +3,7 @@
 import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
 import { tasksForDay } from "@/lib/planner/tasks";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const MOOD_LABELS = ["–", "Awful", "Meh", "Okay", "Good", "Great"];
 
@@ -23,7 +24,9 @@ export function AiInsights({ hasMessages }: { hasMessages: boolean }) {
       <div className="ai-section-title">Your Week at a Glance</div>
 
       <div className="ai-task-summary-box">
-        <span className="summary-label">📋 Tasks Completed Today</span>
+        <span className="summary-label">
+          <SettingsIcon name="listChecks" size={13} /> Tasks Completed Today
+        </span>
         <div className="summary-progress">
           <span className="summary-value">
             {doneTodos}/{todayTodos.length}
@@ -37,7 +40,9 @@ export function AiInsights({ hasMessages }: { hasMessages: boolean }) {
 
       <div className="ai-insights-grid">
         <div className="ai-insight-card">
-          <div style={{ fontSize: "1.5rem", marginBottom: 4 }}>📓</div>
+          <div style={{ marginBottom: 4, color: "var(--accent2)" }}>
+            <SettingsIcon name="bookOpen" size={22} />
+          </div>
           <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.6rem", color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Entries
           </div>
@@ -45,7 +50,9 @@ export function AiInsights({ hasMessages }: { hasMessages: boolean }) {
           <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", color: "var(--text3)" }}>Total written</div>
         </div>
         <div className="ai-insight-card">
-          <div style={{ fontSize: "1.5rem", marginBottom: 4 }}>☑</div>
+          <div style={{ marginBottom: 4, color: "var(--accent2)" }}>
+            <SettingsIcon name="listChecks" size={22} />
+          </div>
           <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.6rem", color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Tasks
           </div>
@@ -55,7 +62,9 @@ export function AiInsights({ hasMessages }: { hasMessages: boolean }) {
           <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", color: "var(--text3)" }}>{pct}% done</div>
         </div>
         <div className="ai-insight-card">
-          <div style={{ fontSize: "1.5rem", marginBottom: 4 }}>◈</div>
+          <div style={{ marginBottom: 4, color: "var(--accent2)" }}>
+            <SettingsIcon name="target" size={22} />
+          </div>
           <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.6rem", color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Habits
           </div>
@@ -63,7 +72,9 @@ export function AiInsights({ hasMessages }: { hasMessages: boolean }) {
           <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.55rem", color: "var(--text3)" }}>Completions this week</div>
         </div>
         <div className="ai-insight-card">
-          <div style={{ fontSize: "1.5rem", marginBottom: 4 }}>😊</div>
+          <div style={{ marginBottom: 4, color: "var(--accent2)" }}>
+            <SettingsIcon name="moodGood" size={22} />
+          </div>
           <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.6rem", color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Mood
           </div>
@@ -89,7 +100,9 @@ export function AiInsights({ hasMessages }: { hasMessages: boolean }) {
               padding: "16px 18px",
             }}
           >
-            <strong style={{ color: "var(--accent2)" }}>⬡ Your AI planner can:</strong>
+            <strong style={{ color: "var(--accent2)" }}>
+              <SettingsIcon name="sparkles" size={14} /> Your AI planner can:
+            </strong>
             <br />
             • Build a complete hourly schedule for your day
             <br />

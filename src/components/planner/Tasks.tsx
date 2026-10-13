@@ -5,7 +5,7 @@ import { usePlanner } from "@/lib/planner/planner-context";
 import { useTheme } from "@/lib/theme/theme-context";
 import { THEME_COPY } from "@/lib/theme/theme-copy";
 import { TodoModal } from "@/components/modals/TodoModal";
-import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 import { useCollapsed } from "@/lib/useCollapsed";
 import {
   repeatLabel,
@@ -106,7 +106,7 @@ export function Tasks() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">{copy.tasks}</div>
+        <SettingsCardTitle icon="listChecks">{copy.tasks}</SettingsCardTitle>
         <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: "var(--text3)" }}>
           {completed.length}/{dayTodos.length}
         </span>

@@ -3356,6 +3356,40 @@ button.swatch {
   color: var(--danger);
 }
 
+/* Word-style cloud save status next to the Save button. */
+.save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text3);
+  white-space: nowrap;
+  cursor: default;
+}
+.save-indicator:disabled {
+  opacity: 1;
+}
+.save-indicator.busy svg {
+  animation: save-pulse 1.2s ease-in-out infinite;
+}
+.save-indicator.error {
+  color: var(--danger);
+  cursor: pointer;
+}
+.save-indicator.error:hover {
+  background: var(--surface);
+  border-color: var(--border);
+}
+@keyframes save-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
 .swatch-menu {
   position: relative;
 }

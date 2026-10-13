@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { AiMessage } from "@/lib/ai/types";
 import { FormattedAiText } from "./FormattedAiText";
 import { PlanCard } from "./PlanCard";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function AiThread({
   messages,
@@ -36,7 +37,9 @@ export function AiThread({
         ) : (
           <div key={i}>
             <div className="ai-msg fade-in">
-              <div className="ai-msg-avatar assistant">⬡</div>
+              <div className="ai-msg-avatar assistant">
+                <SettingsIcon name="sparkles" size={16} />
+              </div>
               <div className="ai-msg-bubble assistant">
                 <FormattedAiText text={msg.content} />
                 <div className="ai-timestamp">{msg.time}</div>
@@ -48,7 +51,9 @@ export function AiThread({
       )}
       {sending && (
         <div className="ai-msg fade-in">
-          <div className="ai-msg-avatar assistant">⬡</div>
+          <div className="ai-msg-avatar assistant">
+                <SettingsIcon name="sparkles" size={16} />
+              </div>
           <div className="ai-msg-bubble assistant">
             <div className="ai-typing">
               <div className="typing-dot" />

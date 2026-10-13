@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function PromptModal({
   open,
@@ -86,8 +87,8 @@ export function PromptModal({
           >
             {title}
           </div>
-          <button className="close-btn" onClick={onCancel}>
-            ✕
+          <button className="close-btn" onClick={onCancel} aria-label="Close">
+            <SettingsIcon name="close" size={14} />
           </button>
         </div>
         <div style={{ padding: "18px 20px" }}>

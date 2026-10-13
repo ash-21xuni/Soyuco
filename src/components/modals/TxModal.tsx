@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
 import type { Category, Transaction, TxType } from "@/lib/budget/budget-context";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const CATEGORY_OPTIONS: { value: Category; label: string }[] = [
-  { value: "food", label: "🍔 Food & Dining" },
-  { value: "transport", label: "🚗 Transport" },
-  { value: "housing", label: "🏠 Housing" },
-  { value: "health", label: "💊 Health" },
-  { value: "entertainment", label: "🎬 Entertainment" },
-  { value: "shopping", label: "🛍 Shopping" },
-  { value: "utilities", label: "💡 Utilities" },
-  { value: "salary", label: "💼 Salary" },
-  { value: "other", label: "◇ Other" },
+  { value: "food", label: "Food & Dining" },
+  { value: "transport", label: "Transport" },
+  { value: "housing", label: "Housing" },
+  { value: "health", label: "Health" },
+  { value: "entertainment", label: "Entertainment" },
+  { value: "shopping", label: "Shopping" },
+  { value: "utilities", label: "Utilities" },
+  { value: "salary", label: "Salary" },
+  { value: "other", label: "Other" },
 ];
 
 const fieldLabel: React.CSSProperties = {
@@ -88,8 +89,8 @@ export function TxModal({
           <div style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, color: "var(--text)", fontStyle: "italic" }}>
             {isEdit ? "Edit Transaction" : "Add Transaction"}
           </div>
-          <button className="close-btn" onClick={onCancel}>
-            ✕
+          <button className="close-btn" onClick={onCancel} aria-label="Close">
+            <SettingsIcon name="close" size={14} />
           </button>
         </div>
         <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
@@ -130,7 +131,7 @@ export function TxModal({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "14px 20px", borderTop: "1px solid var(--border)" }}>
           {isEdit ? (
             <button className="btn" style={{ color: "var(--danger)", border: "1px solid var(--danger)" }} onClick={onDelete}>
-              🗑 Delete
+              <SettingsIcon name="trash" size={14} /> Delete
             </button>
           ) : (
             <div />

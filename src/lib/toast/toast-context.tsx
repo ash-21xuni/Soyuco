@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
 
 type ToastType = "success" | "error" | "info";
 
@@ -16,10 +17,10 @@ type ToastContextValue = {
   showToast: (message: string, type?: ToastType) => void;
 };
 
-const ICONS: Record<ToastType, string> = {
-  success: "✅",
-  error: "❌",
-  info: "✨",
+const ICONS: Record<ToastType, { name: SettingsIconName; color: string }> = {
+  success: { name: "checkCircle", color: "var(--success)" },
+  error: { name: "xCircle", color: "var(--danger)" },
+  info: { name: "info", color: "var(--accent2)" },
 };
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
@@ -64,7 +65,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           color: "var(--text)",
         }}
       >
-        <span>{ICONS[type]}</span>
+        <span style={{ color: ICONS[type].color, display: "inline-flex" }}>
+          <SettingsIcon name={ICONS[type].name} size={18} />
+        </span>
         <span>{message}</span>
       </div>
     </ToastContext.Provider>

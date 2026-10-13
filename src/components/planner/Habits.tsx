@@ -6,7 +6,7 @@ import { useTheme } from "@/lib/theme/theme-context";
 import { THEME_COPY } from "@/lib/theme/theme-copy";
 import { PromptModal } from "@/components/modals/PromptModal";
 import { HabitSettingsModal } from "@/components/modals/HabitSettingsModal";
-import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const DAY_INITIALS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -20,7 +20,7 @@ export function Habits() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">{copy.habits}</div>
+        <SettingsCardTitle icon="target">{copy.habits}</SettingsCardTitle>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           {habitsResetWeekly && (
             <span className="habit-reset-badge" title="Ticks clear every Sunday">

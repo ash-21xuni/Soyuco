@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBudget, type Goal } from "@/lib/budget/budget-context";
 import { GoalModal } from "@/components/modals/GoalModal";
 import { SavingsModal } from "@/components/modals/SavingsModal";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function SavingsGoals() {
   const { goals, addGoal, deleteGoal, applySavings } = useBudget();
@@ -13,7 +14,7 @@ export function SavingsGoals() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">⬡ Savings Goals</div>
+        <SettingsCardTitle icon="piggyBank">Savings Goals</SettingsCardTitle>
         <button className="btn btn-ghost" style={{ fontSize: "0.68rem", padding: "3px 8px" }} onClick={() => setGoalModalOpen(true)}>
           + Goal
         </button>
@@ -30,14 +31,18 @@ export function SavingsGoals() {
             return (
               <div key={g.id} style={{ display: "flex", flexDirection: "column", gap: 6, padding: "12px 0", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.82rem", color: "var(--text)", fontWeight: 500 }}>
-                    {isComplete ? "🎉 " : ""}
+                  <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.82rem", color: "var(--text)", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                    {isComplete && (
+                      <span style={{ color: "var(--success)", display: "inline-flex" }} title="Goal reached">
+                        <SettingsIcon name="checkCircle" size={14} />
+                      </span>
+                    )}
                     {g.name}
                   </span>
                   <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: "var(--accent2)" }}>{pct}%</span>
-                    <button onClick={() => deleteGoal(g.id)} style={{ fontSize: "0.65rem", color: "var(--text3)", background: "none", border: "none", cursor: "pointer" }}>
-                      ✕
+                    <button onClick={() => deleteGoal(g.id)} style={{ fontSize: "0.65rem", color: "var(--text3)", background: "none", border: "none", cursor: "pointer" }} aria-label="Delete goal">
+                      <SettingsIcon name="close" size={12} />
                     </button>
                   </span>
                 </div>

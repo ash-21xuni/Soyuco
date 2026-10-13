@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { useSplash } from "@/components/splash/SplashProvider";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 type Tab = "login" | "signup";
 
@@ -187,7 +188,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <button className="login-btn-primary" type="submit" disabled={submitting}>
-                Sign In →
+                Sign In <SettingsIcon name="arrowRight" size={15} />
               </button>
             </form>
           ) : (
@@ -233,7 +234,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <button className="login-btn-primary" type="submit" disabled={submitting}>
-                Create Account →
+                Create Account <SettingsIcon name="arrowRight" size={15} />
               </button>
             </form>
           )}

@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CAT_LABELS, useBudget, type Category } from "@/lib/budget/budget-context";
+import { CAT_ICONS, CAT_LABELS, useBudget, type Category } from "@/lib/budget/budget-context";
 import { LimitModal } from "@/components/modals/LimitModal";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function BudgetLimits() {
   const { transactions, limits, saveLimit, deleteLimit } = useBudget();
@@ -21,7 +22,7 @@ export function BudgetLimits() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">✦ Budget Limits</div>
+        <SettingsCardTitle icon="gauge">Budget Limits</SettingsCardTitle>
         <button className="btn btn-ghost" style={{ fontSize: "0.68rem", padding: "3px 8px" }} onClick={() => setOpen(true)}>
           + Limit
         </button>
@@ -39,13 +40,13 @@ export function BudgetLimits() {
             return (
               <div key={l.cat} style={{ display: "flex", flexDirection: "column", gap: 4, padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.8rem", color: "var(--text)" }}>{CAT_LABELS[l.cat] ?? l.cat}</span>
+                  <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.8rem", color: "var(--text)", display: "flex", alignItems: "center", gap: 6 }}><SettingsIcon name={CAT_ICONS[l.cat] ?? "tag"} size={12} /> {CAT_LABELS[l.cat] ?? l.cat}</span>
                   <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.65rem", color: col }}>
                       ${spent.toFixed(0)} / ${l.amount.toFixed(0)}
                     </span>
-                    <button onClick={() => deleteLimit(l.cat)} style={{ fontSize: "0.6rem", color: "var(--text3)", padding: "1px 4px", background: "none", border: "none", cursor: "pointer" }}>
-                      ✕
+                    <button onClick={() => deleteLimit(l.cat)} style={{ fontSize: "0.6rem", color: "var(--text3)", padding: "1px 4px", background: "none", border: "none", cursor: "pointer" }} aria-label="Remove limit">
+                      <SettingsIcon name="close" size={12} />
                     </button>
                   </span>
                 </div>
