@@ -7,6 +7,7 @@ import { useJournal } from "@/lib/journal/journal-context";
 import { useToast } from "@/lib/toast/toast-context";
 import { useWallet } from "@/lib/wallet/wallet-context";
 import { displayName } from "@/lib/supabase/display-name";
+import { SoyucoinIcon } from "@/components/wallet/SoyucoinIcon";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const TITLES: Record<string, string> = {
@@ -159,7 +160,7 @@ export function Topbar() {
                 cursor: "pointer",
               }}
             >
-              <SettingsIcon name="wallet" size={14} /> Buy Soyucoins
+              <SoyucoinIcon size={16} /> Buy Soyucoins
             </button>
             <button
               onClick={handleSignOut}

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { SoyucoinIcon } from "@/components/wallet/SoyucoinIcon";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 import { CoinAmount } from "@/components/wallet/CoinAmount";
@@ -197,7 +198,7 @@ function ThemeCard({
                   className="btn btn-primary"
                   onClick={() => setBuyCoinsOpen(true)}
                 >
-                  <SettingsIcon name="wallet" size={14} /> Get Soyucoins
+                  <SoyucoinIcon size={16} /> Get Soyucoins
                 </button>
               )}
             </>
@@ -273,7 +274,7 @@ function Marketplace() {
               className="btn btn-ghost market-wallet-btn"
               onClick={() => setBuyCoinsOpen(true)}
             >
-              <SettingsIcon name="wallet" size={14} /> Get Soyucoins
+              <SoyucoinIcon size={16} /> Get Soyucoins
             </button>
           </div>
         </div>
