@@ -11,6 +11,7 @@ import {
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { reportWrite } from "@/lib/supabase/write";
+import type { SettingsIconName } from "@/components/settings/SettingsIcon";
 
 export type TxType = "expense" | "income";
 export type Category =
@@ -36,15 +37,27 @@ export type Goal = { id: number; name: string; target: number; saved: number };
 export type Limit = { cat: Category; amount: number };
 
 export const CAT_LABELS: Record<Category, string> = {
-  food: "🍔 Food",
-  transport: "🚗 Transport",
-  housing: "🏠 Housing",
-  health: "💊 Health",
-  entertainment: "🎬 Entertainment",
-  shopping: "🛍 Shopping",
-  utilities: "💡 Utilities",
-  salary: "💼 Salary",
-  other: "◇ Other",
+  food: "Food",
+  transport: "Transport",
+  housing: "Housing",
+  health: "Health",
+  entertainment: "Entertainment",
+  shopping: "Shopping",
+  utilities: "Utilities",
+  salary: "Salary",
+  other: "Other",
+};
+
+export const CAT_ICONS: Record<Category, SettingsIconName> = {
+  food: "utensils",
+  transport: "car",
+  housing: "home",
+  health: "pill",
+  entertainment: "film",
+  shopping: "shoppingBag",
+  utilities: "lightbulb",
+  salary: "briefcase",
+  other: "tag",
 };
 
 const TX_KEY = "soyuco_tx";

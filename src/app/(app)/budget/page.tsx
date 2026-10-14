@@ -4,6 +4,7 @@ import { TransactionList } from "@/components/budget/TransactionList";
 import { CategoryBreakdown } from "@/components/budget/CategoryBreakdown";
 import { SavingsGoals } from "@/components/budget/SavingsGoals";
 import { BudgetLimits } from "@/components/budget/BudgetLimits";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export default function BudgetPage() {
   return (
@@ -11,7 +12,9 @@ export default function BudgetPage() {
       {/* One scroll container, so the banner scrolls away with the content. */}
       <div className="page-scroll">
         <div className="ai-hero page-hero">
-          <div className="ai-hero-title">◎ Budget Planner</div>
+          <div className="ai-hero-title">
+            <SettingsIcon name="wallet" size={22} /> Budget Planner
+          </div>
           <div className="ai-hero-sub">
             Track your income, expenses, and savings goals — all in one place.
           </div>

@@ -18,7 +18,11 @@ import { JournalImage } from "@/components/journal/extensions/JournalImage";
 import { TextBox } from "@/components/journal/extensions/TextBox";
 import { IMAGE_MIME_TYPES, uploadJournalImage } from "@/lib/journal/images";
 import { useAuth } from "@/lib/supabase/auth-context";
-import { useJournal, type JournalEntry } from "@/lib/journal/journal-context";
+import {
+  useJournal,
+  type JournalEntry,
+  type SaveStatus,
+} from "@/lib/journal/journal-context";
 import { bodyToHtml, bodyToText, textToHtml } from "@/lib/journal/body";
 import { useTheme } from "@/lib/theme/theme-context";
 import { THEME_COPY } from "@/lib/theme/theme-copy";
@@ -29,7 +33,11 @@ import {
   FormatToolbar,
   TableToolbar,
 } from "@/components/journal/FormatToolbar";
-import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { ToolbarScroller } from "@/components/journal/ToolbarScroller";
+import {
+  SettingsIcon,
+  type SettingsIconName,
+} from "@/components/settings/SettingsIcon";
 import { completeText } from "@/lib/ai/client";
 
 const FONT_OPTIONS = [
@@ -65,7 +73,9 @@ export function EntryEditor() {
   if (!entry) {
     return (
       <div className="empty-state fade-in">
-        <div className="empty-icon">{copy.empty}</div>
+        <div className="empty-icon">
+          <SettingsIcon name={copy.empty} size={48} />
+        </div>
         <div className="empty-title">{copy.emptyTitle}</div>
         <div className="empty-sub">
           Select an entry to read,
@@ -80,11 +90,55 @@ export function EntryEditor() {
   return <EntryEditorView key={entry.id} entry={entry} />;
 }
 
+// Word-style cloud status: pending edits read as "Saving…" too, since the
+// autosave is only waiting for a pause in typing.
+const SAVE_LABELS: Record<SaveStatus, { icon: SettingsIconName; text: string }> = {
+  pending: { icon: "cloudUpload", text: "Saving…" },
+  saving: { icon: "cloudUpload", text: "Saving…" },
+  saved: { icon: "cloudCheck", text: "Saved" },
+  error: { icon: "cloudOff", text: "Not saved" },
+};
+
+function SaveIndicator({
+  status,
+  error,
+  onRetry,
+}: {
+  status: SaveStatus | undefined;
+  error: string | undefined;
+  onRetry: () => void;
+}) {
+  const { icon, text } = SAVE_LABELS[status ?? "saved"];
+  const busy = status === "pending" || status === "saving";
+  return (
+    <button
+      type="button"
+      className={`save-indicator${status === "error" ? " error" : ""}${busy ? " busy" : ""}`}
+      onClick={status === "error" ? onRetry : undefined}
+      disabled={status !== "error"}
+      title={
+        status === "error"
+          ? `Couldn't save to the cloud${error ? `: ${error}` : ""}. Click to retry.`
+          : busy
+            ? "Saving your changes to the cloud"
+            : "All changes saved to the cloud"
+      }
+      aria-live="polite"
+    >
+      <SettingsIcon name={icon} size={15} />
+      <span>{text}</span>
+    </button>
+  );
+}
+
 function EntryEditorView({ entry }: { entry: JournalEntry }) {
   const {
     collections,
+    saveStatus,
+    saveError,
     updateEntry,
     saveEntryToCloud,
+    selectEntry,
     deleteEntry,
     addTag,
     toggleEntryCollection,
@@ -186,12 +240,27 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
 
   const plainBody = bodyToText(entry.body);
 
-  async function handleSave() {
+  // Manual save just skips the autosave wait; the indicator shows the result.
+  const handleSave = useCallback(async () => {
     const { error } = await saveEntryToCloud(entry.id);
-    showToast(
-      error ? `Save failed: ${error}` : "Entry saved!",
-      error ? "error" : "success",
-    );
+    if (error) showToast(`Save failed: ${error}`, "error");
+  }, [entry.id, saveEntryToCloud, showToast]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        void handleSave();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleSave]);
+
+  // Closing pushes any edit still waiting on the autosave delay.
+  function handleClose() {
+    if (saveStatus[entry.id] === "pending") void saveEntryToCloud(entry.id);
+    selectEntry(null);
   }
 
   async function handleConfirmDelete() {
@@ -224,7 +293,21 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <div className="editor-toolbar">
+      <ToolbarScroller
+        className="editor-toolbar"
+        label="Formatting"
+        trailing={
+          <button
+            type="button"
+            className="tool-btn editor-close-btn"
+            onClick={handleClose}
+            title="Close entry"
+            aria-label="Close entry"
+          >
+            <SettingsIcon name="close" size={15} />
+          </button>
+        }
+      >
         <select
           className="font-family-picker"
           value={fontFamily}
@@ -271,7 +354,10 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
         >
           {aiAssisting ? (
             <>
-              <span className="spin">⬡</span> Writing…
+              <span className="spin" style={{ display: "inline-flex" }}>
+                <SettingsIcon name="loader" size={14} />
+              </span>{" "}
+              Writing…
             </>
           ) : (
             <>
@@ -280,7 +366,16 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
           )}
         </button>
         <div className="editor-toolbar-sep" />
-        <button className="tool-btn tool-btn-labelled" onClick={handleSave}>
+        <SaveIndicator
+          status={saveStatus[entry.id]}
+          error={saveError[entry.id]}
+          onRetry={handleSave}
+        />
+        <button
+          className="tool-btn tool-btn-labelled"
+          onClick={handleSave}
+          title="Save now (Ctrl+S)"
+        >
           <SettingsIcon name="save" size={14} /> Save
         </button>
         <button
@@ -290,7 +385,7 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
         >
           <SettingsIcon name="trash" size={14} /> Delete
         </button>
-      </div>
+      </ToolbarScroller>
       {editor && <TableToolbar editor={editor} />}
 
       {/* Title, tags and collections scroll away with the writing; the toolbar stays. */}
@@ -339,7 +434,7 @@ function EntryEditorView({ entry }: { entry: JournalEntry }) {
               color: "var(--text3)",
             }}
           >
-            ◇ Collections:
+            <SettingsIcon name="folder" size={12} /> Collections:
           </span>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             {collections.length === 0 ? (

@@ -19,9 +19,13 @@ Create `.env.local` at the repo root with:
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 ANTHROPIC_API_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+# SOYUCOINS_TEST_PAYMENTS=true
 ```
 
 The Supabase values back auth and cloud sync for entries, todos, habits, events, mood history, transactions, goals, and budget limits. `ANTHROPIC_API_KEY` powers the AI Day Planner and the Journal's "AI Assist" — both routes degrade gracefully with a clear error if it's missing.
+
+`SUPABASE_SERVICE_ROLE_KEY` (server only, never prefix it with `NEXT_PUBLIC_`) lets the server credit Soyucoins; run `supabase/sql/soyucoins.sql` once to create the wallet tables. No payment provider is connected yet, so buying coins is refused unless `SOYUCOINS_TEST_PAYMENTS=true`, which credits packs for free — for local testing only, never on a live site.
 
 ## Structure
 

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useBudget } from "@/lib/budget/budget-context";
+import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
 
 type Bucket = { label: string; total: number; dateStr?: string; key?: string };
 type Range = 7 | 30 | 365;
@@ -87,7 +88,7 @@ export function TrendChart() {
   return (
     <div className="planner-card" style={{ marginBottom: 20 }}>
       <div className="planner-card-header">
-        <div className="planner-card-title">📈 Spending Trend</div>
+        <SettingsCardTitle icon="trendingUp">Spending Trend</SettingsCardTitle>
         <div style={{ display: "flex", gap: 4 }}>
           {([7, 30, 365] as const).map((r) => (
             <button

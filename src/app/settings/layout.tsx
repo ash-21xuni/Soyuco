@@ -5,6 +5,7 @@ import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { ToastProvider } from "@/lib/toast/toast-context";
+import { WalletProvider } from "@/lib/wallet/wallet-context";
 import { useSplash } from "@/components/splash/SplashProvider";
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
@@ -22,7 +23,9 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
 
   return (
     <ThemeProvider>
-      <ToastProvider>{children}</ToastProvider>
+      <ToastProvider>
+        <WalletProvider>{children}</WalletProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

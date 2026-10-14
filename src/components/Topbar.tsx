@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/supabase/auth-context";
 import { useJournal } from "@/lib/journal/journal-context";
 import { useToast } from "@/lib/toast/toast-context";
+import { useWallet } from "@/lib/wallet/wallet-context";
 import { displayName } from "@/lib/supabase/display-name";
+import { SoyucoinIcon } from "@/components/wallet/SoyucoinIcon";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const TITLES: Record<string, string> = {
@@ -22,6 +24,7 @@ export function Topbar() {
   const { user, signOut } = useAuth();
   const { createEntry } = useJournal();
   const { showToast } = useToast();
+  const { setBuyCoinsOpen } = useWallet();
   const [menuOpen, setMenuOpen] = useState(false);
   const areaRef = useRef<HTMLDivElement>(null);
 
@@ -137,6 +140,29 @@ export function Topbar() {
               <SettingsIcon name="settings" size={14} /> Account Settings
             </button>
             <button
+              onClick={() => {
+                setMenuOpen(false);
+                setBuyCoinsOpen(true);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                width: "100%",
+                textAlign: "left",
+                padding: "10px 12px",
+                fontFamily: "var(--font-ui)",
+                fontSize: "0.75rem",
+                color: "var(--text2)",
+                background: "none",
+                border: "none",
+                borderBottom: "1px solid var(--border)",
+                cursor: "pointer",
+              }}
+            >
+              <SoyucoinIcon size={16} /> Buy Soyucoins
+            </button>
+            <button
               onClick={handleSignOut}
               style={{
                 display: "flex",
@@ -160,7 +186,7 @@ export function Topbar() {
       </div>
       {pathname === "/journal" && (
         <button className="btn btn-primary" style={{ padding: "5px 12px" }} onClick={() => createEntry()}>
-          ✦ New Entry
+          <SettingsIcon name="plus" size={14} /> New Entry
         </button>
       )}
     </div>

@@ -14,15 +14,16 @@ import { AiThread } from "@/components/ai/AiThread";
 import { bodyToText } from "@/lib/journal/body";
 import { tasksForDay } from "@/lib/planner/tasks";
 import { AI_CATEGORY_COLOR, eventsForDay, fromMinutes } from "@/lib/planner/events";
+import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
 
 const CHIPS = [
-  { emoji: "💼", label: "Productive", text: "Productive work day with deep focus blocks and regular breaks" },
-  { emoji: "🌿", label: "Relaxed", text: "Relaxed Sunday with self-care, light exercise, and reading" },
-  { emoji: "⚖️", label: "Balanced", text: "Balanced day mixing work, exercise, creative time, and social activities" },
-  { emoji: "💪", label: "Fitness", text: "High energy fitness day with morning workout, healthy meals, and recovery" },
-  { emoji: "🎨", label: "Creative", text: "Creative day focused on art, writing, music and inspiration" },
-  { emoji: "🧘", label: "Mindful", text: "Minimal, meditative day with journaling, meditation, nature walks" },
-];
+  { icon: "briefcase", label: "Productive", text: "Productive work day with deep focus blocks and regular breaks" },
+  { icon: "coffee", label: "Relaxed", text: "Relaxed Sunday with self-care, light exercise, and reading" },
+  { icon: "scale", label: "Balanced", text: "Balanced day mixing work, exercise, creative time, and social activities" },
+  { icon: "dumbbell", label: "Fitness", text: "High energy fitness day with morning workout, healthy meals, and recovery" },
+  { icon: "palette", label: "Creative", text: "Creative day focused on art, writing, music and inspiration" },
+  { icon: "flower", label: "Mindful", text: "Minimal, meditative day with journaling, meditation, nature walks" },
+] satisfies { icon: SettingsIconName; label: string; text: string }[];
 
 function buildHistory(messages: AiMessage[]): AiHistoryMessage[] {
   return messages.map((m) =>
@@ -145,7 +146,7 @@ export default function AiPlannerPage() {
       }
     });
 
-    showToast(`✦ Plan applied! ${msg.plan.length} events added to your Day Planner for ${dayKey}.`, "success");
+    showToast(`Plan applied! ${msg.plan.length} events added to your Day Planner for ${dayKey}.`, "success");
     router.push("/planner");
   }
 
@@ -154,7 +155,9 @@ export default function AiPlannerPage() {
       {/* One scroll container, so the banner scrolls away with the content. */}
       <div className="page-scroll">
         <div className="ai-hero page-hero">
-          <div className="ai-hero-title">{copy.aiTitle}</div>
+          <div className="ai-hero-title">
+            <SettingsIcon name="sparkles" size={22} /> {copy.aiTitle}
+          </div>
           <div className="ai-hero-sub">Describe your day, goals, or constraints — I&apos;ll build your perfect schedule.</div>
           <div className="ai-input-row">
             <textarea
@@ -169,13 +172,16 @@ export default function AiPlannerPage() {
               }}
             />
             <button className="ai-send-btn" onClick={() => send(prompt)} disabled={sending}>
-              <span>{sending ? "⬡ Planning…" : "⬡ Plan My Day"}</span>
+              <span>
+                <SettingsIcon name={sending ? "loader" : "sparkles"} size={14} />{" "}
+                {sending ? "Planning…" : "Plan My Day"}
+              </span>
             </button>
           </div>
           <div className="ai-chips">
             {CHIPS.map((chip) => (
               <div key={chip.label} className="ai-chip" onClick={() => fillChip(chip.text)}>
-                {chip.emoji} {chip.label}
+                <SettingsIcon name={chip.icon} size={13} /> {chip.label}
               </div>
             ))}
           </div>

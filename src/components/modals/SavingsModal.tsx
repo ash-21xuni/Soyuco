@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
 import type { Goal } from "@/lib/budget/budget-context";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function SavingsModal({
   open,
@@ -45,8 +46,8 @@ export function SavingsModal({
           <div style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, color: "var(--text)", fontStyle: "italic" }}>
             {goal.name}
           </div>
-          <button className="close-btn" onClick={onCancel}>
-            ✕
+          <button className="close-btn" onClick={onCancel} aria-label="Close">
+            <SettingsIcon name="close" size={14} />
           </button>
         </div>
         <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 14 }}>

@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { usePlanner } from "@/lib/planner/planner-context";
 import { EventModal } from "@/components/modals/EventModal";
 import { ScheduleSettingsModal } from "@/components/modals/ScheduleSettingsModal";
-import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 import { hourLabel } from "@/lib/planner/time";
 import {
   eventColorValue,
@@ -86,7 +86,7 @@ export function Schedule() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">⏱ Schedule</div>
+        <SettingsCardTitle icon="clock">Schedule</SettingsCardTitle>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <button
             className="btn btn-ghost"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Libre_Caslon_Text, Manrope } from "next/font/google";
 import { ScrollEffects } from "@/components/landing/ScrollEffects";
 import "./landing.css";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const caslon = Libre_Caslon_Text({
   subsets: ["latin"],
@@ -87,7 +88,9 @@ export default function LandingPage() {
               <div className="lp-hero-actions">
                 <Link href="/login" className="lp-btn lp-btn-primary lp-btn-lg lp-arrow-btn">
                   <span>Sign In Now</span>
-                  <span className="lp-arrow">→</span>
+                  <span className="lp-arrow">
+                    <SettingsIcon name="arrowRight" size={16} />
+                  </span>
                 </Link>
                 <a href="#features" className="lp-btn lp-btn-ghost lp-btn-lg">
                   Explore More
@@ -143,7 +146,7 @@ export default function LandingPage() {
               </div>
               <Link href="/login" className="lp-text-link">
                 <span>View All Capabilities</span>
-                <span>→</span>
+                <SettingsIcon name="arrowRight" size={14} />
               </Link>
             </div>
 
@@ -311,7 +314,9 @@ export default function LandingPage() {
               </p>
               <Link href="/login" className="lp-btn lp-btn-primary lp-btn-xl lp-arrow-btn">
                 <span>Sign In Now</span>
-                <span className="lp-arrow">→</span>
+                <span className="lp-arrow">
+                    <SettingsIcon name="arrowRight" size={16} />
+                  </span>
               </Link>
               <p className="lp-cta-fine">No credit card required · Free to begin</p>
             </div>

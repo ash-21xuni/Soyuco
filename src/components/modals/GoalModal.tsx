@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
+import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 const fieldLabel: React.CSSProperties = {
   fontFamily: "var(--font-ui)",
@@ -67,8 +68,8 @@ export function GoalModal({
           <div style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, color: "var(--text)", fontStyle: "italic" }}>
             Add Savings Goal
           </div>
-          <button className="close-btn" onClick={onCancel}>
-            ✕
+          <button className="close-btn" onClick={onCancel} aria-label="Close">
+            <SettingsIcon name="close" size={14} />
           </button>
         </div>
         <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 14 }}>

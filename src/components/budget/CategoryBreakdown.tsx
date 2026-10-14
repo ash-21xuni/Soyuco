@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { CAT_LABELS, useBudget, type Category } from "@/lib/budget/budget-context";
+import { CAT_ICONS, CAT_LABELS, useBudget, type Category } from "@/lib/budget/budget-context";
+import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export function CategoryBreakdown() {
   const { transactions } = useBudget();
@@ -21,7 +22,7 @@ export function CategoryBreakdown() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">◇ Spending by Category</div>
+        <SettingsCardTitle icon="pieChart">Spending by Category</SettingsCardTitle>
       </div>
       <div className="planner-card-body">
         {entries.length === 0 ? (
@@ -32,7 +33,7 @@ export function CategoryBreakdown() {
           entries.map(([cat, amt]) => (
             <div key={cat} style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", color: "var(--text2)" }}>{CAT_LABELS[cat] ?? cat}</span>
+                <span style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", color: "var(--text2)", display: "flex", alignItems: "center", gap: 6 }}><SettingsIcon name={CAT_ICONS[cat] ?? "tag"} size={12} /> {CAT_LABELS[cat] ?? cat}</span>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--accent2)" }}>${amt.toFixed(2)}</span>
               </div>
               <div style={{ height: 5, background: "var(--bg3)", borderRadius: 4, overflow: "hidden" }}>

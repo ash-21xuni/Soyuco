@@ -1,6 +1,7 @@
 "use client";
 
 import { usePlanner } from "@/lib/planner/planner-context";
+import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
 
 function getLast7Days() {
   const days: Date[] = [];
@@ -23,7 +24,7 @@ export function MoodChart() {
   return (
     <div className="planner-card">
       <div className="planner-card-header">
-        <div className="planner-card-title">📈 Mood This Week</div>
+        <SettingsCardTitle icon="trendingUp">Mood This Week</SettingsCardTitle>
       </div>
       <div className="planner-card-body">
         <div className="mood-chart">

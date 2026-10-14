@@ -1601,9 +1601,9 @@ main { padding-top: 0px; }
   border-bottom: 1px solid var(--border);
   background: var(--bg);
   flex-shrink: 0;
-  flex-wrap: wrap;
 }
 .editor-toolbar-sep {
+  flex-shrink: 0;
   width: 1px;
   height: 20px;
   background: var(--border);
@@ -2998,6 +2998,178 @@ option {
   opacity: 0.55;
   cursor: default;
 }
+.market-actions a.btn {
+  text-decoration: none;
+}
+
+/* =========================================
+   SOYUCOINS
+========================================= */
+.coin-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.market-wallet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.market-wallet-label {
+  font-family: var(--font-ui);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.market-wallet-balance {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: var(--accent2);
+}
+.market-wallet-btn {
+  padding: 4px 10px;
+  text-decoration: none;
+}
+
+.coin-balance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.coin-balance-amount {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  color: var(--accent2);
+}
+.coin-balance-hint {
+  flex-basis: 100%;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: var(--text3);
+}
+.coin-packs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.coin-pack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition);
+}
+.coin-pack:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.coin-pack.is-featured {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--surface), var(--bg3));
+}
+.coin-pack-badge {
+  position: absolute;
+  top: -9px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.coin-pack-coins {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--text);
+}
+.coin-pack-price {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--accent2);
+}
+.coin-pack-saving {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  color: var(--text3);
+}
+.coin-pack {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.coin-pack.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.buy-coins-modal {
+  width: 520px;
+}
+.buy-coins-modal .coin-packs {
+  margin-top: 18px;
+}
+
+/* Premium swatches the user hasn't bought yet. */
+button.swatch {
+  position: relative;
+  padding: 0;
+}
+.swatch.is-locked {
+  filter: saturate(0.55);
+}
+.swatch-lock {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+.market-tier-locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text3);
+}
+
+/* Theme card opened from a locked sidebar swatch. */
+.market-card.is-highlighted {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+  animation: market-card-pulse 1.4s ease-out 2;
+}
+@keyframes market-card-pulse {
+  0% { box-shadow: 0 0 0 2px var(--accent); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 2px var(--accent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .market-card.is-highlighted { animation: none; }
+}
+.owned-themes-empty {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text3);
+}
 
 /* =========================================
    OWNED THEMES POPUP
@@ -3184,6 +3356,40 @@ option {
   color: var(--danger);
 }
 
+/* Word-style cloud save status next to the Save button. */
+.save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--text3);
+  white-space: nowrap;
+  cursor: default;
+}
+.save-indicator:disabled {
+  opacity: 1;
+}
+.save-indicator.busy svg {
+  animation: save-pulse 1.2s ease-in-out infinite;
+}
+.save-indicator.error {
+  color: var(--danger);
+  cursor: pointer;
+}
+.save-indicator.error:hover {
+  background: var(--surface);
+  border-color: var(--border);
+}
+@keyframes save-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
 .swatch-menu {
   position: relative;
 }
@@ -3198,10 +3404,8 @@ option {
   border-radius: 2px;
 }
 .swatch-menu-pop {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 50;
+  position: fixed;
+  z-index: 1100;
   width: 164px;
   padding: 10px;
   background: var(--bg2);
@@ -3244,13 +3448,74 @@ option {
 
 .table-toolbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
   padding: 6px 24px;
   border-bottom: 1px solid var(--border);
   background: var(--bg2);
 }
+/* One-line toolbars: overflow scrolls sideways behind arrow buttons. */
+.toolbar-scroller {
+  flex-wrap: nowrap;
+}
+.toolbar-scroll-track {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.toolbar-scroll-track::-webkit-scrollbar {
+  display: none;
+}
+.toolbar-scroller.can-left .toolbar-scroll-track {
+  mask-image: linear-gradient(to right, transparent, #000 24px);
+}
+.toolbar-scroller.can-right .toolbar-scroll-track {
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+.toolbar-scroller.can-left.can-right .toolbar-scroll-track {
+  mask-image: linear-gradient(to right, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+.toolbar-scroll-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+}
+.table-toolbar .toolbar-scroll-inner {
+  gap: 4px;
+}
+.toolbar-scroll-inner > * {
+  flex-shrink: 0;
+}
+.toolbar-scroll-inner .tool-btn,
+.toolbar-scroll-inner .save-indicator {
+  white-space: nowrap;
+}
+.toolbar-scroll-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.editor-close-btn {
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+.toolbar-scroll-btn:hover {
+  color: var(--accent2);
+  border-color: var(--accent);
+}
+
 .table-toolbar-label {
   margin-right: 6px;
   font-family: var(--font-ui);
@@ -4535,4 +4800,118 @@ button.todo-check {
 .planner-reset-layout:hover {
   border-color: var(--accent);
   color: var(--text);
+}
+
+/* =========================================
+   RESIZABLE & DOCKABLE SIDE PANELS
+   (main sidebar and journal entry list)
+========================================= */
+#sidebar,
+.sidebar-header,
+.entry-list {
+  position: relative;
+}
+#sidebar.side-right,
+.entry-list.side-right {
+  order: 2;
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+/* Collapse/expand arrows point the other way when docked on the right. */
+.side-right .panel-toggle[aria-expanded] svg {
+  transform: scaleX(-1);
+}
+
+/* Drag edge: sits over the panel's border without taking up space. */
+.panel-resizer {
+  position: relative;
+  z-index: 11;
+  flex: 0 0 8px;
+  margin: 0 -4px;
+  cursor: col-resize;
+  touch-action: none;
+}
+.panel-resizer.side-right {
+  order: 1;
+}
+.panel-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.panel-resizer:hover::after,
+.panel-resizer:focus-visible::after,
+body.panel-resizing .panel-resizer::after {
+  opacity: 1;
+}
+.panel-resizer:focus-visible {
+  outline: none;
+}
+body.panel-resizing,
+body.panel-resizing * {
+  cursor: col-resize !important;
+  user-select: none;
+}
+body.panel-resizing #sidebar,
+body.panel-resizing .entry-list {
+  transition: none;
+}
+
+/* Docking: grab a panel's header (or its grip) and drop it on either side. */
+.sidebar-header,
+.entry-list-header,
+.entry-list.collapsed {
+  cursor: grab;
+}
+.panel-dock-grip {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 12px;
+  border-radius: 999px;
+  color: var(--text3);
+  cursor: grab;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition:
+    opacity var(--transition),
+    background var(--transition);
+  touch-action: none;
+}
+[data-panel]:hover .panel-dock-grip,
+.panel-dock-grip:focus-visible {
+  opacity: 1;
+}
+.panel-dock-grip:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+[data-panel].is-docking {
+  opacity: 0.55;
+}
+body.panel-docking,
+body.panel-docking * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+.panel-dock-preview {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  transition: left 0.15s ease;
 }

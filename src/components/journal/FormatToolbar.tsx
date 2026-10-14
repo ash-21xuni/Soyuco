@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useEditorState, type Editor } from "@tiptap/react";
 import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
 import { DEFAULT_TEXT_BOX_WIDTH } from "@/components/journal/extensions/TextBox";
+import { ToolbarScroller } from "@/components/journal/ToolbarScroller";
 
 // Text colours are mid-tone so they read on both light and dark themes.
 const TEXT_COLORS = [
@@ -56,6 +58,9 @@ function ToolButton({
   );
 }
 
+// Matches .swatch-menu-pop: 164px content + padding + border.
+const POPOVER_WIDTH = 186;
+
 function SwatchMenu({
   icon,
   label,
@@ -73,22 +78,48 @@ function SwatchMenu({
   onClear: () => void;
   clearLabel: string;
 }) {
-  const [open, setOpen] = useState(false);
+  // The popover is portalled with fixed coordinates so the toolbar's
+  // horizontal scroll track can't clip it.
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const open = pos !== null;
   const ref = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+
+  function toggle() {
+    if (open || !ref.current) {
+      setPos(null);
+      return;
+    }
+    const rect = ref.current.getBoundingClientRect();
+    setPos({
+      top: rect.bottom + 6,
+      left: Math.max(8, Math.min(rect.left, window.innerWidth - POPOVER_WIDTH - 8)),
+    });
+  }
 
   useEffect(() => {
     if (!open) return;
+    const close = () => setPos(null);
     function onDown(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      if (!ref.current?.contains(t) && !popRef.current?.contains(t)) close();
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") close();
+    }
+    // Fixed coordinates go stale once anything scrolls or resizes.
+    function onScroll(e: Event) {
+      if (!popRef.current?.contains(e.target as Node)) close();
     }
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
+    document.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", close);
     return () => {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
+      document.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", close);
     };
   }, [open]);
 
@@ -102,45 +133,53 @@ function SwatchMenu({
         aria-haspopup="true"
         aria-expanded={open}
         onMouseDown={(e) => e.preventDefault()}
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
       >
         <SettingsIcon name={icon} size={15} />
         <span className="swatch-menu-bar" style={{ background: current ?? "currentColor" }} />
       </button>
-      {open && (
-        <div className="swatch-menu-pop" role="menu" aria-label={label}>
-          <div className="swatch-menu-grid">
-            {swatches.map((s) => (
-              <button
-                key={s.value}
-                type="button"
-                role="menuitem"
-                className={`swatch-menu-item${current === s.value ? " active" : ""}`}
-                style={{ background: s.value }}
-                title={s.label}
-                aria-label={s.label}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  onPick(s.value);
-                  setOpen(false);
-                }}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            role="menuitem"
-            className="swatch-menu-clear"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              onClear();
-              setOpen(false);
-            }}
+      {pos &&
+        createPortal(
+          <div
+            ref={popRef}
+            className="swatch-menu-pop"
+            role="menu"
+            aria-label={label}
+            style={{ top: pos.top, left: pos.left }}
           >
-            {clearLabel}
-          </button>
-        </div>
-      )}
+            <div className="swatch-menu-grid">
+              {swatches.map((s) => (
+                <button
+                  key={s.value}
+                  type="button"
+                  role="menuitem"
+                  className={`swatch-menu-item${current === s.value ? " active" : ""}`}
+                  style={{ background: s.value }}
+                  title={s.label}
+                  aria-label={s.label}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    onPick(s.value);
+                    setPos(null);
+                  }}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              role="menuitem"
+              className="swatch-menu-clear"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                onClear();
+                setPos(null);
+              }}
+            >
+              {clearLabel}
+            </button>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
@@ -265,7 +304,7 @@ export function TableToolbar({ editor }: { editor: Editor }) {
   ];
 
   return (
-    <div className="table-toolbar" role="toolbar" aria-label="Table">
+    <ToolbarScroller className="table-toolbar" label="Table">
       <span className="table-toolbar-label">Table</span>
       {actions.map((a) => (
         <button
@@ -278,6 +317,6 @@ export function TableToolbar({ editor }: { editor: Editor }) {
           {a.label}
         </button>
       ))}
-    </div>
+    </ToolbarScroller>
   );
 }

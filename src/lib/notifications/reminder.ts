@@ -26,7 +26,7 @@ export function useJournalReminder() {
       target.setHours(hours, minutes, 0, 0);
 
       if (new Date() >= target) {
-        new Notification("Soyuco", { body: "Time for your daily journal entry ✦" });
+        new Notification("Soyuco", { body: "Time for your daily journal entry." });
         localStorage.setItem(REMINDER_LAST_FIRED_KEY, todayKey);
       }
     }

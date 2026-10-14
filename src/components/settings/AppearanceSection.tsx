@@ -1,6 +1,7 @@
 "use client";
 
-import { PREMIUM_THEMES, THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
+import { THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
+import { PremiumSwatches } from "@/components/PremiumSwatches";
 import { useToast } from "@/lib/toast/toast-context";
 import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
@@ -33,17 +34,7 @@ export function AppearanceSection() {
           <span className="premium-crown"><SettingsIcon name="crown" size={13} /></span> Premium
           <span className="premium-badge">PRO</span>
         </div>
-        <div className="theme-swatches">
-          {PREMIUM_THEMES.map((t) => (
-            <div
-              key={t.id}
-              className={`swatch${theme === t.id ? " active" : ""}`}
-              data-t={t.id}
-              title={t.title}
-              onClick={() => setTheme(t.id as ThemeId)}
-            />
-          ))}
-        </div>
+        <PremiumSwatches />
 
         <button
           className="custom-theme-btn"
