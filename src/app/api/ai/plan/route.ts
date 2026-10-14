@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import type Anthropic from "@anthropic-ai/sdk";
-import { aiErrorResponse, getAnthropicClient } from "@/lib/ai/anthropic";
+import { aiErrorResponse, generateText, ThinkingLevel, type ChatTurn } from "@/lib/ai/gemini";
 
 type HistoryMessage = { role: "user" | "assistant"; content: string };
 
@@ -38,26 +37,20 @@ User context:
 - Habits they track: ${habitsList.length ? habitsList.join(", ") : "None"}
 - Recent journal themes: ${recentEntries.length ? recentEntries.join(" | ") : "No entries yet"}`;
 
-  const messages: Anthropic.MessageParam[] = [
-    ...history.map((m) => ({ role: m.role, content: m.content })),
+  const turns: ChatTurn[] = [
+    ...history
+      .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+      .map((m) => ({ role: m.role, content: m.content })),
     { role: "user", content: prompt },
   ];
 
   try {
-    const client = getAnthropicClient();
-    const response = await client.messages.create({
-      model: "claude-opus-5",
-      max_tokens: 2048,
-      output_config: { effort: "medium" },
+    const text = await generateText({
+      turns,
       system: systemPrompt,
-      messages,
+      thinking: ThinkingLevel.MEDIUM,
+      maxOutputTokens: 8192,
     });
-
-    const text = response.content
-      .filter((b): b is Extract<typeof b, { type: "text" }> => b.type === "text")
-      .map((b) => b.text)
-      .join("");
-
     return NextResponse.json({ text });
   } catch (err) {
     return aiErrorResponse(err);
