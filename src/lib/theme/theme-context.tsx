@@ -25,6 +25,8 @@ export const PREMIUM_THEMES = [
   { id: "meangirls", title: "Queen Bee" },
   { id: "minecraft", title: "Pixel Quarry" },
   { id: "cyberpunk", title: "Neon District" },
+  { id: "partylights", title: "Afterglow" },
+  { id: "lumen", title: "Lumen" },
 ] as const;
 
 export type ThemeId =

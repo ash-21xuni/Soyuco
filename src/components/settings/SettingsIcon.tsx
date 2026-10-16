@@ -398,6 +398,22 @@ const PATHS = {
       <path d="M9 20v2" />
     </>
   ),
+  music: (
+    <>
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
+    </>
+  ),
+  orbit: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <circle cx="19" cy="5" r="2" />
+      <circle cx="5" cy="19" r="2" />
+      <path d="M10.4 21.9a10 10 0 0 0 9.941-15.416" />
+      <path d="M13.5 2.1a10 10 0 0 0-9.841 15.416" />
+    </>
+  ),
   download: (
     <>
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />

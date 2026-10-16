@@ -8,7 +8,7 @@ import type { ThemeId } from "@/lib/theme/theme-context";
 // theme supplies an effect below. Only runs for a mouse, and not at all when
 // the system asks for reduced motion.
 
-type Shape = "square" | "circle" | "bubble" | "star" | "heart" | "glyph" | "ring";
+type Shape = "square" | "circle" | "bubble" | "star" | "heart" | "glyph" | "ring" | "confetti";
 
 type Particle = {
   shape: Shape;
@@ -26,6 +26,11 @@ type Particle = {
   /** Side-to-side sway, for bubbles and falling hearts. */
   sway: number;
   phase: number;
+  /** Rotation and spin, for confetti. */
+  rot: number;
+  spin: number;
+  /** Height as a fraction of width, for confetti (1 = square). */
+  aspect: number;
   char?: string;
 };
 
@@ -152,8 +157,59 @@ const PIXELS: Effect = {
   },
 };
 
+const PARTY_COLORS = ["#ff3cac", "#2bd2ff", "#ffe53b", "#3cff9e", "#a855f7", "#ff8a3d"];
+
+// Afterglow: a rainbow light streak scattering confetti; a click sets off a firework.
+const PARTY: Effect = {
+  blend: "lighter",
+  streak: { colors: PARTY_COLORS, width: 3, glow: 14 },
+  move(x, y, speed, dx, dy, add) {
+    for (let i = 0; i < Math.min(3, 1 + Math.floor(speed / 16)); i++) {
+      const max = rand(40, 65);
+      add({
+        shape: "confetti", x: x + rand(-4, 4), y: y + rand(-4, 4),
+        vx: -dx * 0.04 + rand(-1, 1), vy: rand(-1.6, -0.2), gravity: 0.07,
+        life: max, max, size: rand(3, 6), glow: 6, rot: rand(0, Math.PI), spin: rand(-0.25, 0.25),
+        color: pick(PARTY_COLORS),
+      });
+    }
+    if (Math.random() < 0.25) {
+      add({ shape: "circle", x, y, vx: rand(-0.4, 0.4), vy: rand(-0.4, 0.4), life: 30, max: 30, size: rand(1.5, 3), glow: 12, color: pick(PARTY_COLORS) });
+    }
+  },
+  click(x, y, add) {
+    add({ shape: "ring", x, y, life: 24, max: 24, size: 34, glow: 14, color: pick(PARTY_COLORS) });
+    burst(x, y, 22, [2, 4.5], (vx, vy) => ({ shape: "circle", x, y, vx, vy, gravity: 0.06, life: 44, max: 44, size: rand(1.5, 2.6), glow: 12, color: pick(PARTY_COLORS) }), add);
+    burst(x, y, 10, [1, 3], (vx, vy) => ({ shape: "confetti", x, y, vx, vy: vy - 1, gravity: 0.08, life: 60, max: 60, size: rand(3, 6), glow: 4, rot: rand(0, Math.PI), spin: rand(-0.3, 0.3), color: pick(PARTY_COLORS) }), add);
+  },
+};
+
+// Lumen: a soft iridescent light ribbon shedding tiny drifting diamonds; a
+// click sends out thin sonar rings.
+const LUMEN: Effect = {
+  blend: "source-over",
+  streak: { colors: ["#4f6bff", "#00c2ff", "#b388ff"], width: 2.5, glow: 10 },
+  move(x, y, speed, _dx, _dy, add) {
+    if (Math.random() > 0.3 + speed / 50) return;
+    const max = rand(40, 70);
+    add({
+      shape: "confetti", x: x + rand(-6, 6), y: y + rand(-6, 6), vx: rand(-0.3, 0.3), vy: rand(-0.7, -0.2),
+      life: max, max, size: rand(2, 4), glow: 6, rot: Math.PI / 4, spin: rand(-0.04, 0.04), aspect: 1,
+      color: pick(["#4f6bff", "#00c2ff", "#b388ff", "#9aa8c7"]),
+    });
+  },
+  click(x, y, add) {
+    add({ shape: "ring", x, y, life: 34, max: 34, size: 44, glow: 6, color: "#4f6bff" });
+    add({ shape: "ring", x, y, life: 26, max: 26, size: 30, glow: 6, color: "#00c2ff" });
+    add({ shape: "ring", x, y, life: 18, max: 18, size: 18, glow: 6, color: "#b388ff" });
+    burst(x, y, 8, [0.8, 1.6], (vx, vy) => ({ shape: "circle", x, y, vx, vy, life: 30, max: 30, size: 1.6, glow: 6, color: "#4f6bff" }), add);
+  },
+};
+
 export const CURSOR_EFFECTS: Partial<Record<ThemeId, Effect>> = {
   cyberpunk: NEON,
+  partylights: PARTY,
+  lumen: LUMEN,
   spongebob: BUBBLES,
   meangirls: SPARKLES,
   minecraft: PIXELS,
@@ -193,7 +249,7 @@ export function CursorTrail({ effect }: { effect: Effect }) {
 
     const add: Add = (p) => {
       if (particles.length >= MAX_PARTICLES) particles.shift();
-      particles.push({ vx: 0, vy: 0, life: 40, max: 40, size: 3, glow: 0, gravity: 0, sway: 0, phase: 0, ...p });
+      particles.push({ vx: 0, vy: 0, life: 40, max: 40, size: 3, glow: 0, gravity: 0, sway: 0, phase: 0, rot: 0, spin: 0, aspect: 0.5, ...p });
     };
 
     function resize() {
@@ -297,6 +353,14 @@ export function CursorTrail({ effect }: { effect: Effect }) {
           case "glyph":
             c.font = `${p.size}px 'Share Tech Mono', monospace`;
             c.fillText(p.char ?? "", p.x, p.y);
+            break;
+          case "confetti":
+            p.rot += p.spin;
+            c.save();
+            c.translate(p.x, p.y);
+            c.rotate(p.rot);
+            c.fillRect(-p.size / 2, (-p.size * p.aspect) / 2, p.size, p.size * p.aspect);
+            c.restore();
             break;
           case "ring":
             c.lineWidth = 2 * t;

@@ -2942,9 +2942,17 @@ option {
   color: var(--text2);
 }
 .market-tier-card-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
   font-family: var(--font-display);
   font-size: 1.4rem;
   color: var(--accent2);
+}
+.market-tier-card-from {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: var(--text3);
 }
 
 .market-filters {
@@ -5937,6 +5945,623 @@ body[data-theme="minecraft"],
   [data-theme="minecraft"] *,
   [data-theme="minecraft"] *::before,
   [data-theme="minecraft"] *::after {
+    animation: none !important;
+  }
+}
+
+/* =========================================
+   AFTERGLOW (partylights) - Pro theme
+   Neon party lights: chasing string lights in the top bar, a disco ball,
+   sweeping stage beams and an equalizer in the banners, and a confetti
+   trail from components/theme/CursorTrail.tsx.
+========================================= */
+[data-theme="partylights"] {
+  --bg: #0a0612;
+  --bg2: #120a1f;
+  --bg3: #1c1030;
+  --surface: #1a0f2c;
+  --surface2: #24163d;
+  --border: #3d2566;
+  --text: #fff4fd;
+  --text2: #c9b3e6;
+  --text3: #8a74ad;
+  --accent: #ff3cac;
+  --accent2: #2bd2ff;
+  --accent3: #ffe53b;
+  --danger: #ff4d6d;
+  --success: #3cff9e;
+  --font-display: "Righteous", "Space Grotesk", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+  --font-mono: "DM Mono", monospace;
+  --font-ui: "Space Grotesk", sans-serif;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 0 20px rgba(255, 60, 172, 0.15), 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 0 36px rgba(43, 210, 255, 0.18), 0 12px 48px rgba(0, 0, 0, 0.7);
+  --ai-glow: rgba(255, 60, 172, 0.2);
+  --rainbow: linear-gradient(90deg, #ff3cac, #ff8a3d, #ffe53b, #3cff9e, #2bd2ff, #a855f7, #ff3cac);
+  --logo-color: #ff3cac;
+  --logo-filter: brightness(0) saturate(100%) invert(42%) sepia(91%)
+    saturate(3000%) hue-rotate(300deg) brightness(1.05);
+}
+
+/* Club lighting: soft coloured bokeh behind everything. */
+body[data-theme="partylights"] {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 60, 172, 0.16) 0, transparent 22%),
+    radial-gradient(circle at 85% 12%, rgba(43, 210, 255, 0.14) 0, transparent 20%),
+    radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.16) 0, transparent 24%),
+    radial-gradient(circle at 25% 85%, rgba(255, 229, 59, 0.08) 0, transparent 18%),
+    var(--bg);
+  background-attachment: fixed;
+}
+[data-theme="partylights"] #main,
+[data-theme="partylights"] .editor-pane {
+  background: transparent;
+}
+[data-theme="partylights"] ::selection {
+  background: #a855f7;
+  color: #fff;
+}
+[data-theme="partylights"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(#ff3cac, #a855f7, #2bd2ff);
+}
+
+/* Cursor: a neon arrow, and a little disco ball over anything clickable. */
+body[data-theme="partylights"],
+[data-theme="partylights"] * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M3 2v20l5.5-5.5 4 8.5 3.5-1.6-4-8.4h8z' fill='%23120a1f' stroke='%23ff3cac' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M5.4 7v8' stroke='%232bd2ff' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M22 17.5 Q22 22 26.5 22 Q22 22 22 26.5 Q22 22 17.5 22 Q22 22 22 17.5Z' fill='%23ffe53b' fill-opacity='1'/%3E%3C/svg%3E") 3 2, default;
+}
+[data-theme="partylights"] button,
+[data-theme="partylights"] a,
+[data-theme="partylights"] select,
+[data-theme="partylights"] label,
+[data-theme="partylights"] summary,
+[data-theme="partylights"] [role="button"],
+[data-theme="partylights"] [role="tab"],
+[data-theme="partylights"] [role="checkbox"],
+[data-theme="partylights"] .swatch,
+[data-theme="partylights"] .nav-item,
+[data-theme="partylights"] .ai-chip,
+[data-theme="partylights"] [style*="cursor: pointer"] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='34' viewBox='0 0 30 34'%3E%3Cdefs%3E%3CradialGradient id='b' cx='0.35' cy='0.3' r='0.75'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.5' stop-color='%23b9c0d4'/%3E%3Cstop offset='1' stop-color='%233e4459'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cline x1='15' y1='0' x2='15' y2='8' stroke='%23ff3cac' stroke-width='1.6'/%3E%3Ccircle cx='15' cy='20' r='11' fill='url(%23b)' stroke='%23ff3cac' stroke-width='1.4'/%3E%3Cpath d='M4 17h22M4 23h22M15 9v22M9.5 10.5v19M20.5 10.5v19' stroke='%2320253a' stroke-opacity='0.4' stroke-width='0.7'/%3E%3Cpath d='M10 12.2 Q10 15 12.8 15 Q10 15 10 17.8 Q10 15 7.2 15 Q10 15 10 12.2Z' fill='%23ffffff' fill-opacity='1'/%3E%3C/svg%3E") 15 20, pointer !important;
+}
+
+/* Top bar: string lights whose glow chases along the wire. */
+[data-theme="partylights"] #topbar {
+  position: relative;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='34' viewBox='0 0 90 34'%3E%3Cpath d='M0 6 Q22.5 22 45 6 Q67.5 22 90 6' fill='none' stroke='%234a3870' stroke-width='1.5'/%3E%3Crect x='9.45' y='11.00' width='3.6' height='3.5' rx='0.8' fill='%232a1f3d'/%3E%3Cellipse cx='11.25' cy='18.00' rx='3.2' ry='4.4' fill='%23ff3cac'/%3E%3Cellipse cx='10.25' cy='16.50' rx='0.9' ry='1.4' fill='%23ffffff' fill-opacity='0.8'/%3E%3Crect x='31.95' y='11.00' width='3.6' height='3.5' rx='0.8' fill='%232a1f3d'/%3E%3Cellipse cx='33.75' cy='18.00' rx='3.2' ry='4.4' fill='%232bd2ff'/%3E%3Cellipse cx='32.75' cy='16.50' rx='0.9' ry='1.4' fill='%23ffffff' fill-opacity='0.8'/%3E%3Crect x='54.45' y='11.00' width='3.6' height='3.5' rx='0.8' fill='%232a1f3d'/%3E%3Cellipse cx='56.25' cy='18.00' rx='3.2' ry='4.4' fill='%23ffe53b'/%3E%3Cellipse cx='55.25' cy='16.50' rx='0.9' ry='1.4' fill='%23ffffff' fill-opacity='0.8'/%3E%3Crect x='76.95' y='11.00' width='3.6' height='3.5' rx='0.8' fill='%232a1f3d'/%3E%3Cellipse cx='78.75' cy='18.00' rx='3.2' ry='4.4' fill='%233cff9e'/%3E%3Cellipse cx='77.75' cy='16.50' rx='0.9' ry='1.4' fill='%23ffffff' fill-opacity='0.8'/%3E%3C/svg%3E") 0 0 / 90px 34px repeat-x, rgba(10, 6, 18, 0.85);
+  border-bottom: 1px solid #3d2566;
+  padding-top: 26px;
+}
+[data-theme="partylights"] #topbar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 34px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='34' viewBox='0 0 90 34'%3E%3Cdefs%3E%3CradialGradient id='g0'%3E%3Cstop offset='0' stop-color='%23ff3cac' stop-opacity='0.95'/%3E%3Cstop offset='1' stop-color='%23ff3cac' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g1'%3E%3Cstop offset='0' stop-color='%232bd2ff' stop-opacity='0.95'/%3E%3Cstop offset='1' stop-color='%232bd2ff' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g2'%3E%3Cstop offset='0' stop-color='%23ffe53b' stop-opacity='0.95'/%3E%3Cstop offset='1' stop-color='%23ffe53b' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g3'%3E%3Cstop offset='0' stop-color='%233cff9e' stop-opacity='0.95'/%3E%3Cstop offset='1' stop-color='%233cff9e' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='11.25' cy='18.00' r='11' fill='url(%23g0)'/%3E%3Ccircle cx='56.25' cy='18.00' r='11' fill='url(%23g2)'/%3E%3C/svg%3E") 0 0 / 90px 34px repeat-x;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation:
+    party-chase 0.9s steps(1) infinite,
+    party-hue 8s linear infinite;
+}
+[data-theme="partylights"] .topbar-title {
+  font-style: normal;
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  background: var(--rainbow);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 8px rgba(255, 60, 172, 0.55));
+  animation: party-rainbow 6s linear infinite;
+}
+
+/* Sidebar. */
+[data-theme="partylights"] #sidebar {
+  background: rgba(18, 10, 31, 0.92);
+  border-right: 1px solid #ff3cac;
+  box-shadow: 0 0 18px rgba(255, 60, 172, 0.3);
+}
+[data-theme="partylights"] .logo {
+  font-size: 1.6rem;
+  background: var(--rainbow);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: party-rainbow 6s linear infinite;
+}
+[data-theme="partylights"] .logo span { font-style: normal; }
+[data-theme="partylights"] .logo-dot {
+  background: #ffe53b;
+  box-shadow: 0 0 10px #ffe53b;
+  animation: party-hue 3s linear infinite;
+}
+[data-theme="partylights"] .nav-item.active {
+  background: linear-gradient(90deg, #ff3cac, #a855f7);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(255, 60, 172, 0.5);
+}
+[data-theme="partylights"] .nav-item:hover {
+  color: #ffe53b;
+}
+
+/* Banners: a disco ball, sweeping stage beams and a scrolling equalizer. */
+[data-theme="partylights"] .ai-hero {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='36' viewBox='0 0 160 36'%3E%3Cdefs%3E%3ClinearGradient id='q' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%23ff3cac'/%3E%3Cstop offset='0.5' stop-color='%23a855f7'/%3E%3Cstop offset='1' stop-color='%232bd2ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='1' y='6' width='6' height='30' rx='1' fill='url(%23q)'/%3E%3Crect x='9' y='22' width='6' height='14' rx='1' fill='url(%23q)'/%3E%3Crect x='17' y='14' width='6' height='22' rx='1' fill='url(%23q)'/%3E%3Crect x='25' y='30' width='6' height='6' rx='1' fill='url(%23q)'/%3E%3Crect x='33' y='26' width='6' height='10' rx='1' fill='url(%23q)'/%3E%3Crect x='41' y='26' width='6' height='10' rx='1' fill='url(%23q)'/%3E%3Crect x='49' y='6' width='6' height='30' rx='1' fill='url(%23q)'/%3E%3Crect x='57' y='30' width='6' height='6' rx='1' fill='url(%23q)'/%3E%3Crect x='65' y='18' width='6' height='18' rx='1' fill='url(%23q)'/%3E%3Crect x='73' y='30' width='6' height='6' rx='1' fill='url(%23q)'/%3E%3Crect x='81' y='26' width='6' height='10' rx='1' fill='url(%23q)'/%3E%3Crect x='89' y='14' width='6' height='22' rx='1' fill='url(%23q)'/%3E%3Crect x='97' y='14' width='6' height='22' rx='1' fill='url(%23q)'/%3E%3Crect x='105' y='26' width='6' height='10' rx='1' fill='url(%23q)'/%3E%3Crect x='113' y='18' width='6' height='18' rx='1' fill='url(%23q)'/%3E%3Crect x='121' y='26' width='6' height='10' rx='1' fill='url(%23q)'/%3E%3Crect x='129' y='14' width='6' height='22' rx='1' fill='url(%23q)'/%3E%3Crect x='137' y='30' width='6' height='6' rx='1' fill='url(%23q)'/%3E%3Crect x='145' y='26' width='6' height='10' rx='1' fill='url(%23q)'/%3E%3Crect x='153' y='18' width='6' height='18' rx='1' fill='url(%23q)'/%3E%3C/svg%3E") bottom left / 160px 36px repeat-x,
+    linear-gradient(180deg, #140a26 0%, #2a0e3d 70%, #3a0f45 100%);
+  border-bottom: 1px solid #ff3cac;
+  box-shadow: 0 1px 18px rgba(255, 60, 172, 0.4);
+  isolation: isolate;
+  animation: party-eq 3s linear infinite;
+}
+[data-theme="partylights"] .page-hero {
+  padding-bottom: 46px;
+}
+[data-theme="partylights"] .ai-hero::before {
+  top: -4px;
+  left: auto;
+  right: 14%;
+  width: 60px;
+  height: 70px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='70' viewBox='0 0 60 70'%3E%3Cdefs%3E%3CradialGradient id='b' cx='0.35' cy='0.3' r='0.75'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='0.45' stop-color='%23b9c0d4'/%3E%3Cstop offset='1' stop-color='%233e4459'/%3E%3C/radialGradient%3E%3CclipPath id='c'%3E%3Ccircle cx='30' cy='42' r='24'/%3E%3C/clipPath%3E%3C/defs%3E%3Cline x1='30' y1='0' x2='30' y2='18' stroke='%238a7aa8' stroke-width='1.5'/%3E%3Ccircle cx='30' cy='42' r='24' fill='url(%23b)'/%3E%3Cg clip-path='url(%23c)' stroke='%2320253a' stroke-opacity='0.45' stroke-width='0.8' fill='none'%3E%3Cline x1='0' y1='18' x2='60' y2='18'/%3E%3Cline x1='0' y1='24' x2='60' y2='24'/%3E%3Cline x1='0' y1='30' x2='60' y2='30'/%3E%3Cline x1='0' y1='36' x2='60' y2='36'/%3E%3Cline x1='0' y1='42' x2='60' y2='42'/%3E%3Cline x1='0' y1='48' x2='60' y2='48'/%3E%3Cline x1='0' y1='54' x2='60' y2='54'/%3E%3Cline x1='0' y1='60' x2='60' y2='60'/%3E%3Cellipse cx='30' cy='42' rx='6' ry='24'/%3E%3Cellipse cx='30' cy='42' rx='13' ry='24'/%3E%3Cellipse cx='30' cy='42' rx='19' ry='24'/%3E%3Cellipse cx='30' cy='42' rx='24' ry='24'/%3E%3C/g%3E%3Cpath d='M20 28 Q20 32 24 32 Q20 32 20 36 Q20 32 16 32 Q20 32 20 28Z' fill='%23ffffff' fill-opacity='1'/%3E%3Cpath d='M41 44 Q41 47 44 47 Q41 47 41 50 Q41 47 38 47 Q41 47 41 44Z' fill='%23ffe53b' fill-opacity='1'/%3E%3Cpath d='M33 21.5 Q33 24 35.5 24 Q33 24 33 26.5 Q33 24 30.5 24 Q33 24 33 21.5Z' fill='%232bd2ff' fill-opacity='1'/%3E%3Cpath d='M17 49.5 Q17 52 19.5 52 Q17 52 17 54.5 Q17 52 14.5 52 Q17 52 17 49.5Z' fill='%23ff3cac' fill-opacity='1'/%3E%3C/svg%3E") center / contain no-repeat;
+  transform-origin: 50% 0;
+  z-index: -1;
+  filter: drop-shadow(0 0 14px rgba(43, 210, 255, 0.6));
+  animation:
+    party-sway 4s ease-in-out infinite alternate,
+    party-hue 10s linear infinite;
+}
+[data-theme="partylights"] .ai-hero::after {
+  content: "";
+  position: absolute;
+  inset: -20% 0 0 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    conic-gradient(from 150deg at 20% 0%, transparent 0deg, rgba(255, 60, 172, 0.35) 10deg, transparent 20deg),
+    conic-gradient(from 175deg at 50% 0%, transparent 0deg, rgba(255, 229, 59, 0.22) 8deg, transparent 16deg),
+    conic-gradient(from 195deg at 80% 0%, transparent 0deg, rgba(43, 210, 255, 0.35) 10deg, transparent 20deg);
+  transform-origin: 50% 0;
+  mix-blend-mode: screen;
+  animation: party-sweep 5s ease-in-out infinite alternate;
+}
+[data-theme="partylights"] .ai-hero-title {
+  font-style: normal;
+  color: #fff;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 10px #ff3cac, 0 0 24px rgba(168, 85, 247, 0.8);
+}
+[data-theme="partylights"] .ai-hero-sub {
+  color: #e6d6ff;
+}
+
+/* Cards: a rainbow edge on top and a coloured glow on hover. */
+[data-theme="partylights"] .planner-card {
+  background:
+    var(--rainbow) top left / 100% 2px no-repeat,
+    rgba(26, 15, 44, 0.9);
+}
+[data-theme="partylights"] .planner-card:hover {
+  border-color: #ff3cac;
+  box-shadow: 0 0 22px rgba(255, 60, 172, 0.3);
+}
+[data-theme="partylights"] .planner-card-title {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Buttons, fields and the journal. */
+[data-theme="partylights"] .btn-primary,
+[data-theme="partylights"] .ai-send-btn {
+  background: linear-gradient(90deg, #ff3cac, #a855f7);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(255, 60, 172, 0.5);
+}
+[data-theme="partylights"] .btn-primary:hover,
+[data-theme="partylights"] .ai-send-btn:hover {
+  background: linear-gradient(90deg, #a855f7, #2bd2ff);
+  box-shadow: 0 0 18px rgba(43, 210, 255, 0.6);
+}
+[data-theme="partylights"] .btn-ghost:hover {
+  border-color: #ffe53b;
+  color: #ffe53b;
+}
+[data-theme="partylights"] .btn-ai {
+  background: linear-gradient(120deg, #ff3cac, #ff8a3d, #ffe53b);
+  color: #1a0f2c;
+}
+[data-theme="partylights"] input:focus,
+[data-theme="partylights"] textarea:focus,
+[data-theme="partylights"] select:focus {
+  outline: none;
+  border-color: #ff3cac !important;
+  box-shadow: 0 0 0 1px #ff3cac, 0 0 14px rgba(255, 60, 172, 0.45);
+}
+[data-theme="partylights"] .editor-toolbar {
+  background: rgba(18, 10, 31, 0.9);
+  border-bottom: 1px solid #a855f7;
+}
+[data-theme="partylights"] .entry-list,
+[data-theme="partylights"] .entry-list-header {
+  background: rgba(18, 10, 31, 0.92);
+}
+[data-theme="partylights"] .empty-icon {
+  opacity: 1;
+  color: #ff3cac;
+  filter: drop-shadow(0 0 12px rgba(255, 60, 172, 0.8));
+  animation:
+    party-bounce 0.6s ease-in-out infinite alternate,
+    party-hue 6s linear infinite;
+}
+[data-theme="partylights"] .empty-title {
+  font-style: normal;
+  color: #fff;
+  text-shadow: 0 0 12px #a855f7;
+}
+
+/* =========================================
+   LUMEN - Pro theme
+   Bright, clean futurism: frosted glass, a holographic orb, slow orbit rings
+   and a soft light-ribbon cursor trail.
+========================================= */
+[data-theme="lumen"] {
+  --bg: #f6f8fb;
+  --bg2: #eef2f7;
+  --bg3: #e4e9f1;
+  --surface: #ffffff;
+  --surface2: #f2f5fa;
+  --border: #dbe2ec;
+  --text: #0f1724;
+  --text2: #4a5568;
+  --text3: #8a94a6;
+  --accent: #4f6bff;
+  --accent2: #00a8e8;
+  --accent3: #b388ff;
+  --danger: #e5484d;
+  --success: #12b886;
+  --font-display: "Sora", "Space Grotesk", sans-serif;
+  --font-body: "Manrope", "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", "DM Mono", monospace;
+  --font-ui: "Manrope", "Space Grotesk", sans-serif;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 20px 60px rgba(15, 23, 42, 0.12);
+  --ai-glow: rgba(79, 107, 255, 0.12);
+  --holo: linear-gradient(120deg, #4f6bff, #00c2ff, #b388ff, #ff9ad5);
+  --glass: rgba(255, 255, 255, 0.72);
+  --logo-color: #0f1724;
+  --logo-filter: brightness(0) saturate(100%) invert(38%) sepia(80%)
+    saturate(2500%) hue-rotate(220deg) brightness(1.05);
+}
+
+/* A fine dot grid with soft iridescent light pooling in the corners. */
+body[data-theme="lumen"] {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='1' fill='%23b8c4d8' fill-opacity='0.55'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 0% 0%, rgba(179, 136, 255, 0.18) 0, transparent 35%),
+    radial-gradient(circle at 100% 100%, rgba(0, 194, 255, 0.16) 0, transparent 40%),
+    var(--bg);
+  background-attachment: fixed;
+}
+[data-theme="lumen"] #main,
+[data-theme="lumen"] .editor-pane {
+  background: transparent;
+}
+[data-theme="lumen"] ::selection {
+  background: rgba(79, 107, 255, 0.2);
+}
+[data-theme="lumen"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(#4f6bff, #00c2ff);
+  border-radius: 4px;
+}
+
+/* Cursor: a crisp white arrow with a holographic edge, a ring over clickables. */
+body[data-theme="lumen"],
+[data-theme="lumen"] * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cdefs%3E%3ClinearGradient id='l' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234f6bff'/%3E%3Cstop offset='1' stop-color='%2300c2ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M3 2v20l5.5-5.5 4 8.5 3.5-1.6-4-8.4h8z' fill='%23ffffff' stroke='url(%23l)' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2, default;
+}
+[data-theme="lumen"] button,
+[data-theme="lumen"] a,
+[data-theme="lumen"] select,
+[data-theme="lumen"] label,
+[data-theme="lumen"] summary,
+[data-theme="lumen"] [role="button"],
+[data-theme="lumen"] [role="tab"],
+[data-theme="lumen"] [role="checkbox"],
+[data-theme="lumen"] .swatch,
+[data-theme="lumen"] .nav-item,
+[data-theme="lumen"] .ai-chip,
+[data-theme="lumen"] [style*="cursor: pointer"] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='11' fill='%234f6bff' fill-opacity='0.08' stroke='%234f6bff' stroke-width='1.8'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%2300c2ff'/%3E%3C/svg%3E") 16 16, pointer !important;
+}
+
+/* Top bar: frosted glass with a light glint running along its edge. */
+/* backdrop-filter gives the bar its own stacking layer, so it needs a
+   z-index or its dropdowns (the account menu) end up under the page. */
+[data-theme="lumen"] #topbar {
+  position: relative;
+  z-index: 30;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border-bottom-color: transparent;
+}
+[data-theme="lumen"] #topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background:
+    linear-gradient(90deg, transparent, #4f6bff, #00c2ff, transparent) -30% 0 / 30% 100% no-repeat,
+    var(--border);
+  pointer-events: none;
+  animation: lumen-glint 5s ease-in-out infinite;
+}
+[data-theme="lumen"] .topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+}
+[data-theme="lumen"] .topbar-title::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--holo);
+  animation: lumen-ping 2.4s ease-out infinite;
+}
+
+/* Sidebar. */
+[data-theme="lumen"] #sidebar {
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-right-color: var(--border);
+}
+[data-theme="lumen"] .logo {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+[data-theme="lumen"] .logo span { font-style: normal; }
+[data-theme="lumen"] .logo-dot {
+  background: var(--holo);
+}
+[data-theme="lumen"] .nav-item {
+  position: relative;
+  font-weight: 500;
+}
+[data-theme="lumen"] .nav-item.active {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+[data-theme="lumen"] .nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(#4f6bff, #00c2ff);
+}
+
+/* Banners: a holographic orb, slow orbit rings and a faint grid floor. */
+[data-theme="lumen"] .ai-hero {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='120' viewBox='0 0 800 120' preserveAspectRatio='none'%3E%3Cg stroke='%234f6bff' stroke-opacity='0.14' stroke-width='1' vector-effect='non-scaling-stroke'%3E%3Cline x1='400' y1='0' x2='-440' y2='120'/%3E%3Cline x1='400' y1='0' x2='-370' y2='120'/%3E%3Cline x1='400' y1='0' x2='-300' y2='120'/%3E%3Cline x1='400' y1='0' x2='-230' y2='120'/%3E%3Cline x1='400' y1='0' x2='-160' y2='120'/%3E%3Cline x1='400' y1='0' x2='-90' y2='120'/%3E%3Cline x1='400' y1='0' x2='-20' y2='120'/%3E%3Cline x1='400' y1='0' x2='50' y2='120'/%3E%3Cline x1='400' y1='0' x2='120' y2='120'/%3E%3Cline x1='400' y1='0' x2='190' y2='120'/%3E%3Cline x1='400' y1='0' x2='260' y2='120'/%3E%3Cline x1='400' y1='0' x2='330' y2='120'/%3E%3Cline x1='400' y1='0' x2='400' y2='120'/%3E%3Cline x1='400' y1='0' x2='470' y2='120'/%3E%3Cline x1='400' y1='0' x2='540' y2='120'/%3E%3Cline x1='400' y1='0' x2='610' y2='120'/%3E%3Cline x1='400' y1='0' x2='680' y2='120'/%3E%3Cline x1='400' y1='0' x2='750' y2='120'/%3E%3Cline x1='400' y1='0' x2='820' y2='120'/%3E%3Cline x1='400' y1='0' x2='890' y2='120'/%3E%3Cline x1='400' y1='0' x2='960' y2='120'/%3E%3Cline x1='400' y1='0' x2='1030' y2='120'/%3E%3Cline x1='400' y1='0' x2='1100' y2='120'/%3E%3Cline x1='400' y1='0' x2='1170' y2='120'/%3E%3Cline x1='400' y1='0' x2='1240' y2='120'/%3E%3Cline x1='0' y1='0.0' x2='800' y2='0.0'/%3E%3Cline x1='0' y1='4.1' x2='800' y2='4.1'/%3E%3Cline x1='0' y1='9.5' x2='800' y2='9.5'/%3E%3Cline x1='0' y1='16.9' x2='800' y2='16.9'/%3E%3Cline x1='0' y1='26.9' x2='800' y2='26.9'/%3E%3Cline x1='0' y1='40.3' x2='800' y2='40.3'/%3E%3Cline x1='0' y1='58.5' x2='800' y2='58.5'/%3E%3Cline x1='0' y1='83.0' x2='800' y2='83.0'/%3E%3Cline x1='0' y1='116.1' x2='800' y2='116.1'/%3E%3C/g%3E%3C/svg%3E") bottom center / 100% 60% no-repeat,
+    linear-gradient(135deg, #ffffff 0%, #eef3ff 55%, #f6efff 100%);
+  border-bottom-color: var(--border);
+  isolation: isolate;
+}
+[data-theme="lumen"] .ai-hero::before {
+  top: 50%;
+  left: auto;
+  right: 11%;
+  width: 120px;
+  height: 120px;
+  margin-top: -60px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #b388ff, #00c2ff, #4f6bff, #ff9ad5, #b388ff);
+  filter: blur(16px);
+  opacity: 0.75;
+  z-index: -1;
+  animation: lumen-orb 10s linear infinite;
+}
+[data-theme="lumen"] .ai-hero::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(11% - 70px);
+  width: 260px;
+  height: 130px;
+  margin-top: -65px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='130' viewBox='0 0 260 130'%3E%3Cg fill='none' stroke-width='1'%3E%3Cellipse cx='130' cy='65' rx='120' ry='34' stroke='%234f6bff' stroke-opacity='0.35'/%3E%3Cellipse cx='130' cy='65' rx='92' ry='52' stroke='%2300c2ff' stroke-opacity='0.3' transform='rotate(-18 130 65)'/%3E%3Cellipse cx='130' cy='65' rx='64' ry='60' stroke='%23b388ff' stroke-opacity='0.35' transform='rotate(30 130 65)'/%3E%3C/g%3E%3Ccircle cx='250' cy='65' r='3.5' fill='%234f6bff'/%3E%3Ccircle cx='60' cy='30' r='2.5' fill='%2300c2ff'/%3E%3Ccircle cx='160' cy='124' r='2.5' fill='%23b388ff'/%3E%3C/svg%3E") center / contain no-repeat;
+  z-index: -1;
+  pointer-events: none;
+  animation: lumen-orbit 30s linear infinite;
+}
+[data-theme="lumen"] .ai-hero-title {
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, #0f1724 40%, #4f6bff 70%, #00a8e8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Cards: frosted glass that lifts with a holographic edge on hover. */
+[data-theme="lumen"] .planner-card {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-color: rgba(219, 226, 236, 0.9);
+  box-shadow: var(--shadow);
+}
+[data-theme="lumen"] .planner-card:hover {
+  border-color: transparent;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)) padding-box,
+    var(--holo) border-box;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+[data-theme="lumen"] .planner-card-header {
+  border-bottom-color: rgba(219, 226, 236, 0.7);
+}
+
+/* Buttons, fields and the journal. */
+[data-theme="lumen"] .btn-primary,
+[data-theme="lumen"] .ai-send-btn {
+  background: linear-gradient(90deg, #4f6bff, #00a8e8);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(79, 107, 255, 0.3);
+}
+[data-theme="lumen"] .btn-primary:hover,
+[data-theme="lumen"] .ai-send-btn:hover {
+  background: linear-gradient(90deg, #3d58f0, #0096d6);
+}
+[data-theme="lumen"] .btn-ghost {
+  background: rgba(255, 255, 255, 0.8);
+}
+[data-theme="lumen"] .btn-ai {
+  background: var(--holo);
+  background-size: 200% 100%;
+  color: #fff;
+  animation: lumen-holo 6s linear infinite;
+}
+[data-theme="lumen"] input:focus,
+[data-theme="lumen"] textarea:focus,
+[data-theme="lumen"] select:focus {
+  outline: none;
+  border-color: #4f6bff !important;
+  box-shadow: 0 0 0 3px rgba(79, 107, 255, 0.15);
+}
+[data-theme="lumen"] .editor-toolbar,
+[data-theme="lumen"] .entry-list,
+[data-theme="lumen"] .entry-list-header {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+/* Same reason as the top bar: keep the formatting toolbar's pop-ups above
+   the entry below it. */
+[data-theme="lumen"] .editor-toolbar {
+  position: relative;
+  z-index: 20;
+}
+[data-theme="lumen"] .empty-icon {
+  opacity: 1;
+  color: var(--accent);
+  animation: lumen-orbit 12s linear infinite;
+}
+[data-theme="lumen"] .empty-title {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Both themes: text fields keep the text cursor, disabled controls show
+   not-allowed, drag handles grab. */
+[data-theme="partylights"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+[data-theme="partylights"] textarea,
+[data-theme="partylights"] [contenteditable="true"],
+[data-theme="partylights"] [contenteditable="true"] *,
+[data-theme="lumen"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+[data-theme="lumen"] textarea,
+[data-theme="lumen"] [contenteditable="true"],
+[data-theme="lumen"] [contenteditable="true"] * {
+  cursor: text !important;
+}
+[data-theme="partylights"] button:disabled,
+[data-theme="partylights"] [aria-disabled="true"],
+[data-theme="lumen"] button:disabled,
+[data-theme="lumen"] [aria-disabled="true"] {
+  cursor: not-allowed !important;
+}
+[data-theme="partylights"] .planner-sortable .planner-card-header,
+[data-theme="partylights"] .planner-drag-grip,
+[data-theme="lumen"] .planner-sortable .planner-card-header,
+[data-theme="lumen"] .planner-drag-grip {
+  cursor: grab !important;
+}
+
+/* Swatches. */
+.swatch[data-t="partylights"] {
+  background: conic-gradient(#ff3cac, #ffe53b, #3cff9e, #2bd2ff, #a855f7, #ff3cac);
+  box-shadow: 0 0 8px rgba(255, 60, 172, 0.55);
+}
+.swatch[data-t="lumen"] {
+  background: linear-gradient(135deg, #ffffff 0%, #dfe7ff 45%, #b388ff 75%, #00c2ff 100%);
+  box-shadow: 0 0 0 1px #dbe2ec inset;
+}
+
+/* Animations. */
+@keyframes party-chase {
+  0% { background-position-x: 0; }
+  50% { background-position-x: 22.5px; }
+}
+@keyframes party-hue {
+  to { filter: hue-rotate(360deg); }
+}
+@keyframes party-rainbow {
+  to { background-position: -300% 0; }
+}
+@keyframes party-sway {
+  from { transform: rotate(-6deg); }
+  to { transform: rotate(6deg); }
+}
+@keyframes party-sweep {
+  from { transform: rotate(-7deg); }
+  to { transform: rotate(7deg); }
+}
+@keyframes party-eq {
+  to { background-position: -160px 100%, 0 0; }
+}
+@keyframes party-bounce {
+  to { transform: translateY(-8px) scale(1.06); }
+}
+@keyframes lumen-glint {
+  0%, 20% { background-position: -30% 0, 0 0; }
+  80%, 100% { background-position: 130% 0, 0 0; }
+}
+@keyframes lumen-ping {
+  0% { box-shadow: 0 0 0 0 rgba(79, 107, 255, 0.5); }
+  100% { box-shadow: 0 0 0 10px rgba(79, 107, 255, 0); }
+}
+@keyframes lumen-orb {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@keyframes lumen-orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes lumen-holo {
+  to { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="partylights"] *,
+  [data-theme="partylights"] *::before,
+  [data-theme="partylights"] *::after,
+  [data-theme="lumen"] *,
+  [data-theme="lumen"] *::before,
+  [data-theme="lumen"] *::after {
     animation: none !important;
   }
 }

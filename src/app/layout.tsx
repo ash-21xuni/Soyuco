@@ -14,7 +14,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Caveat:wght@400;600&family=Space+Grotesk:wght@300;400;600&family=Syne:wght@400;700;800&family=EB+Garamond:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@300;400&family=Bangers&family=Pacifico&family=Press+Start+2P&family=Satisfy&family=Fredoka+One&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Caveat:wght@400;600&family=Space+Grotesk:wght@300;400;600&family=Syne:wght@400;700;800&family=EB+Garamond:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@300;400&family=Bangers&family=Pacifico&family=Press+Start+2P&family=Satisfy&family=Fredoka+One&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Righteous&family=Sora:wght@300;400;600;700&family=Manrope:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>

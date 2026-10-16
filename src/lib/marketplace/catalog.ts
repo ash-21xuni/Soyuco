@@ -50,6 +50,8 @@ export type ThemeListing = {
   themeId?: ThemeId;
   /** Placeholder listings stand in for themes that aren't designed yet. */
   placeholder?: boolean;
+  /** Overrides the tier's price for this theme. */
+  price?: number;
 };
 
 const PLACEHOLDER_PREVIEW: ThemePreview = {
@@ -78,7 +80,7 @@ export const CATALOG: ThemeListing[] = [
   {
     id: "sunny-reef",
     name: "Sunny Reef",
-    tier: "enhanced",
+    tier: "pro",
     themeId: "spongebob",
     description: "Bright, bubbly and cheerful. An underwater day out for your journal.",
     features: ["Sunshine palette", "Playful display font", "Underwater banner with rising bubbles", "Rolling waves in the top bar", "Fish cursor with bubble trail", "Reef-themed copy & quotes"],
@@ -94,7 +96,8 @@ export const CATALOG: ThemeListing[] = [
   {
     id: "queen-bee",
     name: "Queen Bee",
-    tier: "enhanced",
+    tier: "pro",
+    price: 500,
     themeId: "meangirls",
     description: "Pink, polished and unapologetically confident.",
     features: ["Pink palette", "Script display font", "Glossy banner with twinkling sparkles", "Shimmering top bar", "Heart cursor with sparkle trail", "Glam headings & quotes"],
@@ -110,7 +113,7 @@ export const CATALOG: ThemeListing[] = [
   {
     id: "pixel-quarry",
     name: "Pixel Quarry",
-    tier: "signature",
+    tier: "pro",
     themeId: "minecraft",
     description: "Blocky, retro and built for questing through your day.",
     features: ["Pixel font", "Bevelled block UI", "Pixel sky, clouds & ground banner", "Grass-block top bar", "Pickaxe cursor with block-break trail", "Quest-style copy"],
@@ -146,6 +149,53 @@ export const CATALOG: ThemeListing[] = [
       radius: 2,
     },
   },
+  {
+    id: "afterglow",
+    name: "Afterglow",
+    tier: "pro",
+    themeId: "partylights",
+    description: "Neon party lights, a spinning disco ball and confetti that follows your every move.",
+    features: [
+      "Multicolour neon palette",
+      "Retro party display font",
+      "Twinkling string lights in the top bar",
+      "Disco ball, stage beams & equalizer banner",
+      "Disco-ball cursor with confetti trail & fireworks",
+      "Party copy & quotes",
+    ],
+    preview: {
+      bg: "#0a0612",
+      panel: "#120a1f",
+      surface: "#1a0f2c",
+      text: "#fff4fd",
+      accent: "#ff3cac",
+      radius: 14,
+    },
+  },
+  {
+    id: "lumen",
+    name: "Lumen",
+    tier: "pro",
+    price: 500,
+    themeId: "lumen",
+    description: "Bright, clean and futuristic. Frosted glass, soft holographic light and quiet motion.",
+    features: [
+      "Crisp white & iridescent palette",
+      "Modern geometric fonts",
+      "Frosted-glass panels",
+      "Holographic orb & orbit-ring banner",
+      "Minimal ring cursor with light-ribbon trail",
+      "Calm, focused copy & quotes",
+    ],
+    preview: {
+      bg: "#f6f8fb",
+      panel: "#eef2f7",
+      surface: "#ffffff",
+      text: "#0f1724",
+      accent: "#4f6bff",
+      radius: 14,
+    },
+  },
   placeholder(1, "essential"),
   placeholder(2, "essential"),
   placeholder(3, "enhanced"),
@@ -153,6 +203,19 @@ export const CATALOG: ThemeListing[] = [
   placeholder(5, "signature"),
   placeholder(6, "signature"),
 ];
+
+/** What a theme costs: its own price if it has one, otherwise its tier's. */
+export function listingPrice(listing: ThemeListing) {
+  return listing.price ?? TIERS[listing.tier].price;
+}
+
+/** The cheapest real theme in a tier, and whether others in it cost more. */
+export function tierPricing(tier: Tier) {
+  const prices = CATALOG.filter((l) => l.tier === tier && !l.placeholder).map(listingPrice);
+  if (!prices.length) return { from: TIERS[tier].price, varies: false };
+  const from = Math.min(...prices);
+  return { from, varies: prices.some((p) => p !== from) };
+}
 
 export type CoinPack = {
   id: string;

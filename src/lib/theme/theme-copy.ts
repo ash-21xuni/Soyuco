@@ -77,6 +77,26 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     quote: "Signal from the Net",
     aiTitle: "Netrunner AI Planner",
   },
+  // Afterglow.
+  partylights: {
+    empty: "music",
+    emptyTitle: "The night is young. Start writing!",
+    schedule: "Tonight's Lineup",
+    tasks: "Setlist",
+    habits: "Good Vibes",
+    quote: "Spin of the Day",
+    aiTitle: "AI Party Planner",
+  },
+  // Lumen.
+  lumen: {
+    empty: "orbit",
+    emptyTitle: "A clean slate. Begin.",
+    schedule: "Timeline",
+    tasks: "Objectives",
+    habits: "Routines",
+    quote: "Insight",
+    aiTitle: "Lumen AI Planner",
+  },
 };
 
 export type Quote = { text: string; author: string };
@@ -121,10 +141,26 @@ export const NEON_DISTRICT_QUOTES: Quote[] = [
   { text: "In a city that never sleeps, your journal is the one quiet signal.", author: "Neon District" },
 ];
 
+export const AFTERGLOW_QUOTES: Quote[] = [
+  { text: "Turn it up. Today deserves a soundtrack.", author: "Afterglow" },
+  { text: "Dance like the lights are on you, because they are.", author: "Afterglow" },
+  { text: "Good vibes are a habit. Practise daily.", author: "Afterglow" },
+  { text: "Every great night starts with one bright idea.", author: "Afterglow" },
+];
+
+export const LUMEN_QUOTES: Quote[] = [
+  { text: "Clarity is the ultimate upgrade.", author: "Lumen" },
+  { text: "Design your day like the future depends on it.", author: "Lumen" },
+  { text: "Less noise. More signal.", author: "Lumen" },
+  { text: "The best way to predict the future is to write it.", author: "Lumen" },
+];
+
 export function quotePoolForTheme(theme: ThemeId): Quote[] {
   if (theme === "spongebob") return REEF_QUOTES;
   if (theme === "meangirls") return QUEEN_BEE_QUOTES;
   if (theme === "minecraft") return PIXEL_QUARRY_QUOTES;
   if (theme === "cyberpunk") return NEON_DISTRICT_QUOTES;
+  if (theme === "partylights") return AFTERGLOW_QUOTES;
+  if (theme === "lumen") return LUMEN_QUOTES;
   return QUOTES;
 }

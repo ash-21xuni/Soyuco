@@ -9,17 +9,20 @@
 --                       payment has been confirmed.
 
 -- Prices live in the database so the browser can't choose what it pays.
--- Keep these in step with TIERS / COIN_PACKS in src/lib/marketplace/catalog.ts.
+-- Keep these in step with CATALOG / TIERS / COIN_PACKS in
+-- src/lib/marketplace/catalog.ts (a theme's own price overrides its tier's).
 create table if not exists public.premium_themes (
   theme_id text primary key,
   price integer not null check (price > 0)
 );
 
 insert into public.premium_themes (theme_id, price) values
-  ('spongebob', 400),
-  ('meangirls', 400),
-  ('minecraft', 500),
-  ('cyberpunk', 750)
+  ('spongebob', 750),
+  ('meangirls', 500),
+  ('minecraft', 750),
+  ('cyberpunk', 750),
+  ('partylights', 750),
+  ('lumen', 500)
 on conflict (theme_id) do update set price = excluded.price;
 
 create table if not exists public.coin_packs (

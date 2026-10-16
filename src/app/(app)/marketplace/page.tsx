@@ -11,6 +11,8 @@ import {
   TIERS,
   TIER_ORDER,
   formatCoins,
+  listingPrice,
+  tierPricing,
   type ThemeListing,
   type ThemePreview,
   type Tier,
@@ -80,6 +82,7 @@ function ThemeCard({
   const [buying, setBuying] = useState(false);
   const cardRef = useRef<HTMLElement>(null);
   const tier = TIERS[listing.tier];
+  const price = listingPrice(listing);
   const active = listing.themeId !== undefined && savedTheme === listing.themeId;
   const isPreviewing =
     listing.themeId !== undefined && previewing === listing.themeId;
@@ -91,7 +94,7 @@ function ThemeCard({
     }
   }, [highlighted]);
   // Until the balance loads, offer Unlock; the server has the final say anyway.
-  const affordable = !loaded || balance >= tier.price;
+  const affordable = !loaded || balance >= price;
 
   async function confirmPurchase() {
     setConfirmOpen(false);
@@ -119,7 +122,7 @@ function ThemeCard({
       <div className="market-card-body">
         <div className="market-card-head">
           <h3 className="market-card-name">{listing.name}</h3>
-          <CoinAmount coins={tier.price} className="market-price" />
+          <CoinAmount coins={price} className="market-price" />
         </div>
         <div className="market-card-meta">
           <span className={`market-tier market-tier-${listing.tier}`}>
@@ -191,7 +194,7 @@ function ThemeCard({
                   disabled={buying}
                   onClick={() => setConfirmOpen(true)}
                 >
-                  {buying ? "Unlocking…" : <>Unlock <CoinAmount coins={tier.price} /></>}
+                  {buying ? "Unlocking…" : <>Unlock <CoinAmount coins={price} /></>}
                 </button>
               ) : (
                 <button
@@ -208,7 +211,7 @@ function ThemeCard({
       <ConfirmModal
         open={confirmOpen}
         title={`Unlock ${listing.name}?`}
-        message={`This spends ${formatCoins(tier.price)} Soyucoins. You'll have ${formatCoins(Math.max(0, balance - tier.price))} left, and the theme is yours to keep.`}
+        message={`This spends ${formatCoins(price)} Soyucoins. You'll have ${formatCoins(Math.max(0, balance - price))} left, and the theme is yours to keep.`}
         confirmLabel="Unlock"
         tone="primary"
         onCancel={() => setConfirmOpen(false)}
@@ -249,7 +252,7 @@ function Marketplace() {
       CATALOG.filter((l) => filter === "all" || l.tier === filter).sort(
         (a, b) =>
           Number(!!a.placeholder) - Number(!!b.placeholder) ||
-          TIERS[a.tier].price - TIERS[b.tier].price,
+          listingPrice(a) - listingPrice(b),
       ),
     [filter],
   );
@@ -287,11 +290,10 @@ function Marketplace() {
                   <span className="market-tier-card-name">
                     {TIERS[t].label}
                   </span>
-                  <CoinAmount
-                    coins={TIERS[t].price}
-                    size={18}
-                    className="market-tier-card-price"
-                  />
+                  <span className="market-tier-card-price">
+                    {tierPricing(t).varies && <span className="market-tier-card-from">from</span>}
+                    <CoinAmount coins={tierPricing(t).from} size={18} />
+                  </span>
                 </div>
                 <ul className="market-features">
                   {TIERS[t].includes.map((f) => (
@@ -318,7 +320,7 @@ function Marketplace() {
               >
                 {f === "all"
                   ? "All themes"
-                  : `${TIERS[f].label} · ${formatCoins(TIERS[f].price)} coins`}
+                  : `${TIERS[f].label} · ${tierPricing(f).varies ? "from " : ""}${formatCoins(tierPricing(f).from)} coins`}
               </button>
             ))}
           </div>
