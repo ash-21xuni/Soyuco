@@ -45,6 +45,7 @@ export default function AiPlannerPage() {
   const [messages, setMessages] = useState<AiMessage[]>([]);
   const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const dayLabel = plannerDay.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
   function fillChip(text: string) {
     setPrompt(text);
@@ -110,14 +111,12 @@ export default function AiPlannerPage() {
     }
   }
 
-  function applyPlan(idx: number) {
-    const msg = messages[idx];
-    if (msg?.role !== "assistant" || !msg.plan) return;
-
+  // Adds the suggestions picked on a plan card to the planner's current day.
+  function applyPlan(items: PlanItem[]) {
     const dayKey = plannerDay.toDateString();
     const existing = eventsForDay(events, dayKey);
     const baseId = Date.now();
-    msg.plan.forEach((item, i) => {
+    items.forEach((item, i) => {
       const title = item.title + (item.note ? ` — ${item.note}` : "");
       const start = fromMinutes(item.hour * 60);
       // Re-applying the same plan shouldn't stack duplicate blocks.
@@ -139,15 +138,14 @@ export default function AiPlannerPage() {
       });
     });
 
-    const workItems = msg.plan.filter((i) => i.category === "work" || i.category === "focus");
+    const workItems = items.filter((i) => i.category === "work" || i.category === "focus");
     workItems.forEach((item) => {
       if (!tasksForDay(todos, dayKey).some((t) => t.text === item.title)) {
         addTodo(item.title, "med");
       }
     });
 
-    showToast(`Plan applied! ${msg.plan.length} events added to your Day Planner for ${dayKey}.`, "success");
-    router.push("/planner");
+    showToast(`Added ${items.length} item${items.length === 1 ? "" : "s"} to your Day Planner for ${dayLabel}.`, "success");
   }
 
   return (
@@ -188,7 +186,14 @@ export default function AiPlannerPage() {
         </div>
         <div className="page-body">
           <AiInsights hasMessages={messages.length > 0} />
-          <AiThread messages={messages} sending={sending} onRegenerate={regeneratePlan} onApply={applyPlan} />
+          <AiThread
+            messages={messages}
+            sending={sending}
+            dayLabel={dayLabel}
+            onRegenerate={regeneratePlan}
+            onApply={applyPlan}
+            onOpenPlanner={() => router.push("/planner")}
+          />
         </div>
       </div>
     </div>

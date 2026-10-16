@@ -2164,17 +2164,189 @@ option {
   margin: 16px 0;
   box-shadow: 0 4px 24px var(--ai-glow);
 }
+.ai-plan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 14px;
+}
+.ai-plan-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.ai-plan-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text3);
+}
+.ai-plan-link {
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text2);
+  transition: all var(--transition);
+}
+.ai-plan-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Each suggestion is a checkbox row. */
 .ai-plan-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 10px 14px;
   margin-bottom: 6px;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
 }
 .ai-plan-item:hover {
   border-color: var(--accent);
-  transform: translateX(4px);
+  opacity: 1;
+}
+.ai-plan-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.ai-plan-item.is-selected {
+  opacity: 1;
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg2));
+}
+.ai-plan-item.is-added {
+  cursor: default;
+  opacity: 0.7;
+  border-style: dashed;
+  background: var(--bg2);
+}
+.ai-plan-item.is-added:hover { border-color: var(--border); }
+.ai-plan-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--bg);
+  transition: all 0.2s ease;
+}
+.ai-plan-item.is-selected .ai-plan-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.ai-plan-item.is-added .ai-plan-check {
+  background: var(--success);
+  border-color: var(--success);
+}
+.ai-plan-time {
+  flex-shrink: 0;
+  width: 44px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent2);
+}
+.ai-plan-event {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.ai-plan-event-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.ai-plan-event-note {
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  color: var(--text3);
+  line-height: 1.4;
+}
+.ai-plan-tag,
+.ai-plan-added {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  --tag: var(--accent);
+  color: var(--tag);
+  background: color-mix(in srgb, var(--tag) 14%, transparent);
+}
+.ai-plan-tag.health { --tag: var(--success); }
+.ai-plan-tag.personal { --tag: var(--accent2); }
+.ai-plan-tag.focus { --tag: var(--danger); }
+.ai-plan-added {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  --tag: var(--success);
+}
+.ai-plan-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.ai-plan-day {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text3);
+}
+.ai-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+.ai-plan-actions .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+@media (max-width: 560px) {
+  .ai-plan-card { padding: 14px; }
+  .ai-plan-item { flex-wrap: wrap; }
+  .ai-plan-event { flex-basis: calc(100% - 100px); }
+  .ai-plan-actions { width: 100%; }
+  .ai-plan-actions .btn { flex: 1; justify-content: center; }
 }
 @media (max-width: 768px) {
   .ai-insights-grid { flex-wrap: wrap; }

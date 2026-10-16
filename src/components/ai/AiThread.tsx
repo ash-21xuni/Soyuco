@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { AiMessage } from "@/lib/ai/types";
+import type { AiMessage, PlanItem } from "@/lib/ai/types";
 import { FormattedAiText } from "./FormattedAiText";
 import { PlanCard } from "./PlanCard";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
@@ -9,13 +9,17 @@ import { SettingsIcon } from "@/components/settings/SettingsIcon";
 export function AiThread({
   messages,
   sending,
+  dayLabel,
   onRegenerate,
   onApply,
+  onOpenPlanner,
 }: {
   messages: AiMessage[];
   sending: boolean;
+  dayLabel: string;
   onRegenerate: (idx: number) => void;
-  onApply: (idx: number) => void;
+  onApply: (items: PlanItem[]) => void;
+  onOpenPlanner: () => void;
 }) {
   const threadRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +49,16 @@ export function AiThread({
                 <div className="ai-timestamp">{msg.time}</div>
               </div>
             </div>
-            {msg.plan && <PlanCard plan={msg.plan} onRegenerate={() => onRegenerate(i)} onApply={() => onApply(i)} />}
+            {msg.plan && (
+              <PlanCard
+                plan={msg.plan}
+                dayLabel={dayLabel}
+                regenerating={sending}
+                onRegenerate={() => onRegenerate(i)}
+                onApply={onApply}
+                onOpenPlanner={onOpenPlanner}
+              />
+            )}
           </div>
         ),
       )}
