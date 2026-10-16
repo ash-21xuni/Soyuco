@@ -14,7 +14,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Caveat:wght@400;600&family=Space+Grotesk:wght@300;400;600&family=Syne:wght@400;700;800&family=EB+Garamond:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@300;400&family=Bangers&family=Pacifico&family=Press+Start+2P&family=Satisfy&family=Fredoka+One&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Righteous&family=Sora:wght@300;400;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Caveat:wght@400;600&family=Space+Grotesk:wght@300;400;600&family=Syne:wght@400;700;800&family=EB+Garamond:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@300;400&family=Bangers&family=Pacifico&family=Press+Start+2P&family=Satisfy&family=Fredoka+One&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Righteous&family=Sora:wght@300;400;600;700&family=Manrope:wght@400;500;600;700&family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Work+Sans:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Quicksand:wght@400;500;600;700&family=Bitter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Josefin+Sans:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap"
           rel="stylesheet"
         />
       </head>

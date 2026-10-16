@@ -77,6 +77,44 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     quote: "Signal from the Net",
     aiTitle: "Netrunner AI Planner",
   },
+  matcha: { ...DEFAULT_COPY, empty: "leaf" },
+  midnight: { ...DEFAULT_COPY, empty: "feather" },
+  sakura: {
+    empty: "flower",
+    emptyTitle: "Let a new page bloom",
+    schedule: "Today's Blossoms",
+    tasks: "To Tend",
+    habits: "Daily Rituals",
+    quote: "Petal of Wisdom",
+    aiTitle: "Blossom AI Planner",
+  },
+  cafe: {
+    empty: "coffee",
+    emptyTitle: "Pour a fresh page",
+    schedule: "Today's Menu",
+    tasks: "Orders Up",
+    habits: "The Daily Grind",
+    quote: "Barista's Note",
+    aiTitle: "Café AI Planner",
+  },
+  starlight: {
+    empty: "sparkles",
+    emptyTitle: "Make a wish. Start writing.",
+    schedule: "Star Chart",
+    tasks: "Missions",
+    habits: "Orbits",
+    quote: "Word from the Stars",
+    aiTitle: "Starlight AI Planner",
+  },
+  academia: {
+    empty: "bookOpen",
+    emptyTitle: "Dip the quill and begin",
+    schedule: "Lectures & Hours",
+    tasks: "Assignments",
+    habits: "Disciplines",
+    quote: "From the Archives",
+    aiTitle: "Archivist AI Planner",
+  },
   // Afterglow.
   partylights: {
     empty: "music",
@@ -141,6 +179,34 @@ export const NEON_DISTRICT_QUOTES: Quote[] = [
   { text: "In a city that never sleeps, your journal is the one quiet signal.", author: "Neon District" },
 ];
 
+export const SAKURA_QUOTES: Quote[] = [
+  { text: "Blossoms don't rush, and still they bloom on time.", author: "Sakura" },
+  { text: "Every season of your life has its own beauty.", author: "Sakura" },
+  { text: "Let small, gentle things fill your page today.", author: "Sakura" },
+  { text: "Petals fall so new buds have room to grow.", author: "Sakura" },
+];
+
+export const COFFEEHOUSE_QUOTES: Quote[] = [
+  { text: "First coffee, then conquer the day.", author: "Coffeehouse" },
+  { text: "Life happens. Coffee helps. Writing makes sense of it.", author: "Coffeehouse" },
+  { text: "Good ideas are best served warm.", author: "Coffeehouse" },
+  { text: "Slow sips, clear thoughts.", author: "Coffeehouse" },
+];
+
+export const STARLIGHT_QUOTES: Quote[] = [
+  { text: "Aim for the stars and write down the route.", author: "Starlight" },
+  { text: "Even the brightest star started as dust.", author: "Starlight" },
+  { text: "Your story is a constellation. Connect the dots.", author: "Starlight" },
+  { text: "Look up. There's always more sky.", author: "Starlight" },
+];
+
+export const OLD_LIBRARY_QUOTES: Quote[] = [
+  { text: "A well-kept journal is a library of one.", author: "The Archivist" },
+  { text: "Read widely, write daily, think deeply.", author: "The Archivist" },
+  { text: "Every great work began as a humble first draft.", author: "The Archivist" },
+  { text: "Knowledge kept is knowledge gained twice.", author: "The Archivist" },
+];
+
 export const AFTERGLOW_QUOTES: Quote[] = [
   { text: "Turn it up. Today deserves a soundtrack.", author: "Afterglow" },
   { text: "Dance like the lights are on you, because they are.", author: "Afterglow" },
@@ -161,6 +227,10 @@ export function quotePoolForTheme(theme: ThemeId): Quote[] {
   if (theme === "minecraft") return PIXEL_QUARRY_QUOTES;
   if (theme === "cyberpunk") return NEON_DISTRICT_QUOTES;
   if (theme === "partylights") return AFTERGLOW_QUOTES;
+  if (theme === "sakura") return SAKURA_QUOTES;
+  if (theme === "cafe") return COFFEEHOUSE_QUOTES;
+  if (theme === "starlight") return STARLIGHT_QUOTES;
+  if (theme === "academia") return OLD_LIBRARY_QUOTES;
   if (theme === "lumen") return LUMEN_QUOTES;
   return QUOTES;
 }

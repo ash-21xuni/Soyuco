@@ -9,7 +9,7 @@ import { OwnedThemesModal } from "@/components/modals/OwnedThemesModal";
 import { useJournal } from "@/lib/journal/journal-context";
 import { usePlanner } from "@/lib/planner/planner-context";
 import { THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
-import { PremiumSwatches } from "@/components/PremiumSwatches";
+import { PaidSwatches } from "@/components/PaidSwatches";
 import { useToast } from "@/lib/toast/toast-context";
 import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
 import { useCollapsed } from "@/lib/useCollapsed";
@@ -231,6 +231,7 @@ export function Sidebar() {
                 onClick={() => setTheme(t.id as ThemeId)}
               />
             ))}
+            <PaidSwatches group="regular" />
           </div>
 
           <div className="premium-label">
@@ -249,7 +250,9 @@ export function Sidebar() {
               <SettingsIcon name="shoppingBag" size={14} />
             </Link>
           </div>
-          <PremiumSwatches />
+          <div className="theme-swatches">
+            <PaidSwatches group="pro" />
+          </div>
 
           <button
             className="custom-theme-btn"

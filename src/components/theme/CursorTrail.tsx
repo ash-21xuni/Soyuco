@@ -206,7 +206,33 @@ const LUMEN: Effect = {
   },
 };
 
+// Signature themes keep it simpler than Pro: no trail while moving, just a
+// small burst where you click.
+const noTrail = () => {};
+
+// Starlight: a burst of twinkling stars.
+const STARDUST: Effect = {
+  blend: "lighter",
+  move: noTrail,
+  click(x, y, add) {
+    add({ shape: "ring", x, y, life: 22, max: 22, size: 24, glow: 10, color: "#9d7bff" });
+    burst(x, y, 10, [1, 2.6], (vx, vy) => ({ shape: "star", x, y, vx, vy, life: 36, max: 36, size: rand(3, 6), glow: 8, phase: rand(0, 6), color: pick(["#ffd27a", "#ffffff", "#ff9de2", "#9d7bff"]) }), add);
+  },
+};
+
+// Old Library: a puff of gold dust, like a page catching the candlelight.
+const GOLD_DUST: Effect = {
+  blend: "lighter",
+  move: noTrail,
+  click(x, y, add) {
+    add({ shape: "ring", x, y, life: 20, max: 20, size: 20, glow: 6, color: "#d1b072" });
+    burst(x, y, 14, [0.6, 2], (vx, vy) => ({ shape: "circle", x, y, vx, vy: vy - 0.4, gravity: 0.03, life: 40, max: 40, size: rand(0.8, 1.8), glow: 6, color: pick(["#d1b072", "#f0d9a0", "#b08d57"]) }), add);
+  },
+};
+
 export const CURSOR_EFFECTS: Partial<Record<ThemeId, Effect>> = {
+  starlight: STARDUST,
+  academia: GOLD_DUST,
   cyberpunk: NEON,
   partylights: PARTY,
   lumen: LUMEN,

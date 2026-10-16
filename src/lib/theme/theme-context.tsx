@@ -27,6 +27,12 @@ export const PREMIUM_THEMES = [
   { id: "cyberpunk", title: "Neon District" },
   { id: "partylights", title: "Afterglow" },
   { id: "lumen", title: "Lumen" },
+  { id: "matcha", title: "Matcha" },
+  { id: "midnight", title: "Midnight Ink" },
+  { id: "sakura", title: "Sakura" },
+  { id: "cafe", title: "Coffeehouse" },
+  { id: "starlight", title: "Starlight" },
+  { id: "academia", title: "Old Library" },
 ] as const;
 
 export type ThemeId =

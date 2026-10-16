@@ -22,7 +22,13 @@ insert into public.premium_themes (theme_id, price) values
   ('minecraft', 750),
   ('cyberpunk', 750),
   ('partylights', 750),
-  ('lumen', 500)
+  ('lumen', 500),
+  ('matcha', 300),
+  ('midnight', 300),
+  ('sakura', 400),
+  ('cafe', 400),
+  ('starlight', 500),
+  ('academia', 500)
 on conflict (theme_id) do update set price = excluded.price;
 
 create table if not exists public.coin_packs (

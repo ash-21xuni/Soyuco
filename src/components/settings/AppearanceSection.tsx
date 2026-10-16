@@ -1,7 +1,7 @@
 "use client";
 
 import { THEMES, useTheme, type ThemeId } from "@/lib/theme/theme-context";
-import { PremiumSwatches } from "@/components/PremiumSwatches";
+import { PaidSwatches } from "@/components/PaidSwatches";
 import { useToast } from "@/lib/toast/toast-context";
 import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
 
@@ -28,13 +28,16 @@ export function AppearanceSection() {
               onClick={() => setTheme(t.id as ThemeId)}
             />
           ))}
+          <PaidSwatches group="regular" />
         </div>
 
         <div className="premium-label" style={{ marginTop: 16 }}>
           <span className="premium-crown"><SettingsIcon name="crown" size={13} /></span> Premium
           <span className="premium-badge">PRO</span>
         </div>
-        <PremiumSwatches />
+        <div className="theme-swatches">
+          <PaidSwatches group="pro" />
+        </div>
 
         <button
           className="custom-theme-btn"

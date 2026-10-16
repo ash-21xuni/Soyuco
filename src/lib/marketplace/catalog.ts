@@ -54,28 +54,6 @@ export type ThemeListing = {
   price?: number;
 };
 
-const PLACEHOLDER_PREVIEW: ThemePreview = {
-  bg: "#2a2a2a",
-  panel: "#333333",
-  surface: "#3d3d3d",
-  text: "#8a8a8a",
-  accent: "#6a6a6a",
-  radius: 6,
-};
-
-function placeholder(n: number, tier: Tier): ThemeListing {
-  const num = String(n).padStart(2, "0");
-  return {
-    id: `placeholder-${num}`,
-    name: `Theme ${num}`,
-    tier,
-    description: "Placeholder listing. Theme name, artwork and details coming soon.",
-    features: TIERS[tier].includes.filter((f) => !f.startsWith("Everything")),
-    preview: PLACEHOLDER_PREVIEW,
-    placeholder: true,
-  };
-}
-
 export const CATALOG: ThemeListing[] = [
   {
     id: "sunny-reef",
@@ -196,13 +174,80 @@ export const CATALOG: ThemeListing[] = [
       radius: 14,
     },
   },
-  placeholder(1, "essential"),
-  placeholder(2, "essential"),
-  placeholder(3, "enhanced"),
-  placeholder(4, "enhanced"),
-  placeholder(5, "signature"),
-  placeholder(6, "signature"),
+  {
+    id: "matcha",
+    name: "Matcha",
+    tier: "essential",
+    themeId: "matcha",
+    description: "Soft sage and warm cream. Calm, fresh and easy on the eyes.",
+    features: ["Sage & cream palette", "DM Serif & DM Sans pairing"],
+    preview: { bg: "#f4f1e8", panel: "#ebe6d6", surface: "#faf8f1", text: "#2b3326", accent: "#6b8f47", radius: 8 },
+  },
+  {
+    id: "midnight-ink",
+    name: "Midnight Ink",
+    tier: "essential",
+    themeId: "midnight",
+    description: "Deep navy with silvery blue. Made for late-night writing.",
+    features: ["Navy & silver palette", "Lora & Work Sans pairing"],
+    preview: { bg: "#0b1020", panel: "#111829", surface: "#1a2340", text: "#e6ebf5", accent: "#7aa2ff", radius: 6 },
+  },
+  {
+    id: "sakura",
+    name: "Sakura",
+    tier: "enhanced",
+    themeId: "sakura",
+    description: "Cherry blossom pinks with petals drifting across the page.",
+    features: ["Blossom palette", "Cormorant & Quicksand pairing", "Petal pattern", "Blossom-themed headings & quotes"],
+    preview: { bg: "#fff7f8", panel: "#fdeef1", surface: "#ffffff", text: "#3d2a30", accent: "#e0748f", radius: 12 },
+  },
+  {
+    id: "coffeehouse",
+    name: "Coffeehouse",
+    tier: "enhanced",
+    themeId: "cafe",
+    description: "Warm latte tones for slow mornings and a good brew.",
+    features: ["Latte palette", "Bitter & Nunito pairing", "Coffee bean pattern", "Café-themed headings & quotes"],
+    preview: { bg: "#f5ece1", panel: "#ecdfcf", surface: "#fbf5ee", text: "#3b2a1e", accent: "#8b5a3c", radius: 6 },
+  },
+  {
+    id: "starlight",
+    name: "Starlight",
+    tier: "signature",
+    themeId: "starlight",
+    description: "A deep-space night sky with a ringed planet and twinkling stars.",
+    features: [
+      "Night-sky palette",
+      "Rounded cosmic shapes",
+      "Star pattern",
+      "Planet & moon banner",
+      "Star cursor with a stardust burst on click",
+      "Celestial copy & quotes",
+    ],
+    preview: { bg: "#0c0a1f", panel: "#13102b", surface: "#1d1945", text: "#f1eeff", accent: "#9d7bff", radius: 12 },
+  },
+  {
+    id: "old-library",
+    name: "Old Library",
+    tier: "signature",
+    themeId: "academia",
+    description: "Leather, brass and candlelight. Dark academia for serious study.",
+    features: [
+      "Leather & brass palette",
+      "Old-style serif fonts",
+      "Lattice pattern",
+      "Bookshelf banner with candle glow",
+      "Quill cursor with a gold-dust burst on click",
+      "Scholarly copy & quotes",
+    ],
+    preview: { bg: "#1a1410", panel: "#221a14", surface: "#2a2018", text: "#efe4d0", accent: "#b08d57", radius: 2 },
+  },
 ];
+
+/** Whether a theme is in the Pro tier. */
+export function isProTheme(themeId: ThemeId) {
+  return CATALOG.some((l) => l.themeId === themeId && l.tier === "pro");
+}
 
 /** What a theme costs: its own price if it has one, otherwise its tier's. */
 export function listingPrice(listing: ThemeListing) {
