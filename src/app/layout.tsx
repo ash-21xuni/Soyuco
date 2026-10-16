@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { AuthProvider } from "@/lib/supabase/auth-context";
 import { SplashProvider } from "@/components/splash/SplashProvider";
 import "./themes.css";
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AuthProvider>
           <SplashProvider>{children}</SplashProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );

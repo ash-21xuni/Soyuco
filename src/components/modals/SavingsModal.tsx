@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
 import type { Goal } from "@/lib/budget/budget-context";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { useCurrency } from "@/lib/budget/currency";
 
 export function SavingsModal({
   open,
@@ -17,6 +18,7 @@ export function SavingsModal({
   onApply: (amount: number, isAdd: boolean) => void;
 }) {
   const [amount, setAmount] = useState("");
+  const { money, symbol } = useCurrency();
 
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -52,7 +54,7 @@ export function SavingsModal({
         </div>
         <div style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
           <div style={{ fontFamily: "var(--font-ui)", fontSize: "0.78rem", color: "var(--text2)" }}>
-            Currently saved: <span style={{ fontFamily: "var(--font-mono)", color: "var(--accent2)" }}>${goal.saved.toFixed(2)}</span>
+            Currently saved: <span style={{ fontFamily: "var(--font-mono)", color: "var(--accent2)" }}>{money(goal.saved)}</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             <label
@@ -65,7 +67,7 @@ export function SavingsModal({
                 letterSpacing: "0.08em",
               }}
             >
-              Amount ($)
+              Amount ({symbol})
             </label>
             <input
               type="number"

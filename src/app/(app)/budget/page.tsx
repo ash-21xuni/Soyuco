@@ -1,9 +1,7 @@
+import { MonthNav } from "@/components/budget/MonthNav";
 import { SummaryStrip } from "@/components/budget/SummaryStrip";
 import { TrendChart } from "@/components/budget/TrendChart";
-import { TransactionList } from "@/components/budget/TransactionList";
-import { CategoryBreakdown } from "@/components/budget/CategoryBreakdown";
-import { SavingsGoals } from "@/components/budget/SavingsGoals";
-import { BudgetLimits } from "@/components/budget/BudgetLimits";
+import { BudgetBoard } from "@/components/budget/BudgetBoard";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
 
 export default function BudgetPage() {
@@ -16,22 +14,14 @@ export default function BudgetPage() {
             <SettingsIcon name="wallet" size={22} /> Budget Planner
           </div>
           <div className="ai-hero-sub">
-            Track your income, expenses, and savings goals — all in one place.
+            Track your income, expenses, and savings goals. Recurring bills, pay and auto-saves log themselves.
           </div>
         </div>
         <div className="page-body">
+          <MonthNav />
           <SummaryStrip />
           <TrendChart />
-          <div className="planner-grid">
-            <div className="planner-col">
-              <TransactionList />
-            </div>
-            <div className="planner-col">
-              <CategoryBreakdown />
-              <SavingsGoals />
-              <BudgetLimits />
-            </div>
-          </div>
+          <BudgetBoard />
         </div>
       </div>
     </div>

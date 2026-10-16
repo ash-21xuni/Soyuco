@@ -2,20 +2,34 @@
 
 import { useState } from "react";
 import { useBudget, type Goal } from "@/lib/budget/budget-context";
+import { monthKey, monthLabel, shiftMonth, todayStr } from "@/lib/budget/recurring";
 import { GoalModal } from "@/components/modals/GoalModal";
 import { SavingsModal } from "@/components/modals/SavingsModal";
 import { SettingsCardTitle, SettingsIcon } from "@/components/settings/SettingsIcon";
+import { useCurrency } from "@/lib/budget/currency";
+
+// When a goal on auto-save will be reached. This month's amount has already
+// gone in, so the remaining months start from next month.
+function finishMonth(g: Goal) {
+  const months = Math.ceil((g.target - g.saved) / g.monthly);
+  return monthLabel(shiftMonth(g.lastContribution ?? monthKey(todayStr()), months));
+}
 
 export function SavingsGoals() {
-  const { goals, addGoal, deleteGoal, applySavings } = useBudget();
+  const { goals, addGoal, updateGoal, deleteGoal, applySavings } = useBudget();
   const [goalModalOpen, setGoalModalOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const { money } = useCurrency();
   const [savingsGoal, setSavingsGoal] = useState<Goal | null>(null);
 
   return (
     <div className="planner-card">
       <div className="planner-card-header">
         <SettingsCardTitle icon="piggyBank">Savings Goals</SettingsCardTitle>
-        <button className="btn btn-ghost" style={{ fontSize: "0.68rem", padding: "3px 8px" }} onClick={() => setGoalModalOpen(true)}>
+        <button className="btn btn-ghost" style={{ fontSize: "0.68rem", padding: "3px 8px" }} onClick={() => {
+            setEditingGoal(null);
+            setGoalModalOpen(true);
+          }}>
           + Goal
         </button>
       </div>
@@ -41,8 +55,15 @@ export function SavingsGoals() {
                   </span>
                   <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", color: "var(--accent2)" }}>{pct}%</span>
-                    <button onClick={() => deleteGoal(g.id)} style={{ fontSize: "0.65rem", color: "var(--text3)", background: "none", border: "none", cursor: "pointer" }} aria-label="Delete goal">
-                      <SettingsIcon name="close" size={12} />
+                    <button
+                      onClick={() => {
+                        setEditingGoal(g);
+                        setGoalModalOpen(true);
+                      }}
+                      style={{ fontSize: "0.65rem", color: "var(--text3)", background: "none", border: "none", cursor: "pointer" }}
+                      aria-label={`Edit ${g.name}`}
+                    >
+                      <SettingsIcon name="pencil" size={12} />
                     </button>
                   </span>
                 </div>
@@ -51,7 +72,7 @@ export function SavingsGoals() {
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 2 }}>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text3)" }}>
-                    ${g.saved.toFixed(2)} of ${g.target.toFixed(2)}
+                    {money(g.saved)} of {money(g.target)}
                   </span>
                   <button
                     onClick={() => setSavingsGoal(g)}
@@ -69,6 +90,11 @@ export function SavingsGoals() {
                     ± Add / Remove
                   </button>
                 </div>
+                {g.monthly > 0 && !isComplete && (
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.6rem", color: "var(--text3)", display: "flex", alignItems: "center", gap: 5 }}>
+                    <SettingsIcon name="repeat" size={11} /> {money(g.monthly, true)}/mo auto-save · reached by {finishMonth(g)}
+                  </div>
+                )}
               </div>
             );
           })
@@ -77,11 +103,21 @@ export function SavingsGoals() {
 
       <GoalModal
         open={goalModalOpen}
+        editing={editingGoal}
         onCancel={() => setGoalModalOpen(false)}
-        onSave={(fields) => {
-          addGoal(fields);
+        onSave={({ saved, ...fields }) => {
+          if (editingGoal) updateGoal(editingGoal.id, fields);
+          else addGoal({ ...fields, saved });
           setGoalModalOpen(false);
         }}
+        onDelete={
+          editingGoal
+            ? () => {
+                deleteGoal(editingGoal.id);
+                setGoalModalOpen(false);
+              }
+            : undefined
+        }
       />
       <SavingsModal
         open={savingsGoal !== null}

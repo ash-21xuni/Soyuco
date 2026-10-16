@@ -31,6 +31,12 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  // supabase.auth.updateUser() edits the current session's user in place and
+  // reports the same object, so setSession alone wouldn't re-render. Bumping
+  // this lets settings saved to user_metadata (currency, layouts) show up
+  // straight away, while `user` keeps its identity so effects keyed on it
+  // don't reload everything.
+  const [revision, setRevision] = useState(0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -42,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
+      setRevision((r) => r + 1);
     });
 
     return () => subscription.unsubscribe();
@@ -81,7 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: null };
       },
     }),
-    [session, loading],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- revision marks in-place user updates
+    [session, loading, revision],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

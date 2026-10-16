@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ProfileSection } from "@/components/settings/ProfileSection";
 import { PasswordSection } from "@/components/settings/PasswordSection";
 import { AppearanceSection } from "@/components/settings/AppearanceSection";
+import { CurrencySection } from "@/components/settings/CurrencySection";
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { DangerZoneSection } from "@/components/settings/DangerZoneSection";
 import { HelpSection } from "@/components/settings/HelpSection";
@@ -95,7 +96,12 @@ export default function SettingsPage() {
                 <DangerZoneSection />
               </>
             )}
-            {tab === "preferences" && <AppearanceSection />}
+            {tab === "preferences" && (
+              <>
+                <AppearanceSection />
+                <CurrencySection />
+              </>
+            )}
             {tab === "notifications" && <NotificationsSection />}
             {tab === "help" && <HelpSection />}
           </div>

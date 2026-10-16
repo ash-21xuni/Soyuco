@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useBudget } from "@/lib/budget/budget-context";
 import { SettingsCardTitle } from "@/components/settings/SettingsIcon";
+import { useCurrency } from "@/lib/budget/currency";
 
 type Bucket = { label: string; total: number; dateStr?: string; key?: string };
 type Range = 7 | 30 | 365;
@@ -20,6 +21,7 @@ const MS_DAY = 86400000;
 export function TrendChart() {
   const { transactions } = useBudget();
   const [range, setRange] = useState<Range>(7);
+  const { money } = useCurrency();
 
   const buckets = useMemo<Bucket[]>(() => {
     const now = new Date();
@@ -83,7 +85,7 @@ export function TrendChart() {
     ? `${linePath} L${pts[pts.length - 1].x.toFixed(1)},${(PAD_T + CHART_H).toFixed(1)} L${pts[0].x.toFixed(1)},${(PAD_T + CHART_H).toFixed(1)} Z`
     : "";
 
-  const yTicks = [0, 0.5, 1].map((frac) => ({ y: PAD_T + CHART_H - frac * CHART_H, val: (frac * maxVal).toFixed(0) }));
+  const yTicks = [0, 0.5, 1].map((frac) => ({ y: PAD_T + CHART_H - frac * CHART_H, val: frac * maxVal }));
 
   return (
     <div className="planner-card" style={{ marginBottom: 20 }}>
@@ -117,7 +119,7 @@ export function TrendChart() {
               ))}
               {yTicks.map((t, i) => (
                 <text key={i} x={PAD_L - 5} y={t.y + 4} fontFamily="var(--font-mono)" fontSize={9} fill="var(--text3)" textAnchor="end">
-                  ${t.val}
+                  {money(t.val, true)}
                 </text>
               ))}
               {pts
@@ -141,7 +143,7 @@ export function TrendChart() {
                 .filter((p) => p.total > 0)
                 .map((p, i) => (
                   <circle key={i} cx={p.x} cy={p.y} r={3} fill="var(--accent)" stroke="var(--bg2)" strokeWidth={1.5}>
-                    <title>${p.total.toFixed(2)}</title>
+                    <title>{money(p.total)}</title>
                   </circle>
                 ))}
             </svg>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useEscapeToClose } from "@/lib/useEscapeToClose";
 import type { Category } from "@/lib/budget/budget-context";
 import { SettingsIcon } from "@/components/settings/SettingsIcon";
+import { useCurrency } from "@/lib/budget/currency";
 
 const LIMIT_CATEGORY_OPTIONS: { value: Category; label: string }[] = [
   { value: "food", label: "Food & Dining" },
@@ -45,6 +46,7 @@ export function LimitModal({
 }) {
   const [cat, setCat] = useState<Category>("food");
   const [amount, setAmount] = useState("");
+  const { symbol } = useCurrency();
 
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -90,7 +92,7 @@ export function LimitModal({
             </select>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-            <label style={fieldLabel}>Monthly Limit ($)</label>
+            <label style={fieldLabel}>Monthly Limit ({symbol})</label>
             <input type="number" min={0} step={1} placeholder="500" value={amount} onChange={(e) => setAmount(e.target.value)} style={fieldInput} />
           </div>
         </div>
