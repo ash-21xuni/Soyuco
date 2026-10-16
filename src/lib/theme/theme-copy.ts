@@ -67,6 +67,16 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     quote: "WISDOM SCROLL",
     aiTitle: "AI QUEST MASTER",
   },
+  // Neon District.
+  cyberpunk: {
+    empty: "cpu",
+    emptyTitle: "> JACK IN. START WRITING_",
+    schedule: "Run Schedule",
+    tasks: "Active Jobs",
+    habits: "Daily Upgrades",
+    quote: "Signal from the Net",
+    aiTitle: "Netrunner AI Planner",
+  },
 };
 
 export type Quote = { text: string; author: string };
@@ -104,9 +114,17 @@ export const PIXEL_QUARRY_QUOTES: Quote[] = [
   { text: "BUILD YOUR DAY BLOCK BY BLOCK.", author: "Quarry Wisdom" },
 ];
 
+export const NEON_DISTRICT_QUOTES: Quote[] = [
+  { text: "The future is already here. Write it down before it reboots.", author: "Neon District" },
+  { text: "Every great run starts with a plan and a little static.", author: "Neon District" },
+  { text: "Upgrade your mind. The rest is just chrome.", author: "Neon District" },
+  { text: "In a city that never sleeps, your journal is the one quiet signal.", author: "Neon District" },
+];
+
 export function quotePoolForTheme(theme: ThemeId): Quote[] {
   if (theme === "spongebob") return REEF_QUOTES;
   if (theme === "meangirls") return QUEEN_BEE_QUOTES;
   if (theme === "minecraft") return PIXEL_QUARRY_QUOTES;
+  if (theme === "cyberpunk") return NEON_DISTRICT_QUOTES;
   return QUOTES;
 }

@@ -18,7 +18,8 @@ create table if not exists public.premium_themes (
 insert into public.premium_themes (theme_id, price) values
   ('spongebob', 400),
   ('meangirls', 400),
-  ('minecraft', 500)
+  ('minecraft', 500),
+  ('cyberpunk', 750)
 on conflict (theme_id) do update set price = excluded.price;
 
 create table if not exists public.coin_packs (

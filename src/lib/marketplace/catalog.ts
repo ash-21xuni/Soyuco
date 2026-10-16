@@ -1,9 +1,10 @@
 import type { ThemeId } from "@/lib/theme/theme-context";
 
-export type Tier = "essential" | "enhanced" | "signature";
+export type Tier = "essential" | "enhanced" | "signature" | "pro";
 
 // Price (in Soyucoins) scales with how much a theme changes: colours only,
-// then pattern and themed copy, then bespoke effects.
+// then pattern and themed copy, then bespoke effects, then Pro themes with
+// animated graphics and interactive cursor effects.
 export const TIERS: Record<Tier, { label: string; price: number; includes: string[] }> = {
   essential: {
     label: "Essential",
@@ -20,9 +21,14 @@ export const TIERS: Record<Tier, { label: string; price: number; includes: strin
     price: 500,
     includes: ["Everything in Enhanced", "Custom cursor & shapes", "Special effects"],
   },
+  pro: {
+    label: "Pro",
+    price: 750,
+    includes: ["Everything in Signature", "Animated scenes & graphics", "Interactive cursor trail"],
+  },
 };
 
-export const TIER_ORDER: Tier[] = ["essential", "enhanced", "signature"];
+export const TIER_ORDER: Tier[] = ["essential", "enhanced", "signature", "pro"];
 
 export type ThemePreview = {
   bg: string;
@@ -75,7 +81,7 @@ export const CATALOG: ThemeListing[] = [
     tier: "enhanced",
     themeId: "spongebob",
     description: "Bright, bubbly and cheerful. An underwater day out for your journal.",
-    features: ["Sunshine palette", "Playful display font", "Bubble pattern", "Reef-themed copy & quotes"],
+    features: ["Sunshine palette", "Playful display font", "Underwater banner with rising bubbles", "Rolling waves in the top bar", "Fish cursor with bubble trail", "Reef-themed copy & quotes"],
     preview: {
       bg: "#fff7b0",
       panel: "#ffe97a",
@@ -91,7 +97,7 @@ export const CATALOG: ThemeListing[] = [
     tier: "enhanced",
     themeId: "meangirls",
     description: "Pink, polished and unapologetically confident.",
-    features: ["Pink palette", "Script display font", "Sparkle pattern", "Glam headings & quotes"],
+    features: ["Pink palette", "Script display font", "Glossy banner with twinkling sparkles", "Shimmering top bar", "Heart cursor with sparkle trail", "Glam headings & quotes"],
     preview: {
       bg: "#fff0f5",
       panel: "#ffe0ee",
@@ -107,7 +113,7 @@ export const CATALOG: ThemeListing[] = [
     tier: "signature",
     themeId: "minecraft",
     description: "Blocky, retro and built for questing through your day.",
-    features: ["Pixel font", "Square-cornered UI", "Block pattern", "Custom cursor", "Quest-style copy"],
+    features: ["Pixel font", "Bevelled block UI", "Pixel sky, clouds & ground banner", "Grass-block top bar", "Pickaxe cursor with block-break trail", "Quest-style copy"],
     preview: {
       bg: "#1a1a1a",
       panel: "#2d2d2d",
@@ -115,6 +121,29 @@ export const CATALOG: ThemeListing[] = [
       text: "#f5f5f0",
       accent: "#55cc22",
       radius: 0,
+    },
+  },
+  {
+    id: "neon-district",
+    name: "Neon District",
+    tier: "pro",
+    themeId: "cyberpunk",
+    description: "Rain-slick neon, a glowing skyline and a cursor that throws sparks wherever it goes.",
+    features: [
+      "Neon pink & cyan palette",
+      "Futuristic HUD fonts",
+      "Animated city skyline & neon grid",
+      "Glitch headings & scanlines",
+      "Neon cursor with spark trail",
+      "Cyberpunk copy & quotes",
+    ],
+    preview: {
+      bg: "#07060d",
+      panel: "#0d0b1a",
+      surface: "#1a1638",
+      text: "#e8f7ff",
+      accent: "#ff2a6d",
+      radius: 2,
     },
   },
   placeholder(1, "essential"),

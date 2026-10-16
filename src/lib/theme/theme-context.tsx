@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { CURSOR_EFFECTS, CursorTrail } from "@/components/theme/CursorTrail";
 
 export const THEMES = [
   { id: "default", title: "Ember" },
@@ -23,6 +24,7 @@ export const PREMIUM_THEMES = [
   { id: "spongebob", title: "Sunny Reef" },
   { id: "meangirls", title: "Queen Bee" },
   { id: "minecraft", title: "Pixel Quarry" },
+  { id: "cyberpunk", title: "Neon District" },
 ] as const;
 
 export type ThemeId =
@@ -80,7 +82,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     [theme, savedTheme, previewing],
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>
+      {children}
+      {/* Premium themes' cursor effects; marketplace previews get them too. */}
+      {CURSOR_EFFECTS[theme] && <CursorTrail key={theme} effect={CURSOR_EFFECTS[theme]} />}
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {
