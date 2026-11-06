@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase/client";
+import { fetchStorageUsage } from "@/lib/storage/storage";
 
 // Journal images live in a private bucket (see supabase/sql/journal_images.sql).
 // Entries store only the storage path; a fresh signed link is fetched to show
@@ -27,6 +28,11 @@ export async function uploadJournalImage(
   }
   if (file.size > MAX_BYTES) {
     return { error: "Images must be 10 MB or smaller." };
+  }
+  // Skipped if usage can't be measured, so an outage doesn't block uploads.
+  const usage = await fetchStorageUsage();
+  if (!("error" in usage) && usage.used + file.size > usage.quota) {
+    return { error: "You're out of storage. Add more in Settings → Profile → Storage." };
   }
   const path = `${userId}/${crypto.randomUUID()}.${EXTENSIONS[file.type]}`;
   const { error } = await supabase.storage

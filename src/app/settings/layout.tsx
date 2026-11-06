@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/lib/theme/theme-context";
 import { ToastProvider } from "@/lib/toast/toast-context";
 import { WalletProvider } from "@/lib/wallet/wallet-context";
 import { useSplash } from "@/components/splash/SplashProvider";
+import { BuyCoinsModal } from "@/components/modals/BuyCoinsModal";
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -24,7 +25,11 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider>
+          {children}
+          {/* Opened from the storage popup when the user needs more coins. */}
+          <BuyCoinsModal />
+        </WalletProvider>
       </ToastProvider>
     </ThemeProvider>
   );

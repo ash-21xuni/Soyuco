@@ -9,6 +9,7 @@ import { CurrencySection } from "@/components/settings/CurrencySection";
 import { NotificationsSection } from "@/components/settings/NotificationsSection";
 import { DangerZoneSection } from "@/components/settings/DangerZoneSection";
 import { HelpSection } from "@/components/settings/HelpSection";
+import { StorageSection } from "@/components/settings/StorageSection";
 import { SettingsIcon, type SettingsIconName } from "@/components/settings/SettingsIcon";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 
@@ -92,6 +93,7 @@ export default function SettingsPage() {
             {tab === "profile" && (
               <>
                 <ProfileSection />
+                <StorageSection />
                 <PasswordSection />
                 <DangerZoneSection />
               </>

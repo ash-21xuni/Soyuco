@@ -27,6 +27,8 @@ type WalletContextValue = {
   loaded: boolean;
   buyCoins: (packId: string) => Promise<Result>;
   buyTheme: (themeId: ThemeId) => Promise<Result>;
+  /** Spends coins on extra storage (see supabase/sql/storage_quota.sql). */
+  buyStorage: (packId: string) => Promise<Result>;
   ownsTheme: (themeId: ThemeId) => boolean;
   /** The "Buy Soyucoins" popup, opened from the account menu or the marketplace. */
   buyCoinsOpen: boolean;
@@ -102,6 +104,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     return { ok: true };
   }, []);
 
+  const buyStorage = useCallback(async (packId: string): Promise<Result> => {
+    const { data, error } = await supabase.rpc("buy_storage", { p_pack_id: packId });
+    if (error) return { ok: false, error: error.message };
+    setBalance(data as number);
+    return { ok: true };
+  }, []);
+
   const value = useMemo<WalletContextValue>(
     () => ({
       balance,
@@ -109,11 +118,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       loaded,
       buyCoins,
       buyTheme,
+      buyStorage,
       ownsTheme: (themeId) => ownedThemes.includes(themeId),
       buyCoinsOpen,
       setBuyCoinsOpen,
     }),
-    [balance, ownedThemes, loaded, buyCoins, buyTheme, buyCoinsOpen],
+    [balance, ownedThemes, loaded, buyCoins, buyTheme, buyStorage, buyCoinsOpen],
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
